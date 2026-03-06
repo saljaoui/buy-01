@@ -278,3 +278,126 @@ The platform supports:
 - Product management
 - Media uploads
 - Responsive frontend UI
+
+
+
+my routes 
+```
+import { Routes } from '@angular/router';
+import { AuthGuard } from './core/guards/auth.guard';
+import { RoleGuard } from './core/guards/role.guard';
+
+export const routes: Routes = [
+  // default
+  {
+    path: '',
+    redirectTo: 'products',
+    pathMatch: 'full',
+  },
+
+  // auth
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./features/auth/login/login.component').then(m => m.LoginComponent),
+  },
+  {
+    path: 'register',
+    loadComponent: () =>
+      import('./features/auth/register/register.component').then(m => m.RegisterComponent),
+  },
+
+  // public product pages
+  {
+    path: 'products',
+    loadComponent: () =>
+      import('./features/products/product-list/product-list.component').then(
+        m => m.ProductListComponent
+      ),
+  },
+  {
+    path: 'products/:id',
+    loadComponent: () =>
+      import('./features/products/product-details/product-details.component').then(
+        m => m.ProductDetailsComponent
+      ),
+  },
+
+  // logged-in user profile
+  {
+    path: 'me',
+    canActivate: [AuthGuard],
+    loadComponent: () =>
+      import('./features/profile/profile.component').then(m => m.ProfileComponent),
+  },
+
+  // seller dashboard
+  {
+    path: 'seller',
+    canActivate: [AuthGuard, RoleGuard],
+    data: { role: 'SELLER' },
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/seller/dashboard/dashboard.component').then(
+            m => m.DashboardComponent
+          ),
+      },
+      {
+        path: 'products',
+        loadComponent: () =>
+          import('./features/seller/products/seller-products.component').then(
+            m => m.SellerProductsComponent
+          ),
+      },
+      {
+        path: 'products/new',
+        loadComponent: () =>
+          import('./features/seller/products/product-form/product-form.component').then(
+            m => m.ProductFormComponent
+          ),
+      },
+      {
+        path: 'products/:id/edit',
+        loadComponent: () =>
+          import('./features/seller/products/product-form/product-form.component').then(
+            m => m.ProductFormComponent
+          ),
+      },
+      {
+        path: 'media',
+        loadComponent: () =>
+          import('./features/seller/media/media-manager.component').then(
+            m => m.MediaManagerComponent
+          ),
+      },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./features/seller/profile/seller-profile.component').then(
+            m => m.SellerProfileComponent
+          ),
+      },
+    ],
+  },
+
+  // unauthorized page
+  {
+    path: 'unauthorized',
+    loadComponent: () =>
+      import('./shared/pages/unauthorized/unauthorized.component').then(
+        m => m.UnauthorizedComponent
+      ),
+  },
+
+  // 404
+  {
+    path: '**',
+    loadComponent: () =>
+      import('./shared/pages/not-found/not-found.component').then(
+        m => m.NotFoundComponent
+      ),
+  },
+];
+```
