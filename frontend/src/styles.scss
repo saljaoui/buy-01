@@ -1,0 +1,99 @@
+/* =========================
+   Global Design Variables
+========================= */
+
+:root {
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --card: #ffffff;
+  --border: #e2e8f0;
+
+  --primary: #1e40af;
+  --primary-h: #1d4ed8;
+  --accent: #0891b2;
+
+  --success: #16a34a;
+  --danger: #dc2626;
+  --warning: #d97706;
+
+  --text: #0f172a;
+  --muted: #64748b;
+  --sub: #94a3b8;
+}
+
+
+/* =========================
+   Base Layout
+========================= */
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+
+/* =========================
+   Navbar Improvements
+========================= */
+
+.navbar-brand {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+
+/* =========================
+   Cards (Products UI)
+========================= */
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+
+/* =========================
+   Buttons
+========================= */
+
+.btn-primary-custom {
+  background: var(--primary);
+  border: none;
+  color: white;
+}
+
+.btn-primary-custom:hover {
+  background: var(--primary-h);
+}
+
+
+/* =========================
+   Product Grid
+========================= */
+
+.product-card img {
+  height: 200px;
+  object-fit: cover;
+}
+
+
+/* =========================
+   Utility Classes
+========================= */
+
+.text-muted-custom {
+  color: var(--muted);
+}
+
+.bg-surface {
+  background: var(--surface);
+}
+
+.border-soft {
+  border: 1px solid var(--border);
+}
+
+.rounded-xl {
+  border-radius: 14px;
+}
