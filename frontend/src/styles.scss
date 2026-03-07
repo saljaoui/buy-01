@@ -3,97 +3,68 @@
 ========================= */
 
 :root {
-  --bg: #f8fafc;
-  --surface: #ffffff;
-  --card: #ffffff;
-  --border: #e2e8f0;
+  --cream: #f5f0e8;
+  --ink: #1a1a18;
+  --gold: #c8a96e;
+  --gold-lt: #e8d5b0;
+  --muted: #7a7a6e;
+  --card-bg: #ffffff;
 
-  --primary: #1e40af;
-  --primary-h: #1d4ed8;
-  --accent: #0891b2;
+  /* status */
+  --error: #c0392b;
+  --success: #27ae60;
+  --warning: #f39c12;
+  --info: #3498db;
 
-  --success: #16a34a;
-  --danger: #dc2626;
-  --warning: #d97706;
+  /* UI helpers */
+  --border: #e5e0d6;
+  --hover: #f0e9dd;
+  --shadow: rgba(0,0,0,0.08);
 
-  --text: #0f172a;
-  --muted: #64748b;
-  --sub: #94a3b8;
+  /* text variations */
+  --text-muted: #8c8c80;
+  --text-light: #b5b5a8;
 }
 
-
-/* =========================
-   Base Layout
-========================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: 'DM Sans', sans-serif;
+  background-color: var(--cream);
+  min-height: 100vh;
+  overflow: hidden;
 }
-
 
 /* =========================
-   Navbar Improvements
+   Scrollbar Styling
 ========================= */
 
-.navbar-brand {
-  font-weight: 600;
-  letter-spacing: 0.5px;
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  width: 8px;
 }
 
-
-/* =========================
-   Cards (Products UI)
-========================= */
-
-.card {
-  border: 1px solid var(--border);
-  border-radius: 12px;
+::-webkit-scrollbar-track {
+  background: var(--cream);
 }
 
-
-/* =========================
-   Buttons
-========================= */
-
-.btn-primary-custom {
-  background: var(--primary);
-  border: none;
-  color: white;
+::-webkit-scrollbar-thumb {
+  background: var(--gold);
+  border-radius: 10px;
 }
 
-.btn-primary-custom:hover {
-  background: var(--primary-h);
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-lt);
 }
 
-
-/* =========================
-   Product Grid
-========================= */
-
-.product-card img {
-  height: 200px;
-  object-fit: cover;
-}
-
-
-/* =========================
-   Utility Classes
-========================= */
-
-.text-muted-custom {
-  color: var(--muted);
-}
-
-.bg-surface {
-  background: var(--surface);
-}
-
-.border-soft {
-  border: 1px solid var(--border);
-}
-
-.rounded-xl {
-  border-radius: 14px;
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--gold) var(--cream);
 }

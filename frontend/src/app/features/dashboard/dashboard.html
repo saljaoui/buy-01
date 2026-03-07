@@ -1,0 +1,319 @@
+<div class="d-flex">
+
+    <!-- ══ SIDEBAR ══════════════════════════════════ -->
+    <aside class="sidebar">
+        <div class="sidebar-inner">
+
+            <!-- Brand -->
+            <a href="../product-list.html" class="sb-brand">
+                <div class="sb-brand-icon"><i class="bi bi-bag-heart-fill"></i></div>
+                <div>
+                    <span style="font-family:'Playfair Display',serif; font-size:1.3rem; color:#fff;">Buy01</span>
+                    <span class="sb-brand-role">Seller Panel</span>
+                </div>
+            </a>
+
+            <!-- Nav -->
+            <nav class="sb-nav">
+                <div class="sb-section-label">Overview</div>
+                <a href="#" class="sb-link active">
+                    <i class="bi bi-grid-1x2"></i> Dashboard
+                </a>
+                <a href="#" class="sb-link">
+                    <i class="bi bi-bar-chart-line"></i> Analytics
+                </a>
+
+                <div class="sb-section-label">Catalog</div>
+                <a href="#" class="sb-link">
+                    <i class="bi bi-box-seam"></i> Products
+                    <span class="sb-badge">12</span>
+                </a>
+                <a href="#" class="sb-link">
+                    <i class="bi bi-images"></i> Media Library
+                    <span class="sb-badge dot"></span>
+                </a>
+
+                <div class="sb-section-label">Account</div>
+                <a href="#" class="sb-link">
+                    <i class="bi bi-person-circle"></i> Profile
+                </a>
+                <a href="#" class="sb-link">
+                    <i class="bi bi-gear"></i> Settings
+                </a>
+                <a href="../login.html" class="sb-link">
+                    <i class="bi bi-box-arrow-left"></i> Sign Out
+                </a>
+            </nav>
+
+            <!-- Profile snippet -->
+            <div class="sb-profile">
+                <div class="sb-avatar">A</div>
+                <div>
+                    <div class="sb-profile-name">Ada Lovelace</div>
+                    <div class="sb-profile-store">My Awesome Store</div>
+                </div>
+                <button class="sb-profile-action"><i class="bi bi-pencil"></i></button>
+            </div>
+
+        </div>
+    </aside>
+
+    <!-- ══ MAIN ═════════════════════════════════════ -->
+    <div class="main-wrap vh-100 overflow-auto">
+
+        <!-- Top bar -->
+        <header class="topbar">
+            <div>
+                <div class="topbar-title">
+                    Dashboard
+                    <span>Friday, 6 March 2026</span>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="tb-icon-btn">
+                    <i class="bi bi-bell"></i>
+                    <span class="notif-dot"></span>
+                </button>
+                <a href="#" class="tb-btn primary">
+                    <i class="bi bi-plus-lg"></i> New Product
+                </a>
+            </div>
+        </header>
+
+        <!-- Page body -->
+        <div class="page-body">
+
+            <!-- Welcome banner -->
+            <div class="welcome-banner">
+                <div class="wb-text">
+                    <h2>Good morning, <em>Ada</em> 👋</h2>
+                    <p>Here's what's happening with your store today.</p>
+                </div>
+                <div class="wb-actions">
+                    <a href="#" class="btn-wb ghost"><i class="bi bi-images"></i> Media</a>
+                    <a href="#" class="btn-wb gold"><i class="bi bi-plus-lg"></i> Add Product</a>
+                </div>
+            </div>
+
+            <!-- Stat cards -->
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <div class="stat-card-top">
+                        <div class="stat-icon gold"><i class="bi bi-box-seam"></i></div>
+                        <span class="stat-trend up"><i class="bi bi-arrow-up-short"></i> 3</span>
+                    </div>
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Total Products</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-top">
+                        <div class="stat-icon green"><i class="bi bi-check-circle"></i></div>
+                        <span class="stat-trend up"><i class="bi bi-arrow-up-short"></i> 2</span>
+                    </div>
+                    <div class="stat-value">9</div>
+                    <div class="stat-label">Active Listings</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-top">
+                        <div class="stat-icon blue"><i class="bi bi-images"></i></div>
+                        <span class="stat-trend up"><i class="bi bi-arrow-up-short"></i> 5</span>
+                    </div>
+                    <div class="stat-value">34</div>
+                    <div class="stat-label">Media Uploads</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-top">
+                        <div class="stat-icon red"><i class="bi bi-archive"></i></div>
+                        <span class="stat-trend down"><i class="bi bi-arrow-down-short"></i> 1</span>
+                    </div>
+                    <div class="stat-value">3</div>
+                    <div class="stat-label">Drafts</div>
+                </div>
+
+            </div>
+
+            <!-- Lower grid -->
+            <div class="lower-grid">
+
+                <!-- Products table -->
+                <div class="section-card">
+                    <div class="section-card-head">
+                        <div>
+                            <h3>My Products</h3>
+                            <p>Your most recent listings</p>
+                        </div>
+                        <div class="head-action">
+                            <a href="#" class="link-btn">View all <i class="bi bi-arrow-right"></i></a>
+                            <a href="#" class="tb-btn primary" style="padding:.4rem .8rem; font-size:.78rem;">
+                                <i class="bi bi-plus-lg"></i> Add
+                            </a>
+                        </div>
+                    </div>
+
+                    <table class="prod-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Images</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Row 1 -->
+                            <tr>
+                                <td>
+                                    <div class="prod-info">
+                                        <div class="prod-thumb">🎧</div>
+                                        <div>
+                                            <div class="prod-name">Noise-Cancelling Pro Headphones</div>
+                                            <div class="prod-cat">Electronics</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><strong>$149</strong></td>
+                                <td><span class="status-pill active">Active</span></td>
+                                <td><span style="font-size:.82rem; color:var(--text-muted);">4 images</span></td>
+                                <td>
+                                    <div class="row-actions">
+                                        <button class="row-btn"><i class="bi bi-pencil"></i></button>
+                                        <button class="row-btn danger"><i class="bi bi-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Row 2 -->
+                            <tr>
+                                <td>
+                                    <div class="prod-info">
+                                        <div class="prod-thumb">💡</div>
+                                        <div>
+                                            <div class="prod-name">Smart LED Desk Lamp</div>
+                                            <div class="prod-cat">Home & Living</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><strong>$39</strong></td>
+                                <td><span class="status-pill active">Active</span></td>
+                                <td><span style="font-size:.82rem; color:var(--text-muted);">2 images</span></td>
+                                <td>
+                                    <div class="row-actions">
+                                        <button class="row-btn"><i class="bi bi-pencil"></i></button>
+                                        <button class="row-btn danger"><i class="bi bi-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Row 3 -->
+                            <tr>
+                                <td>
+                                    <div class="prod-info">
+                                        <div class="prod-thumb">🕯️</div>
+                                        <div>
+                                            <div class="prod-name">Scented Soy Candle Set</div>
+                                            <div class="prod-cat">Home & Living</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><strong>$28</strong></td>
+                                <td><span class="status-pill draft">Draft</span></td>
+                                <td><span style="font-size:.82rem; color:var(--text-muted);">0 images</span></td>
+                                <td>
+                                    <div class="row-actions">
+                                        <button class="row-btn"><i class="bi bi-pencil"></i></button>
+                                        <button class="row-btn danger"><i class="bi bi-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Row 4 -->
+                            <tr>
+                                <td>
+                                    <div class="prod-info">
+                                        <div class="prod-thumb">🧘</div>
+                                        <div>
+                                            <div class="prod-name">Premium Yoga Mat 6mm</div>
+                                            <div class="prod-cat">Sports</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><strong>$35</strong></td>
+                                <td><span class="status-pill inactive">Inactive</span></td>
+                                <td><span style="font-size:.82rem; color:var(--text-muted);">1 image</span></td>
+                                <td>
+                                    <div class="row-actions">
+                                        <button class="row-btn"><i class="bi bi-pencil"></i></button>
+                                        <button class="row-btn danger"><i class="bi bi-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Activity feed -->
+                <div class="section-card">
+                    <div class="section-card-head">
+                        <div>
+                            <h3>Recent Activity</h3>
+                            <p>Latest updates on your store</p>
+                        </div>
+                    </div>
+                    <div class="activity-list">
+
+                        <div class="activity-item">
+                            <div class="act-icon green"><i class="bi bi-check-lg"></i></div>
+                            <div class="act-text">
+                                <div class="act-title">Product published</div>
+                                <div class="act-sub">Noise-Cancelling Headphones is now live</div>
+                            </div>
+                            <div class="act-time">2h ago</div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="act-icon blue"><i class="bi bi-image"></i></div>
+                            <div class="act-text">
+                                <div class="act-title">Image uploaded</div>
+                                <div class="act-sub">4 images added to Headphones</div>
+                            </div>
+                            <div class="act-time">3h ago</div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="act-icon gold"><i class="bi bi-pencil"></i></div>
+                            <div class="act-text">
+                                <div class="act-title">Product updated</div>
+                                <div class="act-sub">Smart LED Lamp price changed to $39</div>
+                            </div>
+                            <div class="act-time">Yesterday</div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="act-icon red"><i class="bi bi-archive"></i></div>
+                            <div class="act-text">
+                                <div class="act-title">Draft saved</div>
+                                <div class="act-sub">Scented Soy Candle Set saved as draft</div>
+                            </div>
+                            <div class="act-time">Yesterday</div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="act-icon green"><i class="bi bi-person-check"></i></div>
+                            <div class="act-text">
+                                <div class="act-title">Account verified</div>
+                                <div class="act-sub">Your seller account is fully active</div>
+                            </div>
+                            <div class="act-time">2 days ago</div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div><!-- /lower-grid -->
+
+        </div><!-- /page-body -->
+    </div>
+
+</div>
