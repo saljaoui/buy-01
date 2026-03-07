@@ -1,1 +1,244 @@
-<p>product-list works!</p>
+<div class="vh-100 vh-100 overflow-auto">
+    <nav class="navbar-buy">
+        <div class="container">
+            <div class="nav-inner">
+                <a class="nav-brand" href="#">
+                    <div class="nav-brand-icon"><i class="bi bi-bag-heart-fill"></i></div>
+                    <span class="nav-brand-name">Buy01</span>
+                </a>
+
+                <div class="nav-search">
+                    <i class="bi bi-search s-icon"></i>
+                    <input type="text" placeholder="Search products…" />
+                </div>
+
+                <div class="nav-actions">
+                    <a href="login.html" class="nav-btn d-none d-sm-flex">Sign In</a>
+                    <a href="register.html" class="nav-btn primary d-none d-sm-flex">
+                        <i class="bi bi-person-plus"></i> Register
+                    </a>
+                    <button class="cart-btn">
+                        <i class="bi bi-bag"></i>
+                        <span class="cart-badge">3</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ══ HERO ════════════════════════════════════ -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-inner">
+                <div class="hero-copy">
+                    <div class="hero-eyebrow"><span></span> New arrivals this week</div>
+                    <h1>Discover <em>products</em><br>you'll love.</h1>
+                    <p>Shop thousands of items from verified sellers — electronics, fashion, home goods, and more.</p>
+                    <div class="hero-cta">
+                        <a href="#products" class="btn-hero-primary">Shop Now <i class="bi bi-arrow-down"></i></a>
+                        <a href="register.html" class="btn-hero-ghost">Sell with us <i
+                                class="bi bi-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <div class="hero-stats d-none d-lg-flex">
+                    <div>
+                        <div class="h-stat-num">12k+</div>
+                        <div class="h-stat-label">Products</div>
+                    </div>
+                    <div>
+                        <div class="h-stat-num">3.4k</div>
+                        <div class="h-stat-label">Sellers</div>
+                    </div>
+                    <div>
+                        <div class="h-stat-num">98%</div>
+                        <div class="h-stat-label">Satisfied</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══ MAIN ═════════════════════════════════════ -->
+    <main class="container" id="products">
+
+        <!-- Category Pills -->
+        <div class="cats-section">
+            <div class="cat-scroll">
+                <a href="#" class="cat-pill active"><i class="bi bi-grid-fill"></i> All <span
+                        class="cat-count">(48)</span></a>
+                <a href="#" class="cat-pill"><i class="bi bi-cpu"></i> Electronics <span
+                        class="cat-count">(12)</span></a>
+                <a href="#" class="cat-pill"><i class="bi bi-bag-heart"></i> Fashion <span
+                        class="cat-count">(10)</span></a>
+                <a href="#" class="cat-pill"><i class="bi bi-house-heart"></i> Home & Living <span
+                        class="cat-count">(8)</span></a>
+                <a href="#" class="cat-pill"><i class="bi bi-bicycle"></i> Sports <span class="cat-count">(7)</span></a>
+                <a href="#" class="cat-pill"><i class="bi bi-book"></i> Books <span class="cat-count">(6)</span></a>
+                <a href="#" class="cat-pill"><i class="bi bi-stars"></i> Beauty <span class="cat-count">(5)</span></a>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <span class="results-count">Showing <strong>4</strong> products</span>
+                <select class="sort-select">
+                    <option>Newest First</option>
+                    <option>Price: Low → High</option>
+                    <option>Price: High → Low</option>
+                    <option>Top Rated</option>
+                </select>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="view-btn active"><i class="bi bi-grid-3x3-gap"></i></button>
+                <button class="view-btn"><i class="bi bi-list-ul"></i></button>
+            </div>
+        </div>
+
+        <!-- Product Grid — 4 cards -->
+        <div class="product-grid">
+
+            <!-- Card 1: Featured + Sale + Liked -->
+            <div class="p-card">
+                <div class="p-card-img">
+                    <span class="emoji">🎧</span>
+                    <div class="card-badges">
+                        <span class="badge-pill badge-featured">Featured</span>
+                    </div>
+                    <button class="wish-btn liked">
+                        <i class="bi bi-heart-fill"></i>
+                    </button>
+                </div>
+                <div class="p-card-body">
+                    <div class="p-card-seller">
+                        <div class="seller-dot">S</div> SoundWave
+                    </div>
+                    <div class="p-card-name">Noise-Cancelling Pro Headphones</div>
+                    <div class="p-card-stars">
+                        <span class="stars">★★★★★</span>
+                        <span class="rating-count">4.8 (212)</span>
+                    </div>
+                    <div class="p-card-footer">
+                        <div>
+                            <div class="p-price-old">$199</div>
+                            <div class="p-price sale">$149</div>
+                        </div>
+                        <button class="btn-add-cart"><i class="bi bi-bag-plus"></i> Add</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: New badge, not liked -->
+            <div class="p-card">
+                <div class="p-card-img">
+                    <span class="emoji">👜</span>
+                    <div class="card-badges">
+                        <span class="badge-pill badge-new">New</span>
+                    </div>
+                    <button class="wish-btn">
+                        <i class="bi bi-heart"></i>
+                    </button>
+                </div>
+                <div class="p-card-body">
+                    <div class="p-card-seller">
+                        <div class="seller-dot">C</div> CraftHouse
+                    </div>
+                    <div class="p-card-name">Minimalist Leather Wallet</div>
+                    <div class="p-card-stars">
+                        <span class="stars">★★★★☆</span>
+                        <span class="rating-count">4.6 (98)</span>
+                    </div>
+                    <div class="p-card-footer">
+                        <div>
+                            <div class="p-price">$49</div>
+                        </div>
+                        <button class="btn-add-cart"><i class="bi bi-bag-plus"></i> Add</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Sale badge, not liked -->
+            <div class="p-card">
+                <div class="p-card-img">
+                    <span class="emoji">💡</span>
+                    <div class="card-badges">
+                        <span class="badge-pill badge-sale">Sale</span>
+                    </div>
+                    <button class="wish-btn">
+                        <i class="bi bi-heart"></i>
+                    </button>
+                </div>
+                <div class="p-card-body">
+                    <div class="p-card-seller">
+                        <div class="seller-dot">L</div> LumiStore
+                    </div>
+                    <div class="p-card-name">Smart LED Desk Lamp</div>
+                    <div class="p-card-stars">
+                        <span class="stars">★★★★☆</span>
+                        <span class="rating-count">4.5 (134)</span>
+                    </div>
+                    <div class="p-card-footer">
+                        <div>
+                            <div class="p-price-old">$59</div>
+                            <div class="p-price sale">$39</div>
+                        </div>
+                        <button class="btn-add-cart"><i class="bi bi-bag-plus"></i> Add</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: No badge, not liked -->
+            <div class="p-card">
+                <div class="p-card-img">
+                    <span class="emoji">📚</span>
+                    <button class="wish-btn">
+                        <i class="bi bi-heart"></i>
+                    </button>
+                </div>
+                <div class="p-card-body">
+                    <div class="p-card-seller">
+                        <div class="seller-dot">B</div> BookNook
+                    </div>
+                    <div class="p-card-name">The Art of Deep Work</div>
+                    <div class="p-card-stars">
+                        <span class="stars">★★★★★</span>
+                        <span class="rating-count">4.9 (441)</span>
+                    </div>
+                    <div class="p-card-footer">
+                        <div>
+                            <div class="p-price">$18</div>
+                        </div>
+                        <button class="btn-add-cart"><i class="bi bi-bag-plus"></i> Add</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Pagination -->
+        <div class="pag-wrap">
+            <a href="#" class="pag-btn"><i class="bi bi-chevron-left"></i></a>
+            <a href="#" class="pag-btn active">1</a>
+            <a href="#" class="pag-btn">2</a>
+            <a href="#" class="pag-btn">3</a>
+            <a href="#" class="pag-btn"><i class="bi bi-chevron-right"></i></a>
+        </div>
+
+    </main>
+
+    <!-- ══ FOOTER ══════════════════════════════════ -->
+    <footer class="footer-strip">
+        <div class="container">
+            <div class="footer-inner">
+                <div class="footer-brand">Buy<em>01</em> &nbsp;·&nbsp; Your marketplace</div>
+                <div class="footer-links">
+                    <a href="#">About</a>
+                    <a href="#">Terms</a>
+                    <a href="#">Privacy</a>
+                    <a href="#">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>

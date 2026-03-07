@@ -25,4 +25,53 @@ export const routes: Routes = [
         m => m.ProductDetailsComponent
       ),
   },
+{
+    path: 'seller',
+    // canActivate: [AuthGuard, RoleGuard],
+    // data: { role: 'SELLER' },
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/dashboard/dashboard.component').then(
+            m => m.DashboardComponent
+          ),
+      },
+      // {
+      //   path: 'products',
+      //   loadComponent: () =>
+      //     import('./features/seller/products/seller-products.component').then(
+      //       m => m.SellerProductsComponent
+      //     ),
+      // },
+      // {
+      //   path: 'products/new',
+      //   loadComponent: () =>
+      //     import('./features/seller/products/product-form/product-form.component').then(
+      //       m => m.ProductFormComponent
+      //     ),
+      // },
+      // {
+      //   path: 'products/:id/edit',
+      //   loadComponent: () =>
+      //     import('./features/seller/products/product-form/product-form.component').then(
+      //       m => m.ProductFormComponent
+      //     ),
+      // },
+      // {
+      //   path: 'media',
+      //   loadComponent: () =>
+      //     import('./features/seller/media/media-manager.component').then(
+      //       m => m.MediaManagerComponent
+      //     ),
+      // },
+      // {
+      //   path: 'profile',
+      //   loadComponent: () =>
+      //     import('./features/seller/profile/seller-profile.component').then(
+      //       m => m.SellerProfileComponent
+      //     ),
+      // },
+    ],
+  },
 ];
