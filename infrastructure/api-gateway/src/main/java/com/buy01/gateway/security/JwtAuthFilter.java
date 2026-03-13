@@ -62,7 +62,7 @@ public class JwtAuthFilter implements GlobalFilter {
 
     private boolean isPublic(String path, String method) {
         // Auth routes are always public
-        if (path.startsWith("/auth/")) return true;
+        if (path.startsWith("/api/auth/")) return true;
 
         // Public GET routes (anyone can browse products and images)
         if (method.equals("GET") && path.startsWith("/products")) return true;
