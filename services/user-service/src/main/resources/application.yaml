@@ -5,6 +5,9 @@ spring:
   application:
     name: user-service
 
+jwt:
+  secret: 4fd8a6c3b92f4a8c9c6b8a1f2e3d4c5f6a7b8c9d
+
 # Eureka client
 eureka:
   client:
