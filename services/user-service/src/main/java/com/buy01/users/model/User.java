@@ -26,7 +26,7 @@ public class User {
 
     private String password; // BCrypt hashed
 
-    private String role; // "CLIENT" or "SELLER"
+    private Role role; // "CLIENT" or "SELLER"
 
     private String avatarUrl;
 }
