@@ -3,8 +3,7 @@
 <!-- ── Left Panel ── -->
 <div class="left-panel">
     <div class="brand">
-        <div class="brand-icon"><i class="bi bi-bag-heart-fill"></i></div>
-        <span class="brand-name">Buy01</span>
+        <img class="brand-logo" src="/logo.png" alt="Buy01 logo" />
     </div>
 
     <div class="hero-copy">
@@ -44,34 +43,66 @@
 
         <!-- Role Toggle -->
         <div class="role-toggle" id="roleToggle">
-            <button class="role-btn active" data-role="client" onclick="setRole('client', this)">
+            <button
+                type="button"
+                class="role-btn"
+                data-role="client"
+                [class.active]="selectedRole === 'CLIENT'"
+                (click)="selectRole('CLIENT')">
                 <i class="bi bi-person"></i> Client
             </button>
-            <button class="role-btn" data-role="seller" onclick="setRole('seller', this)">
+            <button
+                type="button"
+                class="role-btn"
+                data-role="seller"
+                [class.active]="selectedRole === 'SELLER'"
+                (click)="selectRole('SELLER')">
                 <i class="bi bi-shop"></i> Seller
             </button>
         </div>
 
         <!-- Login Form -->
-        <form id="loginForm" novalidate>
-            <input type="hidden" id="selectedRole" value="client" />
+        <form id="loginForm" novalidate (ngSubmit)="submit()">
+            <input type="hidden" id="selectedRole" [value]="selectedRole" />
 
-            <!-- Email -->
+            <!-- Login -->
             <div class="field-wrap">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" placeholder="you@example.com" autocomplete="email" />
+                <label for="login">Email or Username</label>
+                <input
+                    type="text"
+                    id="login"
+                    name="login"
+                    placeholder="you@example.com"
+                    autocomplete="username"
+                    [(ngModel)]="form.login"
+                    [class.is-invalid]="isLoginInvalid" />
                 <i class="bi bi-envelope input-icon"></i>
-                <div class="err-msg">Please enter a valid email address.</div>
+                <div class="err-msg">Please enter your email or username.</div>
             </div>
 
             <!-- Password -->
             <div class="field-wrap">
                 <label for="password">Password</label>
-                <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" />
+                <input
+                    [type]="passwordInputType"
+                    id="password"
+                    name="password"
+                    placeholder="••••••••"
+                    autocomplete="current-password"
+                    [(ngModel)]="form.password"
+                    [class.is-invalid]="isPasswordInvalid" />
                 <i class="bi bi-lock input-icon"></i>
-                <button type="button" class="pw-toggle" id="pwToggle" onclick="togglePassword()"
+                <button
+                    type="button"
+                    class="pw-toggle"
+                    id="pwToggle"
+                    (click)="togglePasswordVisibility()"
                     aria-label="Toggle password visibility">
-                    <i class="bi bi-eye" id="pwIcon"></i>
+                    <i
+                        class="bi"
+                        id="pwIcon"
+                        [class.bi-eye]="!passwordVisible"
+                        [class.bi-eye-slash]="passwordVisible"></i>
                 </button>
                 <div class="err-msg">Password must be at least 8 characters.</div>
             </div>
@@ -79,13 +110,13 @@
             <!-- Meta row -->
             <div class="meta-row">
                 <label class="remember-label">
-                    <input type="checkbox" id="rememberMe" /> Remember me
+                    <input type="checkbox" id="rememberMe" name="rememberMe" [(ngModel)]="form.rememberMe" /> Remember me
                 </label>
                 <a href="#" class="forgot-link">Forgot password?</a>
             </div>
 
             <!-- Submit -->
-            <button type="button" class="btn-signin" onclick="handleLogin()">
+            <button type="submit" class="btn-signin" [disabled]="isSubmitting">
                 Sign In &nbsp;<i class="bi bi-arrow-right"></i>
             </button>
         </form>
@@ -118,15 +149,15 @@
         </div>
 
         <div class="signup-link">
-            Don't have an account? <a href="register.html">Create one</a>
+            Don't have an account? <a routerLink="/register">Create one</a>
         </div>
     </div>
 </div>
 
 <!-- Toast Notification -->
-<div class="toast-alert" id="toast">
+<div class="toast-alert" id="toast" [class.show]="toastVisible" [class.success]="toastType === 'success'">
     <i class="bi bi-exclamation-circle-fill"></i>
-    <span id="toastMsg">Invalid credentials.</span>
+    <span id="toastMsg">{{ toastMessage }}</span>
 </div>
 
 </div>
