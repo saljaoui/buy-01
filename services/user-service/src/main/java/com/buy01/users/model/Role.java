@@ -1,5 +1,6 @@
 package com.buy01.users.model;
 
-public class Role {
-    
+public enum Role {
+    CLIENT,
+    SELLER
 }

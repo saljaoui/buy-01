@@ -1,5 +1,7 @@
 package com.buy01.users.dto;
 
+import com.buy01.users.model.Role;
+
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,5 +12,5 @@ public class AuthResponse {
     private String userId;
     private String username;
     private String email;
-    private String role;
+    private Role role;
 }
