@@ -1,9 +1,8 @@
 package com.buy01.gateway.security;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.AllArgsConstructor;
+
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.http.HttpStatus;
@@ -12,11 +11,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+@AllArgsConstructor
 @Component
 public class JwtAuthFilter implements GlobalFilter {
 
-    @Value("${jwt.secret}")
-    private String secret;
+    private final JwtUtil jwtUtil;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -40,11 +39,8 @@ public class JwtAuthFilter implements GlobalFilter {
         // 3. Validate token
         try {
             String token = authHeader.substring(7);
-            Claims claims = Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor(secret.getBytes()))
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+
+            Claims claims = jwtUtil.extractClaims(token);
 
             // 4. Add headers for downstream services
             ServerHttpRequest request = exchange.getRequest().mutate()
@@ -65,8 +61,8 @@ public class JwtAuthFilter implements GlobalFilter {
         if (path.startsWith("/api/auth/")) return true;
 
         // Public GET routes (anyone can browse products and images)
-        if (method.equals("GET") && path.startsWith("/products")) return true;
-        if (method.equals("GET") && path.startsWith("/media")) return true;
+        if (method.equals("GET") && path.startsWith("/api/products")) return true;
+        if (method.equals("GET") && path.startsWith("/api/media")) return true;
 
         return false;
     }
