@@ -27,12 +27,4 @@ public class JwtUtil {
                 .getBody();
     }
 
-    public boolean isValid(String token) {
-        try {
-            extractClaims(token);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
 }
