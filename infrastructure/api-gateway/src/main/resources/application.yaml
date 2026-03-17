@@ -13,17 +13,17 @@ spring:
             - id: user-service
               uri: lb://user-service
               predicates:
-                - Path=/api/auth/**
+                - Path=/api/auth/**,/api/users/**
             
             - id: product-service
               uri: lb://product-service
               predicates:
-                - Path=/products/**
+                - Path=/api/products/**
 
             - id: media-service
               uri: lb://media-service
               predicates:
-                - Path=/media/**
+                - Path=/api/media/**
 
 jwt:
   secret: 4fd8a6c3b92f4a8c9c6b8a1f2e3d4c5f6a7b8c9d

@@ -24,9 +24,9 @@ public class User {
     @Indexed(unique = true)
     private String email;
 
-    private String password; // BCrypt hashed
+    private String password;
 
-    private Role role; // "CLIENT" or "SELLER"
+    private Role role;
 
     private String avatarUrl;
 }

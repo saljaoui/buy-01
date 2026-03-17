@@ -22,10 +22,12 @@ public class AuthService {
 
         boolean emailExists = userRepository.existsByEmail(request.getEmail());
         if (emailExists) {
+            throw new IllegalArgumentException("Email is already in use");
         }
 
         boolean usernameExists = userRepository.existsByUsername(request.getUsername());
         if (usernameExists) {
+            throw new IllegalArgumentException("Username is already taken");
         }
 
         User user = User.builder()
