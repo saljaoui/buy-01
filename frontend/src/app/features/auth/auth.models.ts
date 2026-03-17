@@ -1,28 +1,39 @@
 export type UserRole = 'CLIENT' | 'SELLER';
 
 export interface LoginRequest {
-  login: string;
+  email: string;
   password: string;
 }
 
 export interface RegisterRequest {
-  username: string;
+  name: string;
   email: string;
   password: string;
   role: UserRole;
+  avatar?: string | null;
 }
 
 export interface AuthResponse {
   token: string;
-  userId: string;
-  username: string;
-  email: string;
-  role: UserRole;
 }
 
 export interface AuthUser {
   id: string;
-  username: string;
+  name: string;
   email: string;
   role: UserRole;
+  avatar?: string | null;
+}
+
+export interface RegisterResponse {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  avatar?: string | null;
+}
+
+export interface AuthSession {
+  token: string;
+  user: AuthUser;
 }

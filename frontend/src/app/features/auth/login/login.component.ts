@@ -3,7 +3,6 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
-import { UserRole } from '../auth.models';
 import { AuthService } from '../auth.service';
 
 type ToastKind = 'error' | 'success';
@@ -16,12 +15,11 @@ type ToastKind = 'error' | 'success';
 })
 export class LoginComponent implements OnDestroy {
   protected readonly form = {
-    login: '',
+    email: '',
     password: '',
     rememberMe: true,
   };
 
-  protected selectedRole: UserRole = 'CLIENT';
   protected passwordVisible = false;
   protected submitted = false;
   protected isSubmitting = false;
@@ -33,10 +31,6 @@ export class LoginComponent implements OnDestroy {
   private readonly router = inject(Router);
   private toastTimer: ReturnType<typeof setTimeout> | null = null;
 
-  protected selectRole(role: UserRole): void {
-    this.selectedRole = role;
-  }
-
   protected togglePasswordVisibility(): void {
     this.passwordVisible = !this.passwordVisible;
   }
@@ -44,7 +38,7 @@ export class LoginComponent implements OnDestroy {
   protected submit(): void {
     this.submitted = true;
 
-    if (this.isSubmitting || this.isLoginInvalid || this.isPasswordInvalid) {
+    if (this.isSubmitting || this.isEmailInvalid || this.isPasswordInvalid) {
       return;
     }
 
@@ -53,14 +47,14 @@ export class LoginComponent implements OnDestroy {
 
     this.authService
       .login({
-        login: this.form.login.trim(),
+        email: this.form.email.trim(),
         password: this.form.password,
       })
       .pipe(finalize(() => (this.isSubmitting = false)))
       .subscribe({
-        next: (response) => {
-          this.authService.storeSession(response, this.form.rememberMe);
-          const target = response.role === 'SELLER' ? '/seller' : '/products';
+        next: (session) => {
+          this.authService.storeSession(session, this.form.rememberMe);
+          const target = session.user.role === 'SELLER' ? '/seller' : '/products';
           void this.router.navigate([target]);
         },
         error: (error) => {
@@ -73,8 +67,8 @@ export class LoginComponent implements OnDestroy {
     return this.passwordVisible ? 'text' : 'password';
   }
 
-  protected get isLoginInvalid(): boolean {
-    return this.submitted && this.form.login.trim().length === 0;
+  protected get isEmailInvalid(): boolean {
+    return this.submitted && this.form.email.trim().length === 0;
   }
 
   protected get isPasswordInvalid(): boolean {

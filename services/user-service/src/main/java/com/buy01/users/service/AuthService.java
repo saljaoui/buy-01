@@ -35,6 +35,7 @@ public class AuthService {
                 .email(email)
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
+                .avatar(normalizeOptionalValue(request.getAvatar()))
                 .build();
 
         User saved = userRepository.save(user);
@@ -80,5 +81,14 @@ public class AuthService {
             throw new IllegalArgumentException(fieldName + " is required");
         }
         return normalized;
+    }
+
+    private String normalizeOptionalValue(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        String normalized = value.trim();
+        return normalized.isEmpty() ? null : normalized;
     }
 }

@@ -22,4 +22,6 @@ public class RegisterRequest {
 
     @NotNull(message = "role is required")
     private Role role;
+
+    private String avatar;
 }

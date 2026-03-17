@@ -1,8 +1,15 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable, switchMap } from 'rxjs';
 
-import { AuthResponse, AuthUser, LoginRequest, RegisterRequest } from './auth.models';
+import {
+  AuthResponse,
+  AuthSession,
+  AuthUser,
+  LoginRequest,
+  RegisterRequest,
+  RegisterResponse,
+} from './auth.models';
 
 const AUTH_TOKEN_KEY = 'buy01.auth.token';
 const AUTH_USER_KEY = 'buy01.auth.user';
@@ -25,21 +32,32 @@ function resolveApiBaseUrl(): string {
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${resolveApiBaseUrl()}/api/auth`;
+  private readonly usersUrl = `${resolveApiBaseUrl()}/api/users`;
 
-  login(payload: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, payload);
+  login(payload: LoginRequest): Observable<AuthSession> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, payload).pipe(
+      switchMap(({ token }) =>
+        this.http
+          .get<AuthUser>(`${this.usersUrl}/me`, {
+            headers: new HttpHeaders({
+              Authorization: `Bearer ${token}`,
+            }),
+          })
+          .pipe(map((user) => ({ token, user }))),
+      ),
+    );
   }
 
-  register(payload: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, payload);
+  register(payload: RegisterRequest): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${this.apiUrl}/register`, payload);
   }
 
-  storeSession(response: AuthResponse, persistent = true): void {
+  storeSession(session: AuthSession, persistent = true): void {
     this.clearSession();
 
     const storage = persistent ? localStorage : sessionStorage;
-    storage.setItem(AUTH_TOKEN_KEY, response.token);
-    storage.setItem(AUTH_USER_KEY, JSON.stringify(this.toUser(response)));
+    storage.setItem(AUTH_TOKEN_KEY, session.token);
+    storage.setItem(AUTH_USER_KEY, JSON.stringify(session.user));
   }
 
   clearSession(): void {
@@ -69,15 +87,6 @@ export class AuthService {
     }
 
     return fallback;
-  }
-
-  private toUser(response: AuthResponse): AuthUser {
-    return {
-      id: response.userId,
-      username: response.username,
-      email: response.email,
-      role: response.role,
-    };
   }
 
   private hasMessage(value: unknown): value is { message: string } {

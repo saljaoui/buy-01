@@ -10,7 +10,6 @@ type RegisterStep = 1 | 2 | 3;
 type ToastKind = 'error' | 'success' | 'warning';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const USERNAME_PATTERN = /^[A-Za-z0-9_]{3,}$/;
 
 @Component({
   selector: 'app-register',
@@ -22,15 +21,10 @@ export class RegisterComponent implements OnDestroy {
   protected currentStep: RegisterStep = 1;
   protected selectedRole: UserRole = 'CLIENT';
   protected readonly form = {
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
-    username: '',
     password: '',
     confirmPassword: '',
-    storeName: '',
-    storeDesc: '',
-    phone: '',
     terms: false,
   };
 
@@ -39,7 +33,6 @@ export class RegisterComponent implements OnDestroy {
   protected step2Submitted = false;
   protected finalSubmitted = false;
   protected isSubmitting = false;
-  protected avatarPreviewUrl = '';
   protected toastVisible = false;
   protected toastMessage = 'Something went wrong.';
   protected toastType: ToastKind = 'error';
@@ -48,7 +41,6 @@ export class RegisterComponent implements OnDestroy {
   private readonly router = inject(Router);
   private toastTimer: ReturnType<typeof setTimeout> | null = null;
   private redirectTimer: ReturnType<typeof setTimeout> | null = null;
-  private avatarObjectUrl: string | null = null;
 
   protected selectRole(role: UserRole): void {
     this.selectedRole = role;
@@ -84,23 +76,6 @@ export class RegisterComponent implements OnDestroy {
     this.confirmPasswordVisible = !this.confirmPasswordVisible;
   }
 
-  protected onAvatarSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-
-    if (!file) {
-      this.clearAvatarPreview();
-      return;
-    }
-
-    if (this.avatarObjectUrl) {
-      URL.revokeObjectURL(this.avatarObjectUrl);
-    }
-
-    this.avatarObjectUrl = URL.createObjectURL(file);
-    this.avatarPreviewUrl = this.avatarObjectUrl;
-  }
-
   protected submit(): void {
     this.step2Submitted = true;
     this.finalSubmitted = true;
@@ -121,7 +96,7 @@ export class RegisterComponent implements OnDestroy {
 
     this.authService
       .register({
-        username: this.form.username.trim(),
+        name: this.form.name.trim(),
         email: this.form.email.trim(),
         password: this.form.password,
         role: this.selectedRole,
@@ -156,12 +131,8 @@ export class RegisterComponent implements OnDestroy {
     return this.confirmPasswordVisible ? 'text' : 'password';
   }
 
-  protected get isFirstNameInvalid(): boolean {
-    return this.step2Submitted && this.form.firstName.trim().length === 0;
-  }
-
-  protected get isLastNameInvalid(): boolean {
-    return this.step2Submitted && this.form.lastName.trim().length === 0;
+  protected get isNameInvalid(): boolean {
+    return this.step2Submitted && this.form.name.trim().length === 0;
   }
 
   protected get isEmailInvalid(): boolean {
@@ -170,10 +141,6 @@ export class RegisterComponent implements OnDestroy {
 
   protected get isEmailValid(): boolean {
     return this.step2Submitted && EMAIL_PATTERN.test(this.form.email.trim());
-  }
-
-  protected get isUsernameInvalid(): boolean {
-    return this.step2Submitted && !USERNAME_PATTERN.test(this.form.username.trim());
   }
 
   protected get isPasswordInvalid(): boolean {
@@ -185,18 +152,6 @@ export class RegisterComponent implements OnDestroy {
       this.step2Submitted &&
       (this.form.confirmPassword.length === 0 || this.form.confirmPassword !== this.form.password)
     );
-  }
-
-  protected get isStoreNameInvalid(): boolean {
-    return (
-      this.finalSubmitted &&
-      this.selectedRole === 'SELLER' &&
-      this.form.storeName.trim().length === 0
-    );
-  }
-
-  protected get shouldShowSellerExtras(): boolean {
-    return this.selectedRole === 'SELLER';
   }
 
   protected get passwordStrength(): {
@@ -280,17 +235,15 @@ export class RegisterComponent implements OnDestroy {
 
   protected get hasStep2Errors(): boolean {
     return (
-      this.isFirstNameInvalid ||
-      this.isLastNameInvalid ||
+      this.isNameInvalid ||
       this.isEmailInvalid ||
-      this.isUsernameInvalid ||
       this.isPasswordInvalid ||
       this.isConfirmPasswordInvalid
     );
   }
 
   protected get hasFinalStepErrors(): boolean {
-    return this.isStoreNameInvalid || !this.form.terms;
+    return !this.form.terms;
   }
 
   ngOnDestroy(): void {
@@ -301,19 +254,6 @@ export class RegisterComponent implements OnDestroy {
     if (this.redirectTimer) {
       clearTimeout(this.redirectTimer);
     }
-
-    if (this.avatarObjectUrl) {
-      URL.revokeObjectURL(this.avatarObjectUrl);
-    }
-  }
-
-  private clearAvatarPreview(): void {
-    if (this.avatarObjectUrl) {
-      URL.revokeObjectURL(this.avatarObjectUrl);
-      this.avatarObjectUrl = null;
-    }
-
-    this.avatarPreviewUrl = '';
   }
 
   private showToast(message: string, type: ToastKind = 'error'): void {
