@@ -3,6 +3,9 @@ package com.buy01.users.service;
 import com.buy01.users.dto.AuthResponse;
 import com.buy01.users.dto.LoginRequest;
 import com.buy01.users.dto.RegisterRequest;
+import com.buy01.users.dto.UserResponse;
+import com.buy01.users.exception.DuplicateEmailException;
+import com.buy01.users.exception.InvalidCredentialsException;
 import com.buy01.users.model.User;
 import com.buy01.users.repository.UserRepository;
 import com.buy01.users.security.JwtUtil;
@@ -18,58 +21,64 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public AuthResponse register(RegisterRequest request) {
+    public UserResponse register(RegisterRequest request) {
+        String email = normalizeEmail(request.getEmail());
+        String name = normalizeRequiredValue(request.getName(), "name");
 
-        boolean emailExists = userRepository.existsByEmail(request.getEmail());
+        boolean emailExists = userRepository.existsByEmail(email);
         if (emailExists) {
-            throw new IllegalArgumentException("Email is already in use");
-        }
-
-        boolean usernameExists = userRepository.existsByUsername(request.getUsername());
-        if (usernameExists) {
-            throw new IllegalArgumentException("Username is already taken");
+            throw new DuplicateEmailException("Email is already in use");
         }
 
         User user = User.builder()
-                .username(request.getUsername())
-                .email(request.getEmail())
+                .name(name)
+                .email(email)
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
                 .build();
 
         User saved = userRepository.save(user);
 
-        String token = jwtUtil.generateToken(saved.getId(), saved.getRole());
-
-        return AuthResponse.builder()
-                .token(token)
-                .userId(saved.getId())
-                .username(saved.getUsername())
-                .email(saved.getEmail())
-                .role(saved.getRole())
-                .build();
+        return toUserResponse(saved);
     }
 
     public AuthResponse login(LoginRequest request) {
-
-        String login = request.getLogin().trim();
+        String email = normalizeEmail(request.getEmail());
 
         User user = userRepository
-                .findByEmailOrUsername(login, login)
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+                .findByEmail(email)
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new InvalidCredentialsException("Invalid credentials");
         }
 
         String token = jwtUtil.generateToken(user.getId(), user.getRole());
 
         return AuthResponse.builder()
                 .token(token)
-                .userId(user.getId())
-                .username(user.getUsername())
+                .build();
+    }
+
+    private UserResponse toUserResponse(User user) {
+        return UserResponse.builder()
+                .id(user.getId())
+                .name(user.getName())
                 .email(user.getEmail())
                 .role(user.getRole())
+                .avatar(user.getAvatar())
                 .build();
+    }
+
+    private String normalizeEmail(String email) {
+        return normalizeRequiredValue(email, "email").toLowerCase();
+    }
+
+    private String normalizeRequiredValue(String value, String fieldName) {
+        String normalized = value == null ? null : value.trim();
+        if (normalized == null || normalized.isEmpty()) {
+            throw new IllegalArgumentException(fieldName + " is required");
+        }
+        return normalized;
     }
 }
