@@ -41,43 +41,21 @@
         <h2>Welcome back</h2>
         <p class="subtitle">Sign in to your Buy01 account to continue.</p>
 
-        <!-- Role Toggle -->
-        <div class="role-toggle" id="roleToggle">
-            <button
-                type="button"
-                class="role-btn"
-                data-role="client"
-                [class.active]="selectedRole === 'CLIENT'"
-                (click)="selectRole('CLIENT')">
-                <i class="bi bi-person"></i> Client
-            </button>
-            <button
-                type="button"
-                class="role-btn"
-                data-role="seller"
-                [class.active]="selectedRole === 'SELLER'"
-                (click)="selectRole('SELLER')">
-                <i class="bi bi-shop"></i> Seller
-            </button>
-        </div>
-
         <!-- Login Form -->
         <form id="loginForm" novalidate (ngSubmit)="submit()">
-            <input type="hidden" id="selectedRole" [value]="selectedRole" />
-
-            <!-- Login -->
+            <!-- Email -->
             <div class="field-wrap">
-                <label for="login">Email or Username</label>
+                <label for="email">Email</label>
                 <input
-                    type="text"
-                    id="login"
-                    name="login"
+                    type="email"
+                    id="email"
+                    name="email"
                     placeholder="you@example.com"
-                    autocomplete="username"
-                    [(ngModel)]="form.login"
-                    [class.is-invalid]="isLoginInvalid" />
+                    autocomplete="email"
+                    [(ngModel)]="form.email"
+                    [class.is-invalid]="isEmailInvalid" />
                 <i class="bi bi-envelope input-icon"></i>
-                <div class="err-msg">Please enter your email or username.</div>
+                <div class="err-msg">Please enter your email.</div>
             </div>
 
             <!-- Password -->
