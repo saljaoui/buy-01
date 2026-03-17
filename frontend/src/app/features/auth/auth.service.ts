@@ -71,6 +71,22 @@ export class AuthService {
     return localStorage.getItem(AUTH_TOKEN_KEY) ?? sessionStorage.getItem(AUTH_TOKEN_KEY);
   }
 
+  getStoredUser(): AuthUser | null {
+    const storedUser =
+      localStorage.getItem(AUTH_USER_KEY) ?? sessionStorage.getItem(AUTH_USER_KEY);
+
+    if (!storedUser) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(storedUser) as AuthUser;
+    } catch {
+      this.clearSession();
+      return null;
+    }
+  }
+
   getErrorMessage(error: unknown, fallback = 'Something went wrong.'): string {
     if (error instanceof HttpErrorResponse) {
       if (typeof error.error === 'string' && error.error.trim()) {

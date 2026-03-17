@@ -2,7 +2,7 @@
     <nav class="navbar-buy">
         <div class="container">
             <div class="nav-inner">
-                <a class="nav-brand" href="#">
+                <a class="nav-brand" routerLink="/products">
                     <div class="nav-brand-icon"><i class="bi bi-bag-heart-fill"></i></div>
                     <span class="nav-brand-name">Buy01</span>
                 </a>
@@ -13,10 +13,37 @@
                 </div>
 
                 <div class="nav-actions">
-                    <a href="login.html" class="nav-btn d-none d-sm-flex">Sign In</a>
-                    <a href="register.html" class="nav-btn primary d-none d-sm-flex">
-                        <i class="bi bi-person-plus"></i> Register
-                    </a>
+                    @if (currentUser; as user) {
+                        <div class="nav-profile">
+                            <div class="nav-avatar">
+                                @if (user.avatar) {
+                                    <img [src]="user.avatar" [alt]="user.name" />
+                                } @else {
+                                    <span>{{ userInitials }}</span>
+                                }
+                            </div>
+                            <div class="nav-profile-copy d-none d-md-flex">
+                                <strong>{{ user.name }}</strong>
+                                <small>{{ profileLabel }}</small>
+                            </div>
+                        </div>
+
+                        @if (sellerDashboardLink; as dashboardLink) {
+                            <a [routerLink]="dashboardLink" class="nav-btn d-none d-sm-flex">
+                                <i class="bi bi-grid-1x2"></i> Dashboard
+                            </a>
+                        }
+
+                        <button type="button" class="nav-btn" (click)="logout()">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span class="d-none d-sm-inline">Sign Out</span>
+                        </button>
+                    } @else {
+                        <a routerLink="/login" class="nav-btn d-none d-sm-flex">Sign In</a>
+                        <a routerLink="/register" class="nav-btn primary d-none d-sm-flex">
+                            <i class="bi bi-person-plus"></i> Register
+                        </a>
+                    }
                     <button class="cart-btn">
                         <i class="bi bi-bag"></i>
                         <span class="cart-badge">3</span>
@@ -36,7 +63,7 @@
                     <p>Shop thousands of items from verified sellers — electronics, fashion, home goods, and more.</p>
                     <div class="hero-cta">
                         <a href="#products" class="btn-hero-primary">Shop Now <i class="bi bi-arrow-down"></i></a>
-                        <a href="register.html" class="btn-hero-ghost">Sell with us <i
+                        <a routerLink="/register" class="btn-hero-ghost">Sell with us <i
                                 class="bi bi-arrow-right"></i></a>
                     </div>
                 </div>
