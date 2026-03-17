@@ -1,314 +1,282 @@
-<div class="d-flex vh-100" >
-<!-- ══ LEFT PANEL ══════════════════════════════ -->
-<div class="left-panel">
-  <div class="brand">
-    <img class="brand-logo" src="/logo.png" alt="Buy01 logo" />
-  </div>
-
-  <div class="steps-visual">
-    <h2>Join our<br><em>marketplace</em><br>in minutes.</h2>
-    <p>Create an account to start browsing products or build your seller storefront today.</p>
-
-    <ul class="step-list" id="leftStepList">
-      <li>
-        <div class="step-dot" id="ls1" [class.active]="currentStep === 1" [class.done]="currentStep > 1">1</div>
-        <div class="step-text">
-          <strong>Choose your role</strong>
-          <span>Client or Seller — pick what fits</span>
-        </div>
-      </li>
-      <li>
-        <div class="step-dot" id="ls2" [class.active]="currentStep === 2" [class.done]="currentStep > 2">2</div>
-        <div class="step-text">
-          <strong>Your details</strong>
-          <span>Name, email, and a strong password</span>
-        </div>
-      </li>
-      <li>
-        <div class="step-dot" id="ls3" [class.active]="currentStep === 3">3</div>
-        <div class="step-text">
-          <strong>Profile & confirm</strong>
-          <span>Optional avatar, then you're in</span>
-        </div>
-      </li>
-    </ul>
-  </div>
-
-  <div class="left-quote">
-    <p>"The best marketplace is one where both sides win."</p>
-    <span>— Buy01 philosophy</span>
-  </div>
-</div>
-
-<!-- ══ RIGHT PANEL ══════════════════════════════ -->
-<div class="right-panel">
-  <div class="form-card">
-
-    <!-- top nav -->
-    <div class="form-topnav">
-      <a routerLink="/login"><i class="bi bi-arrow-left"></i> Back to Sign In</a>
-      <div class="step-pills" id="stepPills">
-        <div class="step-pill" id="pill1" [class.active]="currentStep === 1" [class.done]="currentStep > 1"></div>
-        <div class="step-pill" id="pill2" [class.active]="currentStep === 2" [class.done]="currentStep > 2" [class.todo]="currentStep < 2"></div>
-        <div class="step-pill" id="pill3" [class.active]="currentStep === 3" [class.todo]="currentStep < 3"></div>
-      </div>
+<div class="d-flex vh-100">
+  <!-- ══ LEFT PANEL ══════════════════════════════ -->
+  <div class="left-panel">
+    <div class="brand">
+      <img class="brand-logo" src="/logo.png" alt="Buy01 logo" />
     </div>
 
-    <!-- ╔══════════════════════════════╗
-         ║  STEP 1 — Role              ║
+    <div class="steps-visual">
+      <h2>Join our<br><em>marketplace</em><br>in minutes.</h2>
+      <p>Create an account to start browsing products or build your seller storefront today.</p>
+
+      <ul class="step-list" id="leftStepList">
+        <li>
+          <div class="step-dot" id="ls1" [class.active]="currentStep === 1" [class.done]="currentStep > 1">1</div>
+          <div class="step-text">
+            <strong>Choose your role</strong>
+            <span>Client or Seller — pick what fits</span>
+          </div>
+        </li>
+        <li>
+          <div class="step-dot" id="ls2" [class.active]="currentStep === 2" [class.done]="currentStep > 2">2</div>
+          <div class="step-text">
+            <strong>Your details</strong>
+            <span>Name, email, and a strong password</span>
+          </div>
+        </li>
+        <li>
+          <div class="step-dot" id="ls3" [class.active]="currentStep === 3">3</div>
+          <div class="step-text">
+            <strong>Profile & confirm</strong>
+            <span>Optional avatar, then you're in</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="left-quote">
+      <p>"The best marketplace is one where both sides win."</p>
+      <span>— Buy01 philosophy</span>
+    </div>
+  </div>
+
+  <!-- ══ RIGHT PANEL ══════════════════════════════ -->
+  <div class="right-panel">
+    <div class="form-card">
+
+      <!-- top nav -->
+      <div class="form-topnav">
+        <a routerLink="/login"><i class="bi bi-arrow-left"></i> Back to Sign In</a>
+        <div class="step-pills" id="stepPills">
+          <div class="step-pill" id="pill1" [class.active]="currentStep === 1" [class.done]="currentStep > 1"></div>
+          <div class="step-pill" id="pill2" [class.active]="currentStep === 2" [class.done]="currentStep > 2"
+            [class.todo]="currentStep < 2"></div>
+          <div class="step-pill" id="pill3" [class.active]="currentStep === 3" [class.todo]="currentStep < 3"></div>
+        </div>
+      </div>
+
+      <!-- ╔══════════════════════════════╗
+         ║  STEP 1 — Role               ║
          ╚══════════════════════════════╝ -->
-    <div id="step1" [style.display]="currentStep === 1 ? 'block' : 'none'">
-      <div class="step-heading">
-        <div class="step-label"><i class="bi bi-circle-fill" style="font-size:.45rem;"></i> Step 1 of 3</div>
-        <h2>What brings you here?</h2>
-        <p>Choose a role — you can always create another account later.</p>
+      <div id="step1" [style.display]="currentStep === 1 ? 'block' : 'none'">
+        <div class="step-heading">
+          <div class="step-label"><i class="bi bi-circle-fill" style="font-size:.45rem;"></i> Step 1 of 3</div>
+          <h2>What brings you here?</h2>
+          <p>Choose a role — you can always create another account later.</p>
+        </div>
+
+        <div class="role-cards">
+          <!-- CLIENT -->
+          <div class="role-card" id="rcClient" [class.selected]="selectedRole === 'CLIENT'"
+            (click)="selectRole('CLIENT')">
+            <div class="role-check"><i class="bi bi-check"></i></div>
+            <div class="role-card-icon"><i class="bi bi-bag">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                  <g fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="12" cy="6" r="4" />
+                    <path d="M20 17.5c0 2.485 0 4.5-8 4.5s-8-2.015-8-4.5S7.582 13 12 13s8 2.015 8 4.5Z" />
+                  </g>
+                </svg>
+              </i></div>
+            <strong>Client</strong>
+            <small>Browse and purchase products from sellers.</small>
+          </div>
+          <!-- SELLER -->
+          <div class="role-card" id="rcSeller" [class.selected]="selectedRole === 'SELLER'"
+            (click)="selectRole('SELLER')">
+            <div class="role-check"><i class="bi bi-check"></i></div>
+            <div class="role-card-icon"><i class="bi bi-shop">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                  <g fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path
+                      d="M3.742 20.555C4.942 22 7.174 22 11.639 22h.722c4.465 0 6.698 0 7.898-1.445m-16.517 0c-1.2-1.446-.788-3.64.035-8.03c.585-3.12.877-4.681 1.988-5.603M3.742 20.555Zm16.517 0c1.2-1.446.788-3.64-.035-8.03c-.585-3.12-.878-4.681-1.989-5.603m2.024 13.633ZM18.235 6.922C17.125 6 15.536 6 12.361 6h-.722c-3.175 0-4.763 0-5.874.922m12.47 0Zm-12.47 0Z" />
+                    <path stroke-linecap="round" d="m15 11l1 6m-7-6l-1 6M9 6V5a3 3 0 1 1 6 0v1" />
+                  </g>
+                </svg>
+              </i></div>
+            <strong>Seller</strong>
+            <small>List products, manage media, grow sales.</small>
+          </div>
+        </div>
+
+        <button type="button" class="btn-register" (click)="goToStep(2)">
+          <span class="btn-text">Continue &nbsp;<i class="bi bi-arrow-right"></i></span>
+          <div class="btn-spinner"></div>
+        </button>
       </div>
 
-      <div class="role-cards">
-        <!-- CLIENT -->
-        <div class="role-card" id="rcClient" [class.selected]="selectedRole === 'CLIENT'" (click)="selectRole('CLIENT')">
-          <div class="role-check"><i class="bi bi-check"></i></div>
-          <div class="role-card-icon"><i class="bi bi-bag"></i></div>
-          <strong>Client</strong>
-          <small>Browse and purchase products from sellers.</small>
-        </div>
-        <!-- SELLER -->
-        <div class="role-card" id="rcSeller" [class.selected]="selectedRole === 'SELLER'" (click)="selectRole('SELLER')">
-          <div class="role-check"><i class="bi bi-check"></i></div>
-          <div class="role-card-icon"><i class="bi bi-shop"></i></div>
-          <strong>Seller</strong>
-          <small>List products, manage media, grow sales.</small>
-        </div>
-      </div>
-
-      <button type="button" class="btn-register" (click)="goToStep(2)">
-        <span class="btn-text">Continue &nbsp;<i class="bi bi-arrow-right"></i></span>
-        <div class="btn-spinner"></div>
-      </button>
-    </div>
-
-    <!-- ╔══════════════════════════════╗
+      <!-- ╔══════════════════════════════╗
          ║  STEP 2 — Account details   ║
          ╚══════════════════════════════╝ -->
-    <div id="step2" [style.display]="currentStep === 2 ? 'block' : 'none'">
-      <div class="step-heading">
-        <div class="step-label"><i class="bi bi-circle-fill" style="font-size:.45rem;"></i> Step 2 of 3</div>
-        <h2>Your account details</h2>
-        <p>We'll use these to keep your account secure.</p>
-      </div>
-
-      <div class="field-row">
-        <div class="field-wrap">
-          <label for="firstName">First Name</label>
-          <input
-            type="text"
-            id="firstName"
-            name="firstName"
-            placeholder="Ada"
-            autocomplete="given-name"
-            [(ngModel)]="form.firstName"
-            [class.is-invalid]="isFirstNameInvalid" />
-          <i class="bi bi-person f-icon"></i>
-          <div class="err-msg"><i class="bi bi-exclamation-circle"></i> Required</div>
+      <div id="step2" [style.display]="currentStep === 2 ? 'block' : 'none'">
+        <div class="step-heading">
+          <div class="step-label"><i class="bi bi-circle-fill" style="font-size:.45rem;"></i> Step 2 of 3</div>
+          <h2>Your account details</h2>
+          <p>We'll use these to keep your account secure.</p>
         </div>
-        <div class="field-wrap">
-          <label for="lastName">Last Name</label>
-          <input
-            type="text"
-            id="lastName"
-            name="lastName"
-            placeholder="Lovelace"
-            autocomplete="family-name"
-            [(ngModel)]="form.lastName"
-            [class.is-invalid]="isLastNameInvalid" />
-          <i class="bi bi-person f-icon"></i>
-          <div class="err-msg"><i class="bi bi-exclamation-circle"></i> Required</div>
-        </div>
-      </div>
 
-      <div class="field-wrap">
-        <label for="email">Email Address</label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          placeholder="ada@example.com"
-          autocomplete="email"
-          [(ngModel)]="form.email"
-          [class.is-invalid]="isEmailInvalid"
-          [class.is-valid]="isEmailValid" />
-        <i class="bi bi-envelope f-icon"></i>
-        <div class="err-msg"><i class="bi bi-exclamation-circle"></i> Enter a valid email</div>
-        <div class="ok-msg"><i class="bi bi-check-circle"></i> Looks good!</div>
-      </div>
-
-      <div class="field-wrap">
-        <label for="username">Username</label>
-        <input
-          type="text"
-          id="username"
-          name="username"
-          placeholder="ada_lovelace"
-          autocomplete="username"
-          [(ngModel)]="form.username"
-          [class.is-invalid]="isUsernameInvalid" />
-        <i class="bi bi-at f-icon"></i>
-        <div class="err-msg"><i class="bi bi-exclamation-circle"></i> Min 3 chars, letters/numbers/_ only</div>
-      </div>
-
-      <div class="field-wrap">
-        <label for="password">Password</label>
-        <input
-          [type]="passwordInputType"
-          id="password"
-          name="password"
-          placeholder="••••••••"
-          autocomplete="new-password"
-          [(ngModel)]="form.password"
-          [class.is-invalid]="isPasswordInvalid" />
-        <i class="bi bi-lock f-icon"></i>
-        <button type="button" class="pw-toggle" (click)="togglePassword('password')">
-          <i class="bi" id="pwIcon1" [class.bi-eye]="!passwordVisible" [class.bi-eye-slash]="passwordVisible"></i>
-        </button>
-        <div class="err-msg"><i class="bi bi-exclamation-circle"></i> Min 8 chars required</div>
-        <!-- strength bar -->
-        <div class="pw-strength" id="pwStrength" [class.visible]="passwordStrength.visible">
-          <div class="pw-strength-bar">
-            <div
-              class="pw-strength-fill"
-              id="pwFill"
-              [style.width]="passwordStrength.width"
-              [style.background]="passwordStrength.color"></div>
+        <div class="field-row">
+          <div class="field-wrap">
+            <label for="firstName">First Name</label>
+            <input type="text" id="firstName" name="firstName" placeholder="Ada" autocomplete="given-name"
+              [(ngModel)]="form.firstName" [class.is-invalid]="isFirstNameInvalid" />
+            <i class="bi bi-person f-icon"></i>
+            <div class="err-msg"><i class="bi bi-exclamation-circle"></i> Required</div>
           </div>
-          <div class="pw-strength-text" id="pwText">{{ passwordStrength.label }}</div>
+          <div class="field-wrap">
+            <label for="lastName">Last Name</label>
+            <input type="text" id="lastName" name="lastName" placeholder="Lovelace" autocomplete="family-name"
+              [(ngModel)]="form.lastName" [class.is-invalid]="isLastNameInvalid" />
+            <i class="bi bi-person f-icon"></i>
+            <div class="err-msg"><i class="bi bi-exclamation-circle"></i> Required</div>
+          </div>
         </div>
-      </div>
 
-      <div class="field-wrap">
-        <label for="confirmPw">Confirm Password</label>
-        <input
-          [type]="confirmPasswordInputType"
-          id="confirmPw"
-          name="confirmPassword"
-          placeholder="••••••••"
-          autocomplete="new-password"
-          [(ngModel)]="form.confirmPassword"
-          [class.is-invalid]="isConfirmPasswordInvalid" />
-        <i class="bi bi-lock-fill f-icon"></i>
-        <button type="button" class="pw-toggle" (click)="togglePassword('confirmPassword')">
-          <i class="bi" id="pwIcon2" [class.bi-eye]="!confirmPasswordVisible" [class.bi-eye-slash]="confirmPasswordVisible"></i>
+        <div class="field-wrap">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" placeholder="ada@example.com" autocomplete="email"
+            [(ngModel)]="form.email" [class.is-invalid]="isEmailInvalid" [class.is-valid]="isEmailValid" />
+          <i class="bi bi-envelope f-icon"></i>
+          <div class="err-msg"><i class="bi bi-exclamation-circle"></i> Enter a valid email</div>
+          <div class="ok-msg"><i class="bi bi-check-circle"></i> Looks good!</div>
+        </div>
+
+        <div class="field-wrap">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="ada_lovelace" autocomplete="username"
+            [(ngModel)]="form.username" [class.is-invalid]="isUsernameInvalid" />
+          <i class="bi bi-at f-icon"></i>
+          <div class="err-msg"><i class="bi bi-exclamation-circle"></i> Min 3 chars, letters/numbers/_ only</div>
+        </div>
+
+        <div class="field-wrap">
+          <label for="password">Password</label>
+          <input [type]="passwordInputType" id="password" name="password" placeholder="••••••••"
+            autocomplete="new-password" [(ngModel)]="form.password" [class.is-invalid]="isPasswordInvalid" />
+          <i class="bi bi-lock f-icon"></i>
+          <button type="button" class="pw-toggle" (click)="togglePassword('password')">
+            <i class="bi" id="pwIcon1" [class.bi-eye]="!passwordVisible" [class.bi-eye-slash]="passwordVisible"></i>
+          </button>
+          <div class="err-msg"><i class="bi bi-exclamation-circle"></i> Min 8 chars required</div>
+          <!-- strength bar -->
+          <div class="pw-strength" id="pwStrength" [class.visible]="passwordStrength.visible">
+            <div class="pw-strength-bar">
+              <div class="pw-strength-fill" id="pwFill" [style.width]="passwordStrength.width"
+                [style.background]="passwordStrength.color"></div>
+            </div>
+            <div class="pw-strength-text" id="pwText">{{ passwordStrength.label }}</div>
+          </div>
+        </div>
+
+        <div class="field-wrap">
+          <label for="confirmPw">Confirm Password</label>
+          <input [type]="confirmPasswordInputType" id="confirmPw" name="confirmPassword" placeholder="••••••••"
+            autocomplete="new-password" [(ngModel)]="form.confirmPassword"
+            [class.is-invalid]="isConfirmPasswordInvalid" />
+          <i class="bi bi-lock-fill f-icon"></i>
+          <button type="button" class="pw-toggle" (click)="togglePassword('confirmPassword')">
+            <i class="bi" id="pwIcon2" [class.bi-eye]="!confirmPasswordVisible"
+              [class.bi-eye-slash]="confirmPasswordVisible"></i>
+          </button>
+          <div class="err-msg"><i class="bi bi-exclamation-circle"></i> Passwords don't match</div>
+        </div>
+
+        <button type="button" class="btn-register" (click)="goToStep(3)">
+          <span class="btn-text">Continue &nbsp;<i class="bi bi-arrow-right"></i></span>
+          <div class="btn-spinner"></div>
         </button>
-        <div class="err-msg"><i class="bi bi-exclamation-circle"></i> Passwords don't match</div>
+
+        <p style="text-align:center; margin-top:.9rem;">
+          <a href="" (click)="goToStep(1); $event.preventDefault()"
+            style="font-size:.82rem; color:var(--text-muted); text-decoration:none;">
+            <i class="bi bi-arrow-left"></i> Back
+          </a>
+        </p>
       </div>
 
-      <button type="button" class="btn-register" (click)="goToStep(3)">
-        <span class="btn-text">Continue &nbsp;<i class="bi bi-arrow-right"></i></span>
-        <div class="btn-spinner"></div>
-      </button>
-
-      <p style="text-align:center; margin-top:.9rem;">
-        <a href="" (click)="goToStep(1); $event.preventDefault()" style="font-size:.82rem; color:var(--text-muted); text-decoration:none;">
-          <i class="bi bi-arrow-left"></i> Back
-        </a>
-      </p>
-    </div>
-
-    <!-- ╔══════════════════════════════╗
+      <!-- ╔══════════════════════════════╗
          ║  STEP 3 — Profile / confirm ║
          ╚══════════════════════════════╝ -->
-    <div id="step3" [style.display]="currentStep === 3 ? 'block' : 'none'">
-      <div class="step-heading">
-        <div class="step-label"><i class="bi bi-circle-fill" style="font-size:.45rem;"></i> Step 3 of 3</div>
-        <h2>Almost there!</h2>
-        <p>Add an optional avatar, then create your account.</p>
-      </div>
-
-      <!-- Avatar upload -->
-      <div class="avatar-upload" (click)="avatarInput.click()">
-        <div class="avatar-preview" id="avatarPreview">
-          <i class="bi bi-person-fill" id="avatarIcon" [style.display]="avatarPreviewUrl ? 'none' : 'block'"></i>
-          <img id="avatarImg" alt="avatar" [src]="avatarPreviewUrl" [style.display]="avatarPreviewUrl ? 'block' : 'none'"/>
+      <div id="step3" [style.display]="currentStep === 3 ? 'block' : 'none'">
+        <div class="step-heading">
+          <div class="step-label"><i class="bi bi-circle-fill" style="font-size:.45rem;"></i> Step 3 of 3</div>
+          <h2>Almost there!</h2>
+          <p>Add an optional avatar, then create your account.</p>
         </div>
-        <div class="avatar-upload-text">
-          <strong>Upload profile photo</strong>
-          <small>JPG, PNG or WebP · Max 2 MB · Optional</small>
-        </div>
-        <i class="bi bi-upload ms-auto" style="color:var(--text-light); font-size:.95rem;"></i>
-      </div>
-      <input #avatarInput type="file" id="avatarInput" accept="image/*" style="display:none;" (change)="onAvatarSelected($event)"/>
 
-      <!-- Seller extras -->
-      <div id="sellerExtras" [style.display]="shouldShowSellerExtras ? 'block' : 'none'">
+        <!-- Avatar upload -->
+        <div class="avatar-upload" (click)="avatarInput.click()">
+          <div class="avatar-preview" id="avatarPreview">
+            <i class="bi bi-person-fill" id="avatarIcon" [style.display]="avatarPreviewUrl ? 'none' : 'block'"></i>
+            <img id="avatarImg" alt="avatar" [src]="avatarPreviewUrl"
+              [style.display]="avatarPreviewUrl ? 'block' : 'none'" />
+          </div>
+          <div class="avatar-upload-text">
+            <strong>Upload profile photo</strong>
+            <small>JPG, PNG or WebP · Max 2 MB · Optional</small>
+          </div>
+          <i class="bi bi-upload ms-auto" style="color:var(--text-light); font-size:.95rem;"></i>
+        </div>
+        <input #avatarInput type="file" id="avatarInput" accept="image/*" style="display:none;"
+          (change)="onAvatarSelected($event)" />
+
+        <!-- Seller extras -->
+        <div id="sellerExtras" [style.display]="shouldShowSellerExtras ? 'block' : 'none'">
+          <div class="field-wrap">
+            <label for="storeName">Store Name</label>
+            <input type="text" id="storeName" name="storeName" placeholder="My Awesome Store"
+              [(ngModel)]="form.storeName" [class.is-invalid]="isStoreNameInvalid" />
+            <i class="bi bi-shop f-icon"></i>
+            <div class="err-msg"><i class="bi bi-exclamation-circle"></i> Required for sellers</div>
+          </div>
+          <div class="field-wrap">
+            <label for="storeDesc">Short Bio / Store Description</label>
+            <input type="text" id="storeDesc" name="storeDesc" placeholder="Handcrafted goods since 2020…"
+              [(ngModel)]="form.storeDesc" />
+            <i class="bi bi-chat-left-text f-icon"></i>
+          </div>
+        </div>
+
+        <!-- Phone (optional) -->
         <div class="field-wrap">
-          <label for="storeName">Store Name</label>
-          <input
-            type="text"
-            id="storeName"
-            name="storeName"
-            placeholder="My Awesome Store"
-            [(ngModel)]="form.storeName"
-            [class.is-invalid]="isStoreNameInvalid" />
-          <i class="bi bi-shop f-icon"></i>
-          <div class="err-msg"><i class="bi bi-exclamation-circle"></i> Required for sellers</div>
+          <label for="phone">Phone Number <span
+              style="color:var(--text-light);font-weight:400;">(optional)</span></label>
+          <input type="tel" id="phone" name="phone" placeholder="+1 555 000 0000" autocomplete="tel"
+            [(ngModel)]="form.phone" />
+          <i class="bi bi-telephone f-icon"></i>
         </div>
-        <div class="field-wrap">
-          <label for="storeDesc">Short Bio / Store Description</label>
-          <input
-            type="text"
-            id="storeDesc"
-            name="storeDesc"
-            placeholder="Handcrafted goods since 2020…"
-            [(ngModel)]="form.storeDesc" />
-          <i class="bi bi-chat-left-text f-icon"></i>
+
+        <!-- Terms -->
+        <div class="terms-wrap">
+          <input type="checkbox" id="terms" name="terms" [(ngModel)]="form.terms" />
+          <label for="terms">
+            I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I understand my data
+            will be processed securely.
+          </label>
         </div>
+
+        <button type="button" class="btn-register" id="submitBtn" [class.loading]="isSubmitting"
+          [disabled]="isSubmitting" (click)="submit()">
+          <span class="btn-text"><i class="bi bi-person-check"></i> &nbsp;Create Account</span>
+          <div class="btn-spinner"></div>
+        </button>
+
+        <p style="text-align:center; margin-top:.9rem;">
+          <a href="" (click)="goToStep(2); $event.preventDefault()"
+            style="font-size:.82rem; color:var(--text-muted); text-decoration:none;">
+            <i class="bi bi-arrow-left"></i> Back
+          </a>
+        </p>
       </div>
 
-      <!-- Phone (optional) -->
-      <div class="field-wrap">
-        <label for="phone">Phone Number <span style="color:var(--text-light);font-weight:400;">(optional)</span></label>
-        <input
-          type="tel"
-          id="phone"
-          name="phone"
-          placeholder="+1 555 000 0000"
-          autocomplete="tel"
-          [(ngModel)]="form.phone" />
-        <i class="bi bi-telephone f-icon"></i>
-      </div>
-
-      <!-- Terms -->
-      <div class="terms-wrap">
-        <input type="checkbox" id="terms" name="terms" [(ngModel)]="form.terms"/>
-        <label for="terms">
-          I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I understand my data will be processed securely.
-        </label>
-      </div>
-
-      <button
-        type="button"
-        class="btn-register"
-        id="submitBtn"
-        [class.loading]="isSubmitting"
-        [disabled]="isSubmitting"
-        (click)="submit()">
-        <span class="btn-text"><i class="bi bi-person-check"></i> &nbsp;Create Account</span>
-        <div class="btn-spinner"></div>
-      </button>
-
-      <p style="text-align:center; margin-top:.9rem;">
-        <a href="" (click)="goToStep(2); $event.preventDefault()" style="font-size:.82rem; color:var(--text-muted); text-decoration:none;">
-          <i class="bi bi-arrow-left"></i> Back
-        </a>
-      </p>
+      <div class="signin-link">Already have an account? <a routerLink="/login">Sign in</a></div>
     </div>
-
-    <div class="signin-link">Already have an account? <a routerLink="/login">Sign in</a></div>
   </div>
-</div>
 
-<!-- Toast -->
-<div class="toast-alert" id="toast" [class.show]="toastVisible" [class.success]="toastType === 'success'" [class.warning]="toastType === 'warning'">
-  <i class="bi bi-exclamation-circle-fill" id="toastIcon"></i>
-  <span id="toastMsg">{{ toastMessage }}</span>
-</div>
+  <!-- Toast -->
+  <div class="toast-alert" id="toast" [class.show]="toastVisible" [class.success]="toastType === 'success'"
+    [class.warning]="toastType === 'warning'">
+    <i class="bi bi-exclamation-circle-fill" id="toastIcon"></i>
+    <span id="toastMsg">{{ toastMessage }}</span>
+  </div>
 </div>
