@@ -1,12 +1,12 @@
 package com.buy01.users.model;
 
-import lombok.Data;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @Builder
@@ -18,8 +18,7 @@ public class User {
     @Id
     private String id;
 
-    @Indexed(unique = true)
-    private String username;
+    private String name;
 
     @Indexed(unique = true)
     private String email;
@@ -28,5 +27,5 @@ public class User {
 
     private Role role;
 
-    private String avatarUrl;
+    private String avatar;
 }
