@@ -1,0 +1,325 @@
+<div class="seller-shell">
+  <aside class="seller-sidebar">
+    <div class="seller-sidebar-inner">
+      <a class="seller-brand" href="/seller">
+        <div class="seller-brand-icon"><i class="bi bi-bag-heart-fill"></i></div>
+        <div class="seller-brand-copy">
+          <strong>Buy01</strong>
+          <span>Seller panel</span>
+        </div>
+      </a>
+
+      <nav class="seller-nav">
+        <div class="seller-nav-label">Overview</div>
+        <a class="seller-nav-link" href="/seller">
+          <i class="bi bi-grid-1x2"></i>
+          Dashboard
+        </a>
+        <a class="seller-nav-link" href="#">
+          <i class="bi bi-bar-chart-line"></i>
+          Analytics
+        </a>
+
+        <div class="seller-nav-label">Catalog</div>
+        <a class="seller-nav-link" href="/seller">
+          <i class="bi bi-box-seam"></i>
+          Products
+          <span class="seller-nav-badge">12</span>
+        </a>
+        <a class="seller-nav-link active" href="#">
+          <i class="bi bi-plus-square"></i>
+          Create product
+        </a>
+        <a class="seller-nav-link" href="/seller/media">
+          <i class="bi bi-images"></i>
+          Media library
+        </a>
+
+        <div class="seller-nav-label">Account</div>
+        <a class="seller-nav-link" href="/seller/profile">
+          <i class="bi bi-person-circle"></i>
+          Profile
+        </a>
+        <a class="seller-nav-link" href="/products">
+          <i class="bi bi-shop-window"></i>
+          Storefront
+        </a>
+      </nav>
+
+      <div class="seller-account">
+        <div class="seller-account-avatar">A</div>
+        <div class="seller-account-copy">
+          <strong>Ada Lovelace</strong>
+          <span>Northline Studio</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="seller-main">
+    <header class="seller-topbar">
+      <div class="seller-topbar-copy">
+        <strong>Create / edit product</strong>
+        <span>Static seller form UI</span>
+      </div>
+
+      <div class="seller-topbar-actions">
+        <a class="ghost-btn" href="/products">
+          <i class="bi bi-eye"></i>
+          Preview
+        </a>
+        <a class="secondary-btn" href="/seller">Cancel</a>
+        <button class="primary-btn" type="button">
+          <i class="bi bi-check2"></i>
+          Save product
+        </button>
+      </div>
+    </header>
+
+    <main class="seller-body">
+      <section class="seller-banner">
+        <div class="seller-banner-copy">
+          <div class="eyebrow"><span></span> Product editor</div>
+          <h1>Build a polished <em>listing</em> quickly.</h1>
+          <p>
+            This form keeps the same soft cards, dark accents, and structured spacing used across
+            the rest of the app while remaining UI-only.
+          </p>
+        </div>
+
+        <div class="seller-banner-actions">
+          <a class="secondary-btn" href="/seller/media">
+            <i class="bi bi-images"></i>
+            Manage media
+          </a>
+          <button class="primary-btn" type="button">
+            <i class="bi bi-upload"></i>
+            Publish later
+          </button>
+        </div>
+      </section>
+
+      <div class="form-layout">
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h3>Product information</h3>
+              <p>Core details buyers will see in the storefront.</p>
+            </div>
+            <span class="pill">Draft</span>
+          </div>
+
+          <div class="panel-body form-stack">
+            <section class="form-section">
+              <div class="section-intro">
+                <h3>Core details</h3>
+                <p>Clear titles and descriptions help the product cards feel premium and consistent.</p>
+              </div>
+
+              <div class="field-grid">
+                <div class="field full invalid">
+                  <label for="title">Product title</label>
+                  <input id="title" type="text" placeholder="Noise-Cancelling Pro Headphones" />
+                  <div class="message">Title is required before publishing.</div>
+                </div>
+
+                <div class="field">
+                  <label for="category">Category</label>
+                  <select id="category">
+                    <option>Electronics</option>
+                    <option>Home & Living</option>
+                    <option>Wellness</option>
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label for="status">Listing status</label>
+                  <select id="status">
+                    <option>Draft</option>
+                    <option>Published</option>
+                    <option>Archived</option>
+                  </select>
+                </div>
+
+                <div class="field full">
+                  <label for="shortDescription">Short description</label>
+                  <textarea
+                    id="shortDescription"
+                    placeholder="Write a concise summary that will appear in cards and previews."></textarea>
+                  <div class="helper">Keep it focused on materials, benefits, and visual style.</div>
+                </div>
+
+                <div class="field full">
+                  <label for="longDescription">Full description</label>
+                  <textarea
+                    id="longDescription"
+                    placeholder="Tell buyers what makes this product different, how it is used, and what is included."></textarea>
+                </div>
+              </div>
+            </section>
+
+            <section class="form-section">
+              <div class="section-intro">
+                <h3>Pricing and inventory</h3>
+                <p>Static placeholders for merchant-friendly selling controls.</p>
+              </div>
+
+              <div class="field-grid">
+                <div class="field invalid">
+                  <label for="price">Price</label>
+                  <input id="price" type="text" placeholder="$149.00" />
+                  <div class="message">Enter a valid sale price.</div>
+                </div>
+
+                <div class="field">
+                  <label for="comparePrice">Compare at price</label>
+                  <input id="comparePrice" type="text" placeholder="$199.00" />
+                </div>
+
+                <div class="field">
+                  <label for="stock">Stock quantity</label>
+                  <input id="stock" type="number" placeholder="12" />
+                </div>
+
+                <div class="field">
+                  <label for="sku">SKU</label>
+                  <input id="sku" type="text" placeholder="SW-HP-001" />
+                </div>
+
+                <div class="field">
+                  <label for="shippingClass">Shipping class</label>
+                  <select id="shippingClass">
+                    <option>Standard parcel</option>
+                    <option>Fragile handling</option>
+                    <option>Oversized</option>
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label for="weight">Weight</label>
+                  <input id="weight" type="text" placeholder="0.45 kg" />
+                </div>
+              </div>
+            </section>
+
+            <section class="form-section">
+              <div class="section-intro">
+                <h3>Media gallery</h3>
+                <p>Dropzone and file cards stay visually aligned with the dashboard and media library.</p>
+              </div>
+
+              <div class="upload-dropzone media-dropzone">
+                <div class="drop-icon"><i class="bi bi-cloud-arrow-up"></i></div>
+                <strong>Upload product imagery</strong>
+                <span>Drag and drop hero shots, detail crops, or packaging images here.</span>
+                <div class="drop-actions">
+                  <button class="primary-btn" type="button">Choose files</button>
+                  <a class="ghost-btn" href="/seller/media">Open library</a>
+                </div>
+                <small>Allowed: JPG, PNG, WEBP up to 5 MB each.</small>
+              </div>
+
+              <div class="upload-preview-grid">
+                <article class="upload-card">
+                  <div class="preview-art">🎧</div>
+                  <strong>hero-front.jpg</strong>
+                  <span>1600 x 1200 px</span>
+                </article>
+
+                <article class="upload-card">
+                  <div class="preview-art">🎚️</div>
+                  <strong>control-closeup.png</strong>
+                  <span>1200 x 1200 px</span>
+                </article>
+
+                <article class="upload-card empty">
+                  <div class="preview-art"><i class="bi bi-plus-lg"></i></div>
+                  <strong>Add another file</strong>
+                  <span>Placeholder slot</span>
+                </article>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <aside class="form-side">
+          <div class="sticky-side">
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <h3>Publish summary</h3>
+                  <p>Quick review before saving</p>
+                </div>
+              </div>
+
+              <div class="panel-body summary-stack">
+                <div class="summary-row">
+                  <span>Visibility</span>
+                  <strong>Draft only</strong>
+                </div>
+                <div class="summary-row">
+                  <span>Sales channel</span>
+                  <strong>Web storefront</strong>
+                </div>
+                <div class="summary-row">
+                  <span>Images attached</span>
+                  <strong>2 / 5</strong>
+                </div>
+                <div class="summary-alert">
+                  <i class="bi bi-exclamation-triangle"></i>
+                  Three required fields still show placeholder validation.
+                </div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <h3>Checklist</h3>
+                  <p>Typical seller workflow</p>
+                </div>
+              </div>
+
+              <div class="panel-body note-list">
+                <div class="note-item done">
+                  <i class="bi bi-check-circle-fill"></i>
+                  Category selected
+                </div>
+                <div class="note-item">
+                  <i class="bi bi-circle"></i>
+                  Add a valid price
+                </div>
+                <div class="note-item">
+                  <i class="bi bi-circle"></i>
+                  Upload at least 3 images
+                </div>
+                <div class="note-item">
+                  <i class="bi bi-circle"></i>
+                  Review final storefront preview
+                </div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <h3>Actions</h3>
+                  <p>UI-only button states</p>
+                </div>
+              </div>
+
+              <div class="panel-body action-stack">
+                <button class="primary-btn" type="button">
+                  <i class="bi bi-check2"></i>
+                  Save product
+                </button>
+                <button class="secondary-btn" type="button">Save as draft</button>
+                <a class="ghost-btn" href="/seller">Cancel</a>
+              </div>
+            </section>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </div>
+</div>

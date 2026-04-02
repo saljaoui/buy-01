@@ -1,271 +1,439 @@
-<div class="vh-100 vh-100 overflow-auto">
-    <nav class="navbar-buy">
-        <div class="container">
-            <div class="nav-inner">
-                <a class="nav-brand" routerLink="/products">
-                    <div class="nav-brand-icon"><i class="bi bi-bag-heart-fill"></i></div>
-                    <span class="nav-brand-name">Buy01</span>
-                </a>
+<div class="storefront-shell">
+  <nav class="navbar-buy">
+    <div class="container">
+      <div class="nav-inner">
+        <a class="nav-brand" routerLink="/products">
+          <div class="nav-brand-icon"><i class="bi bi-bag-heart-fill"></i></div>
+          <span class="nav-brand-name">Buy01</span>
+        </a>
 
-                <div class="nav-search">
-                    <i class="bi bi-search s-icon"></i>
-                    <input type="text" placeholder="Search products…" />
-                </div>
-
-                <div class="nav-actions">
-                    @if (currentUser; as user) {
-                        <div class="nav-profile">
-                            <div class="nav-avatar">
-                                @if (user.avatar) {
-                                    <img [src]="user.avatar" [alt]="user.name" />
-                                } @else {
-                                    <span>{{ userInitials }}</span>
-                                }
-                            </div>
-                            <div class="nav-profile-copy d-none d-md-flex">
-                                <strong>{{ user.name }}</strong>
-                                <small>{{ profileLabel }}</small>
-                            </div>
-                        </div>
-
-                        @if (sellerDashboardLink; as dashboardLink) {
-                            <a [routerLink]="dashboardLink" class="nav-btn d-none d-sm-flex">
-                                <i class="bi bi-grid-1x2"></i> Dashboard
-                            </a>
-                        }
-
-                        <button type="button" class="nav-btn" (click)="logout()">
-                            <i class="bi bi-box-arrow-right"></i>
-                            <span class="d-none d-sm-inline">Sign Out</span>
-                        </button>
-                    } @else {
-                        <a routerLink="/login" class="nav-btn d-none d-sm-flex">Sign In</a>
-                        <a routerLink="/register" class="nav-btn primary d-none d-sm-flex">
-                            <i class="bi bi-person-plus"></i> Register
-                        </a>
-                    }
-                    <button class="cart-btn">
-                        <i class="bi bi-bag"></i>
-                        <span class="cart-badge">3</span>
-                    </button>
-                </div>
-            </div>
+        <div class="nav-search">
+          <i class="bi bi-search s-icon"></i>
+          <input type="text" placeholder="Search products, brands, or categories" />
         </div>
-    </nav>
 
-    <!-- ══ HERO ════════════════════════════════════ -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-inner">
-                <div class="hero-copy">
-                    <div class="hero-eyebrow"><span></span> New arrivals this week</div>
-                    <h1>Discover <em>products</em><br>you'll love.</h1>
-                    <p>Shop thousands of items from verified sellers — electronics, fashion, home goods, and more.</p>
-                    <div class="hero-cta">
-                        <a href="#products" class="btn-hero-primary">Shop Now <i class="bi bi-arrow-down"></i></a>
-                        <a routerLink="/register" class="btn-hero-ghost">Sell with us <i
-                                class="bi bi-arrow-right"></i></a>
-                    </div>
-                </div>
-
-                <div class="hero-stats d-none d-lg-flex">
-                    <div>
-                        <div class="h-stat-num">12k+</div>
-                        <div class="h-stat-label">Products</div>
-                    </div>
-                    <div>
-                        <div class="h-stat-num">3.4k</div>
-                        <div class="h-stat-label">Sellers</div>
-                    </div>
-                    <div>
-                        <div class="h-stat-num">98%</div>
-                        <div class="h-stat-label">Satisfied</div>
-                    </div>
-                </div>
+        <div class="nav-actions">
+          @if (currentUser; as user) {
+            <div class="nav-profile">
+              <div class="nav-avatar">
+                @if (user.avatar) {
+                  <img [src]="user.avatar" [alt]="user.name" />
+                } @else {
+                  <span>{{ userInitials }}</span>
+                }
+              </div>
+              <div class="nav-profile-copy">
+                <strong>{{ user.name }}</strong>
+                <small>{{ profileLabel }}</small>
+              </div>
             </div>
+
+            @if (sellerDashboardLink; as dashboardLink) {
+              <a [routerLink]="dashboardLink" class="nav-btn hide-mobile">
+                <i class="bi bi-grid-1x2"></i>
+                Dashboard
+              </a>
+            }
+
+            <button type="button" class="nav-btn" (click)="logout()">
+              <i class="bi bi-box-arrow-right"></i>
+              <span class="hide-mobile">Sign Out</span>
+            </button>
+          } @else {
+            <a routerLink="/login" class="nav-btn hide-mobile">Sign In</a>
+            <a routerLink="/register" class="nav-btn primary hide-mobile">
+              <i class="bi bi-person-plus"></i>
+              Register
+            </a>
+          }
+
+          <button class="cart-btn" type="button">
+            <i class="bi bi-bag"></i>
+            <span class="cart-badge">3</span>
+          </button>
         </div>
+      </div>
+    </div>
+  </nav>
+
+  <section class="page-hero catalog-hero">
+    <div class="container page-hero-inner">
+      <div class="hero-copy-block">
+        <div class="eyebrow"><span></span> Curated weekly picks</div>
+        <h1 class="page-title">Find standout <em>products</em><br />from trusted sellers.</h1>
+        <p class="page-copy">
+          Browse elevated essentials across audio, decor, wellness, and creative tools. Every card
+          below is a UI placeholder designed to feel like a polished live storefront.
+        </p>
+        <div class="hero-actions">
+          <a href="#catalog" class="btn-primary">
+            Explore catalog
+            <i class="bi bi-arrow-down"></i>
+          </a>
+          <a routerLink="/register" class="btn-secondary">
+            Sell on Buy01
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-panel">
+        <div class="hero-panel-head">
+          <div>
+            <div class="hero-panel-kicker">This week</div>
+            <strong>Best performing categories</strong>
+          </div>
+          <span class="hero-chip">+18%</span>
+        </div>
+
+        <div class="hero-highlight">
+          <div class="hero-highlight-art">🎧</div>
+          <div>
+            <h2>Audio & Desk Setup</h2>
+            <p>Most saved collection by first-time shoppers this week.</p>
+          </div>
+        </div>
+
+        <div class="hero-panel-grid">
+          <div class="hero-mini-card">
+            <span>48</span>
+            <small>Live listings</small>
+          </div>
+          <div class="hero-mini-card">
+            <span>12</span>
+            <small>Verified shops</small>
+          </div>
+          <div class="hero-mini-card">
+            <span>24h</span>
+            <small>Avg. dispatch</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="container catalog-page" id="catalog">
+    <section class="catalog-toolbar surface-card">
+      <div class="toolbar-copy">
+        <div class="kicker">Catalog experience</div>
+        <h2>Search, filter, and compare quickly</h2>
+        <p>
+          The layout mirrors the rest of the app: soft cards, clear spacing, dark accents, and
+          gold highlights for the primary actions.
+        </p>
+      </div>
+
+      <div class="toolbar-controls">
+        <div class="search-field toolbar-search">
+          <i class="bi bi-search"></i>
+          <input type="text" placeholder="Search for headphones, candles, journals..." />
+        </div>
+
+        <div class="toolbar-selects">
+          <div class="select-field">
+            <select>
+              <option>Newest arrivals</option>
+              <option>Best sellers</option>
+              <option>Price: low to high</option>
+              <option>Price: high to low</option>
+            </select>
+          </div>
+
+          <button class="btn-light" type="button">
+            <i class="bi bi-sliders"></i>
+            Filters
+          </button>
+        </div>
+      </div>
     </section>
 
-    <!-- ══ MAIN ═════════════════════════════════════ -->
-    <main class="container" id="products">
-
-        <!-- Category Pills -->
-        <div class="cats-section">
-            <div class="cat-scroll">
-                <a href="#" class="cat-pill active"><i class="bi bi-grid-fill"></i> All <span
-                        class="cat-count">(48)</span></a>
-                <a href="#" class="cat-pill"><i class="bi bi-cpu"></i> Electronics <span
-                        class="cat-count">(12)</span></a>
-                <a href="#" class="cat-pill"><i class="bi bi-bag-heart"></i> Fashion <span
-                        class="cat-count">(10)</span></a>
-                <a href="#" class="cat-pill"><i class="bi bi-house-heart"></i> Home & Living <span
-                        class="cat-count">(8)</span></a>
-                <a href="#" class="cat-pill"><i class="bi bi-bicycle"></i> Sports <span class="cat-count">(7)</span></a>
-                <a href="#" class="cat-pill"><i class="bi bi-book"></i> Books <span class="cat-count">(6)</span></a>
-                <a href="#" class="cat-pill"><i class="bi bi-stars"></i> Beauty <span class="cat-count">(5)</span></a>
-            </div>
+    <div class="catalog-layout">
+      <aside class="filter-panel surface-card">
+        <div class="filter-group">
+          <div class="filter-title">Categories</div>
+          <label class="check-row active"><input checked type="checkbox" /> All products <span>48</span></label>
+          <label class="check-row"><input type="checkbox" /> Electronics <span>12</span></label>
+          <label class="check-row"><input type="checkbox" /> Home & Living <span>9</span></label>
+          <label class="check-row"><input type="checkbox" /> Wellness <span>7</span></label>
+          <label class="check-row"><input type="checkbox" /> Office <span>5</span></label>
         </div>
 
-        <!-- Toolbar -->
-        <div class="toolbar">
-            <div class="d-flex align-items-center gap-3 flex-wrap">
-                <span class="results-count">Showing <strong>4</strong> products</span>
-                <select class="sort-select">
-                    <option>Newest First</option>
-                    <option>Price: Low → High</option>
-                    <option>Price: High → Low</option>
-                    <option>Top Rated</option>
-                </select>
+        <div class="filter-group">
+          <div class="filter-title">Price range</div>
+          <div class="range-card">
+            <div class="range-bar">
+              <span></span>
             </div>
-            <div class="d-flex gap-2">
-                <button class="view-btn active"><i class="bi bi-grid-3x3-gap"></i></button>
-                <button class="view-btn"><i class="bi bi-list-ul"></i></button>
+            <div class="range-values">
+              <strong>$25</strong>
+              <strong>$180</strong>
             </div>
+          </div>
         </div>
 
-        <!-- Product Grid — 4 cards -->
+        <div class="filter-group">
+          <div class="filter-title">Shopping options</div>
+          <label class="check-row"><input checked type="checkbox" /> Free delivery</label>
+          <label class="check-row"><input type="checkbox" /> New arrivals</label>
+          <label class="check-row"><input type="checkbox" /> Seller verified</label>
+          <label class="check-row"><input type="checkbox" /> In stock only</label>
+        </div>
+
+        <div class="filter-group">
+          <div class="filter-title">Seller rating</div>
+          <div class="rating-stack">
+            <button type="button" class="rating-btn active">4.8+ stars</button>
+            <button type="button" class="rating-btn">4.5+ stars</button>
+            <button type="button" class="rating-btn">4.0+ stars</button>
+          </div>
+        </div>
+
+        <div class="filter-note">
+          <strong>Fast dispatch across the catalog</strong>
+          <span>Most placeholder sellers here ship within 24 hours and maintain active listings.</span>
+        </div>
+
+        <button class="btn-primary filter-cta" type="button">
+          Apply filters
+          <i class="bi bi-arrow-right"></i>
+        </button>
+      </aside>
+
+      <section class="catalog-content">
+        <div class="section-heading">
+          <div>
+            <div class="kicker">48 products available</div>
+            <h2>Popular right now</h2>
+            <p>Responsive cards with strong hierarchy, lightweight copy, and clean pricing.</p>
+          </div>
+
+          <div class="view-switch">
+            <button class="view-btn active" type="button"><i class="bi bi-grid-3x3-gap"></i></button>
+            <button class="view-btn" type="button"><i class="bi bi-list-task"></i></button>
+          </div>
+        </div>
+
+        <div class="feature-strip">
+          <div class="feature-card">
+            <i class="bi bi-patch-check"></i>
+            <div>
+              <strong>Verified sellers</strong>
+              <span>Profiles reviewed before publishing</span>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <i class="bi bi-stars"></i>
+            <div>
+              <strong>Thoughtful curation</strong>
+              <span>Balanced grid with premium visual rhythm</span>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <i class="bi bi-truck"></i>
+            <div>
+              <strong>Fast fulfillment</strong>
+              <span>Clear shipping cues in the product detail flow</span>
+            </div>
+          </div>
+        </div>
+
         <div class="product-grid">
-
-            <!-- Card 1: Featured + Sale + Liked -->
-            <div class="p-card">
-                <div class="p-card-img">
-                    <span class="emoji">🎧</span>
-                    <div class="card-badges">
-                        <span class="badge-pill badge-featured">Featured</span>
-                    </div>
-                    <button class="wish-btn liked">
-                        <i class="bi bi-heart-fill"></i>
-                    </button>
-                </div>
-                <div class="p-card-body">
-                    <div class="p-card-seller">
-                        <div class="seller-dot">S</div> SoundWave
-                    </div>
-                    <div class="p-card-name">Noise-Cancelling Pro Headphones</div>
-                    <div class="p-card-stars">
-                        <span class="stars">★★★★★</span>
-                        <span class="rating-count">4.8 (212)</span>
-                    </div>
-                    <div class="p-card-footer">
-                        <div>
-                            <div class="p-price-old">$199</div>
-                            <div class="p-price sale">$149</div>
-                        </div>
-                        <button class="btn-add-cart"><i class="bi bi-bag-plus"></i> Add</button>
-                    </div>
-                </div>
+          <article class="product-card">
+            <div class="product-media media-audio">
+              <div class="media-badges">
+                <span class="media-badge featured">Featured</span>
+              </div>
+              <button class="wish-btn liked" type="button"><i class="bi bi-heart-fill"></i></button>
+              <span class="product-emoji">🎧</span>
             </div>
-
-            <!-- Card 2: New badge, not liked -->
-            <div class="p-card">
-                <div class="p-card-img">
-                    <span class="emoji">👜</span>
-                    <div class="card-badges">
-                        <span class="badge-pill badge-new">New</span>
-                    </div>
-                    <button class="wish-btn">
-                        <i class="bi bi-heart"></i>
-                    </button>
+            <div class="product-body">
+              <div class="product-meta">
+                <span class="seller-pill">SoundWave</span>
+                <span class="rating-pill">4.8</span>
+              </div>
+              <h3><a [routerLink]="['/products', '1']">Noise-Cancelling Pro Headphones</a></h3>
+              <p>Adaptive noise control, studio-grade balance, and a clean aluminum finish.</p>
+              <div class="product-footer">
+                <div>
+                  <div class="old-price">$199</div>
+                  <strong>$149</strong>
                 </div>
-                <div class="p-card-body">
-                    <div class="p-card-seller">
-                        <div class="seller-dot">C</div> CraftHouse
-                    </div>
-                    <div class="p-card-name">Minimalist Leather Wallet</div>
-                    <div class="p-card-stars">
-                        <span class="stars">★★★★☆</span>
-                        <span class="rating-count">4.6 (98)</span>
-                    </div>
-                    <div class="p-card-footer">
-                        <div>
-                            <div class="p-price">$49</div>
-                        </div>
-                        <button class="btn-add-cart"><i class="bi bi-bag-plus"></i> Add</button>
-                    </div>
-                </div>
+                <a class="mini-btn" [routerLink]="['/products', '1']">View item</a>
+              </div>
             </div>
+          </article>
 
-            <!-- Card 3: Sale badge, not liked -->
-            <div class="p-card">
-                <div class="p-card-img">
-                    <span class="emoji">💡</span>
-                    <div class="card-badges">
-                        <span class="badge-pill badge-sale">Sale</span>
-                    </div>
-                    <button class="wish-btn">
-                        <i class="bi bi-heart"></i>
-                    </button>
-                </div>
-                <div class="p-card-body">
-                    <div class="p-card-seller">
-                        <div class="seller-dot">L</div> LumiStore
-                    </div>
-                    <div class="p-card-name">Smart LED Desk Lamp</div>
-                    <div class="p-card-stars">
-                        <span class="stars">★★★★☆</span>
-                        <span class="rating-count">4.5 (134)</span>
-                    </div>
-                    <div class="p-card-footer">
-                        <div>
-                            <div class="p-price-old">$59</div>
-                            <div class="p-price sale">$39</div>
-                        </div>
-                        <button class="btn-add-cart"><i class="bi bi-bag-plus"></i> Add</button>
-                    </div>
-                </div>
+          <article class="product-card">
+            <div class="product-media media-wallet">
+              <div class="media-badges">
+                <span class="media-badge new">New</span>
+              </div>
+              <button class="wish-btn" type="button"><i class="bi bi-heart"></i></button>
+              <span class="product-emoji">👜</span>
             </div>
-
-            <!-- Card 4: No badge, not liked -->
-            <div class="p-card">
-                <div class="p-card-img">
-                    <span class="emoji">📚</span>
-                    <button class="wish-btn">
-                        <i class="bi bi-heart"></i>
-                    </button>
-                </div>
-                <div class="p-card-body">
-                    <div class="p-card-seller">
-                        <div class="seller-dot">B</div> BookNook
-                    </div>
-                    <div class="p-card-name">The Art of Deep Work</div>
-                    <div class="p-card-stars">
-                        <span class="stars">★★★★★</span>
-                        <span class="rating-count">4.9 (441)</span>
-                    </div>
-                    <div class="p-card-footer">
-                        <div>
-                            <div class="p-price">$18</div>
-                        </div>
-                        <button class="btn-add-cart"><i class="bi bi-bag-plus"></i> Add</button>
-                    </div>
-                </div>
+            <div class="product-body">
+              <div class="product-meta">
+                <span class="seller-pill">CraftHouse</span>
+                <span class="rating-pill">4.6</span>
+              </div>
+              <h3><a [routerLink]="['/products', '2']">Minimalist Leather Wallet</a></h3>
+              <p>Slim silhouette with hand-stitched edges and premium matte leather.</p>
+              <div class="product-footer">
+                <strong>$49</strong>
+                <a class="mini-btn" [routerLink]="['/products', '2']">View item</a>
+              </div>
             </div>
+          </article>
 
+          <article class="product-card">
+            <div class="product-media media-lamp">
+              <div class="media-badges">
+                <span class="media-badge sale">Sale</span>
+              </div>
+              <button class="wish-btn" type="button"><i class="bi bi-heart"></i></button>
+              <span class="product-emoji">💡</span>
+            </div>
+            <div class="product-body">
+              <div class="product-meta">
+                <span class="seller-pill">LumiStore</span>
+                <span class="rating-pill">4.5</span>
+              </div>
+              <h3><a [routerLink]="['/products', '3']">Smart LED Desk Lamp</a></h3>
+              <p>Warm-to-cool light modes with a rotating head and subtle brass detailing.</p>
+              <div class="product-footer">
+                <div>
+                  <div class="old-price">$59</div>
+                  <strong>$39</strong>
+                </div>
+                <a class="mini-btn" [routerLink]="['/products', '3']">View item</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-card">
+            <div class="product-media media-journal">
+              <button class="wish-btn" type="button"><i class="bi bi-heart"></i></button>
+              <span class="product-emoji">📓</span>
+            </div>
+            <div class="product-body">
+              <div class="product-meta">
+                <span class="seller-pill">PaperForm</span>
+                <span class="rating-pill">4.9</span>
+              </div>
+              <h3><a [routerLink]="['/products', '4']">Bound Daily Planning Journal</a></h3>
+              <p>Undated weekly spreads with textured covers and heavyweight paper stock.</p>
+              <div class="product-footer">
+                <strong>$24</strong>
+                <a class="mini-btn" [routerLink]="['/products', '4']">View item</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-card">
+            <div class="product-media media-yoga">
+              <div class="media-badges">
+                <span class="media-badge featured">Popular</span>
+              </div>
+              <button class="wish-btn liked" type="button"><i class="bi bi-heart-fill"></i></button>
+              <span class="product-emoji">🧘</span>
+            </div>
+            <div class="product-body">
+              <div class="product-meta">
+                <span class="seller-pill">Balance Co.</span>
+                <span class="rating-pill">4.7</span>
+              </div>
+              <h3><a [routerLink]="['/products', '5']">Premium Yoga Mat 6mm</a></h3>
+              <p>High-grip surface, balanced cushioning, and neutral studio-ready colorways.</p>
+              <div class="product-footer">
+                <strong>$35</strong>
+                <a class="mini-btn" [routerLink]="['/products', '5']">View item</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-card">
+            <div class="product-media media-camera">
+              <button class="wish-btn" type="button"><i class="bi bi-heart"></i></button>
+              <span class="product-emoji">📷</span>
+            </div>
+            <div class="product-body">
+              <div class="product-meta">
+                <span class="seller-pill">Frame Lab</span>
+                <span class="rating-pill">4.4</span>
+              </div>
+              <h3><a [routerLink]="['/products', '6']">Portable Creator Camera Grip</a></h3>
+              <p>Compact rig for mobile filming with tripod mount and wireless shutter control.</p>
+              <div class="product-footer">
+                <strong>$68</strong>
+                <a class="mini-btn" [routerLink]="['/products', '6']">View item</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-card">
+            <div class="product-media media-ceramic">
+              <div class="media-badges">
+                <span class="media-badge new">New</span>
+              </div>
+              <button class="wish-btn" type="button"><i class="bi bi-heart"></i></button>
+              <span class="product-emoji">🏺</span>
+            </div>
+            <div class="product-body">
+              <div class="product-meta">
+                <span class="seller-pill">Terra Studio</span>
+                <span class="rating-pill">4.8</span>
+              </div>
+              <h3><a [routerLink]="['/products', '7']">Handcrafted Ceramic Vase</a></h3>
+              <p>Matte glazed vessel with a sculpted silhouette designed for modern interiors.</p>
+              <div class="product-footer">
+                <strong>$72</strong>
+                <a class="mini-btn" [routerLink]="['/products', '7']">View item</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="product-card">
+            <div class="product-media media-speaker">
+              <div class="media-badges">
+                <span class="media-badge sale">Limited</span>
+              </div>
+              <button class="wish-btn" type="button"><i class="bi bi-heart"></i></button>
+              <span class="product-emoji">🔊</span>
+            </div>
+            <div class="product-body">
+              <div class="product-meta">
+                <span class="seller-pill">North Tone</span>
+                <span class="rating-pill">4.7</span>
+              </div>
+              <h3><a [routerLink]="['/products', '8']">Wireless Studio Speaker</a></h3>
+              <p>Balanced room-filling sound with tactile controls and a woven front grille.</p>
+              <div class="product-footer">
+                <div>
+                  <div class="old-price">$129</div>
+                  <strong>$109</strong>
+                </div>
+                <a class="mini-btn" [routerLink]="['/products', '8']">View item</a>
+              </div>
+            </div>
+          </article>
         </div>
+      </section>
+    </div>
+  </main>
 
-        <!-- Pagination -->
-        <div class="pag-wrap">
-            <a href="#" class="pag-btn"><i class="bi bi-chevron-left"></i></a>
-            <a href="#" class="pag-btn active">1</a>
-            <a href="#" class="pag-btn">2</a>
-            <a href="#" class="pag-btn">3</a>
-            <a href="#" class="pag-btn"><i class="bi bi-chevron-right"></i></a>
+  <footer class="footer-strip">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-brand">Buy<em>01</em></div>
+        <div class="footer-links">
+          <a href="#">Collections</a>
+          <a href="#">Seller guidelines</a>
+          <a href="#">Support</a>
+          <a href="#">Privacy</a>
         </div>
-
-    </main>
-
-    <!-- ══ FOOTER ══════════════════════════════════ -->
-    <footer class="footer-strip">
-        <div class="container">
-            <div class="footer-inner">
-                <div class="footer-brand">Buy<em>01</em> &nbsp;·&nbsp; Your marketplace</div>
-                <div class="footer-links">
-                    <a href="#">About</a>
-                    <a href="#">Terms</a>
-                    <a href="#">Privacy</a>
-                    <a href="#">Contact</a>
-                </div>
-            </div>
-        </div>
-    </footer>
+      </div>
+    </div>
+  </footer>
 </div>
