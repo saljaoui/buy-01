@@ -1,0 +1,107 @@
+.not-found-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(200, 169, 110, 0.16), transparent 22%),
+    radial-gradient(circle at 80% 80%, rgba(200, 169, 110, 0.12), transparent 24%),
+    var(--cream);
+}
+
+.not-found-card {
+  position: relative;
+  width: min(100%, 680px);
+  padding: 2.3rem;
+  border-radius: 24px;
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  box-shadow: 0 24px 60px rgba(26, 26, 24, 0.08);
+  text-align: center;
+}
+
+.eyebrow {
+  margin-bottom: 1rem;
+}
+
+.not-found-code {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(4rem, 10vw, 6rem);
+  line-height: 1;
+  color: var(--gold);
+  margin-bottom: 0.7rem;
+}
+
+.not-found-card h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.9rem, 5vw, 2.8rem);
+  color: var(--ink);
+  margin-bottom: 0.7rem;
+}
+
+.not-found-card p {
+  max-width: 520px;
+  margin: 0 auto;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.75;
+}
+
+.not-found-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-top: 1.6rem;
+}
+
+.floating-stack {
+  position: absolute;
+  inset: auto 2rem 2rem auto;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.floating-card {
+  min-width: 190px;
+  padding: 0.95rem 1rem;
+  border-radius: 18px;
+  background: rgba(26, 26, 24, 0.94);
+  border: 1px solid rgba(200, 169, 110, 0.22);
+  box-shadow: 0 20px 45px rgba(26, 26, 24, 0.18);
+}
+
+.floating-card span {
+  display: block;
+  font-size: 1.4rem;
+  margin-bottom: 0.45rem;
+}
+
+.floating-card strong {
+  display: block;
+  color: #fff;
+  font-size: 0.86rem;
+  margin-bottom: 0.12rem;
+}
+
+.floating-card small {
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 0.74rem;
+}
+
+@media (max-width: 767px) {
+  .not-found-shell {
+    padding: 1.2rem;
+  }
+
+  .not-found-card {
+    padding: 1.8rem 1.2rem;
+  }
+
+  .floating-stack {
+    position: static;
+    width: min(100%, 680px);
+    margin-top: 1rem;
+    grid-template-columns: 1fr;
+  }
+}

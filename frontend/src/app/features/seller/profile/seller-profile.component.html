@@ -1,0 +1,282 @@
+<div class="seller-shell">
+  <aside class="seller-sidebar">
+    <div class="seller-sidebar-inner">
+      <a class="seller-brand" href="/seller">
+        <div class="seller-brand-icon"><i class="bi bi-bag-heart-fill"></i></div>
+        <div class="seller-brand-copy">
+          <strong>Buy01</strong>
+          <span>Seller panel</span>
+        </div>
+      </a>
+
+      <nav class="seller-nav">
+        <div class="seller-nav-label">Overview</div>
+        <a class="seller-nav-link" href="/seller">
+          <i class="bi bi-grid-1x2"></i>
+          Dashboard
+        </a>
+        <a class="seller-nav-link" href="#">
+          <i class="bi bi-bar-chart-line"></i>
+          Analytics
+        </a>
+
+        <div class="seller-nav-label">Catalog</div>
+        <a class="seller-nav-link" href="/seller">
+          <i class="bi bi-box-seam"></i>
+          Products
+          <span class="seller-nav-badge">12</span>
+        </a>
+        <a class="seller-nav-link" href="/seller/products/new">
+          <i class="bi bi-plus-square"></i>
+          Create product
+        </a>
+        <a class="seller-nav-link" href="/seller/media">
+          <i class="bi bi-images"></i>
+          Media library
+        </a>
+
+        <div class="seller-nav-label">Account</div>
+        <a class="seller-nav-link active" href="#">
+          <i class="bi bi-person-circle"></i>
+          Profile
+        </a>
+        <a class="seller-nav-link" href="/products">
+          <i class="bi bi-shop-window"></i>
+          Storefront
+        </a>
+      </nav>
+
+      <div class="seller-account">
+        <div class="seller-account-avatar">A</div>
+        <div class="seller-account-copy">
+          <strong>Ada Lovelace</strong>
+          <span>Northline Studio</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="seller-main">
+    <header class="seller-topbar">
+      <div class="seller-topbar-copy">
+        <strong>Seller profile</strong>
+        <span>Personal details and storefront identity</span>
+      </div>
+
+      <div class="seller-topbar-actions">
+        <a class="ghost-btn" href="/products">
+          <i class="bi bi-eye"></i>
+          Preview store
+        </a>
+        <button class="primary-btn" type="button">
+          <i class="bi bi-check2"></i>
+          Save changes
+        </button>
+      </div>
+    </header>
+
+    <main class="seller-body">
+      <section class="seller-banner profile-banner">
+        <div class="profile-banner-head">
+          <div class="profile-avatar">A</div>
+          <div>
+            <div class="eyebrow"><span></span> Seller identity</div>
+            <h1>Ada Lovelace <em>/ Northline Studio</em></h1>
+            <p>Refresh profile details, public shop information, and account preferences from one consistent form layout.</p>
+          </div>
+        </div>
+
+        <div class="seller-banner-actions">
+          <button class="secondary-btn" type="button">
+            <i class="bi bi-camera"></i>
+            Change avatar
+          </button>
+          <button class="primary-btn" type="button">
+            <i class="bi bi-shop-window"></i>
+            Update storefront
+          </button>
+        </div>
+      </section>
+
+      <div class="profile-layout">
+        <div class="profile-stack">
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Personal information</h3>
+                <p>Private account fields used across the seller workspace</p>
+              </div>
+            </div>
+
+            <div class="panel-body">
+              <div class="field-grid">
+                <div class="field">
+                  <label for="fullName">Full name</label>
+                  <input id="fullName" type="text" placeholder="Ada Lovelace" />
+                </div>
+
+                <div class="field">
+                  <label for="email">Email address</label>
+                  <input id="email" type="email" placeholder="ada@example.com" />
+                </div>
+
+                <div class="field">
+                  <label for="phone">Phone number</label>
+                  <input id="phone" type="tel" placeholder="+1 555 010 204" />
+                </div>
+
+                <div class="field">
+                  <label for="role">Account role</label>
+                  <input id="role" type="text" placeholder="Seller" />
+                </div>
+
+                <div class="field full">
+                  <label for="bio">Short bio</label>
+                  <textarea id="bio" placeholder="Introduce yourself and the background behind your store."></textarea>
+                  <div class="helper">This copy can also support the public seller card on product pages.</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Store information</h3>
+                <p>Public-facing brand details for the storefront experience</p>
+              </div>
+            </div>
+
+            <div class="panel-body">
+              <div class="field-grid">
+                <div class="field">
+                  <label for="storeName">Store name</label>
+                  <input id="storeName" type="text" placeholder="Northline Studio" />
+                </div>
+
+                <div class="field">
+                  <label for="tagline">Tagline</label>
+                  <input id="tagline" type="text" placeholder="Thoughtful gear for modern workspaces" />
+                </div>
+
+                <div class="field">
+                  <label for="location">Location</label>
+                  <input id="location" type="text" placeholder="San Francisco, CA" />
+                </div>
+
+                <div class="field">
+                  <label for="website">Website</label>
+                  <input id="website" type="text" placeholder="www.northlinestudio.co" />
+                </div>
+
+                <div class="field full">
+                  <label for="storeDescription">Store description</label>
+                  <textarea
+                    id="storeDescription"
+                    placeholder="Describe your catalog, values, and what customers can expect from your store."></textarea>
+                  <div class="message">Store description placeholder for UI validation messaging.</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <h3>Preferences</h3>
+                <p>Static toggle placeholders for account notifications</p>
+              </div>
+            </div>
+
+            <div class="panel-body toggle-list">
+              <div class="toggle-item">
+                <div>
+                  <strong>Order notifications</strong>
+                  <span>Receive updates when a new order is placed.</span>
+                </div>
+                <button class="toggle-switch active" type="button"></button>
+              </div>
+
+              <div class="toggle-item">
+                <div>
+                  <strong>Marketing summaries</strong>
+                  <span>Weekly recap of listing performance and trends.</span>
+                </div>
+                <button class="toggle-switch" type="button"></button>
+              </div>
+
+              <div class="toggle-item">
+                <div>
+                  <strong>Low stock reminders</strong>
+                  <span>Prompt sellers before stock runs out on live listings.</span>
+                </div>
+                <button class="toggle-switch active" type="button"></button>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <aside class="profile-side">
+          <div class="sticky-side">
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <h3>Avatar</h3>
+                  <p>Profile image placeholder</p>
+                </div>
+              </div>
+
+              <div class="panel-body">
+                <div class="avatar-dropzone">
+                  <div class="avatar-preview">A</div>
+                  <strong>Upload a new profile image</strong>
+                  <span>Recommended size: 800 x 800 px, square crop.</span>
+                  <button class="ghost-btn" type="button">Choose image</button>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <h3>Store stats</h3>
+                  <p>Snapshot card placeholders</p>
+                </div>
+              </div>
+
+              <div class="panel-body mini-stat-grid">
+                <div class="mini-stat">
+                  <strong>12</strong>
+                  <span>Products</span>
+                </div>
+                <div class="mini-stat">
+                  <strong>34</strong>
+                  <span>Media files</span>
+                </div>
+                <div class="mini-stat">
+                  <strong>4.9</strong>
+                  <span>Seller rating</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <div>
+                  <h3>Actions</h3>
+                  <p>Primary profile controls</p>
+                </div>
+              </div>
+
+              <div class="panel-body button-stack">
+                <button class="primary-btn" type="button">Save profile</button>
+                <button class="secondary-btn" type="button">Edit storefront</button>
+                <button class="ghost-btn" type="button">Cancel</button>
+              </div>
+            </section>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </div>
+</div>
