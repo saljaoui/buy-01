@@ -10,6 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,13 +22,13 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> getCurrentUser(@AuthenticationPrincipal String userId) {
+    public ResponseEntity<UserResponse> getCurrentUser(@RequestHeader("X-User-Id") String userId) {
         return ResponseEntity.ok(userService.getCurrentUser(userId));
     }
 
     @PutMapping("/me")
     public ResponseEntity<UserResponse> updateCurrentUser(
-            @AuthenticationPrincipal String userId,
+            @RequestHeader("X-User-Id") String userId,
             @Valid @RequestBody UpdateUserRequest request) {
         return ResponseEntity.ok(userService.updateCurrentUser(userId, request));
     }
