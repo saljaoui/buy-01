@@ -1,6 +1,13 @@
+server:
+  port: 8083
+
 spring:
   application:
     name: media-service
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 
 jwt:
   secret: 4fd8a6c3b92f4a8c9c6b8a1f2e3d4c5f6a7b8c9d
