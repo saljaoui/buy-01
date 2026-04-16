@@ -1,11 +1,26 @@
 server:
-  port: 8761
+  port: ${SERVER_PORT:8761}
 
 spring:
   application:
     name: discovery-service
 
 eureka:
+  instance:
+    hostname: ${EUREKA_HOSTNAME:localhost}
+    prefer-ip-address: ${EUREKA_PREFER_IP_ADDRESS:false}
   client:
     register-with-eureka: false
     fetch-registry: false
+  server:
+    wait-time-in-ms-when-sync-empty: 0
+    eviction-interval-timer-in-ms: 5000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always

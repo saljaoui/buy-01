@@ -1,5 +1,5 @@
 server:
-  port: 8083
+  port: ${SERVER_PORT:8083}
 
 spring:
   application:
@@ -8,6 +8,24 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/buy01_media}
 
 jwt:
-  secret: 4fd8a6c3b92f4a8c9c6b8a1f2e3d4c5f6a7b8c9d
+  secret: ${JWT_SECRET:4fd8a6c3b92f4a8c9c6b8a1f2e3d4c5f6a7b8c9d}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_DEFAULT_ZONE:http://localhost:8761/eureka/}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

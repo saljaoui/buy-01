@@ -1,0 +1,97 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    restart: unless-stopped
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - buy01-network
+
+  discovery-service:
+    build:
+      context: ./infrastructure/discovery-service
+    restart: unless-stopped
+    environment:
+      SERVER_PORT: 8761
+      EUREKA_HOSTNAME: discovery-service
+    networks:
+      - buy01-network
+
+  api-gateway:
+    build:
+      context: ./infrastructure/api-gateway
+    restart: unless-stopped
+    environment:
+      SERVER_PORT: 8080
+      EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
+      JWT_SECRET: ${JWT_SECRET:-4fd8a6c3b92f4a8c9c6b8a1f2e3d4c5f6a7b8c9d}
+    ports:
+      - "${GATEWAY_PORT:-8080}:8080"
+    depends_on:
+      - discovery-service
+    networks:
+      - buy01-network
+
+  user-service:
+    build:
+      context: ./services/user-service
+    restart: unless-stopped
+    environment:
+      SERVER_PORT: 8081
+      EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
+      MONGODB_URI: mongodb://mongodb:27017/buy01_users
+      JWT_SECRET: ${JWT_SECRET:-4fd8a6c3b92f4a8c9c6b8a1f2e3d4c5f6a7b8c9d}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-24h}
+    depends_on:
+      - discovery-service
+      - mongodb
+    networks:
+      - buy01-network
+
+  product-service:
+    build:
+      context: ./services/product-service
+    restart: unless-stopped
+    environment:
+      SERVER_PORT: 8082
+      EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
+      MONGODB_URI: mongodb://mongodb:27017/buy01_products
+      JWT_SECRET: ${JWT_SECRET:-4fd8a6c3b92f4a8c9c6b8a1f2e3d4c5f6a7b8c9d}
+    depends_on:
+      - discovery-service
+      - mongodb
+    networks:
+      - buy01-network
+
+  media-service:
+    build:
+      context: ./services/media-service
+    restart: unless-stopped
+    environment:
+      SERVER_PORT: 8083
+      EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
+      MONGODB_URI: mongodb://mongodb:27017/buy01_media
+      JWT_SECRET: ${JWT_SECRET:-4fd8a6c3b92f4a8c9c6b8a1f2e3d4c5f6a7b8c9d}
+    depends_on:
+      - discovery-service
+      - mongodb
+    networks:
+      - buy01-network
+
+  frontend:
+    build:
+      context: ./frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-4200}:80"
+    depends_on:
+      - api-gateway
+    networks:
+      - buy01-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  buy01-network:
+    driver: bridge

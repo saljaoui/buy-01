@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
+    
 
     public UserResponse getCurrentUser(String userId) {
         return toUserResponse(getUserById(userId));
