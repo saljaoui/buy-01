@@ -3,7 +3,6 @@ package com.buy01.users.controller;
 import com.buy01.users.dto.AuthResponse;
 import com.buy01.users.dto.LoginRequest;
 import com.buy01.users.dto.RegisterRequest;
-import com.buy01.users.dto.UserResponse;
 import com.buy01.users.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
