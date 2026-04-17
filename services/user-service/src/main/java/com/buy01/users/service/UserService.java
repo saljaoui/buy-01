@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
-    
 
     public UserResponse getCurrentUser(String userId) {
         return toUserResponse(getUserById(userId));
@@ -23,18 +22,13 @@ public class UserService {
         User user = getUserById(userId);
         boolean updated = false;
 
-        if (request.getName() != null) {
-            String name = request.getName().trim();
-            if (name.isEmpty()) {
-                throw new IllegalArgumentException("name must not be blank");
-            }
-            user.setName(name);
+        if (request.getName() != null && !request.getName().equals(user.getName())) {
+            user.setName(request.getName());
             updated = true;
         }
 
-        if (request.getAvatar() != null) {
-            String avatar = request.getAvatar().trim();
-            user.setAvatar(avatar.isEmpty() ? null : avatar);
+        if (request.getAvatar() != null && !request.getAvatar().equals(user.getAvatar())) {
+            user.setAvatar(request.getAvatar().isEmpty() ? null : request.getAvatar());
             updated = true;
         }
 
