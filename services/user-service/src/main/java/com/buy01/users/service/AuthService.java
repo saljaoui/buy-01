@@ -21,33 +21,32 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public UserResponse register(RegisterRequest request) {
-        String email = normalizeEmail(request.getEmail());
-        String name = normalizeRequiredValue(request.getName(), "name");
-
-        boolean emailExists = userRepository.existsByEmail(email);
-        if (emailExists) {
+    public AuthResponse register(RegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
             throw new DuplicateEmailException("Email is already in use");
         }
 
         User user = User.builder()
-                .name(name)
-                .email(email)
+                .name(request.getName().trim())
+                .email(request.getEmail().trim())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
-                .avatar(normalizeOptionalValue(request.getAvatar()))
+                .avatar(request.getAvatar() != null ? request.getAvatar().trim() : null)
                 .build();
 
         User saved = userRepository.save(user);
+        String token = jwtUtil.generateToken(user.getId(), user.getRole());
 
-        return toUserResponse(saved);
+        return AuthResponse.builder()
+                .token(token)
+                .type("Bearer")
+                .user(toUserResponse(saved))
+                .build();
     }
 
     public AuthResponse login(LoginRequest request) {
-        String email = normalizeEmail(request.getEmail());
-
         User user = userRepository
-                .findByEmail(email)
+                .findByEmail(request.getEmail())
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
@@ -58,6 +57,8 @@ public class AuthService {
 
         return AuthResponse.builder()
                 .token(token)
+                .type("Bearer")
+                .user(toUserResponse(user))
                 .build();
     }
 
@@ -69,26 +70,5 @@ public class AuthService {
                 .role(user.getRole())
                 .avatar(user.getAvatar())
                 .build();
-    }
-
-    private String normalizeEmail(String email) {
-        return normalizeRequiredValue(email, "email").toLowerCase();
-    }
-
-    private String normalizeRequiredValue(String value, String fieldName) {
-        String normalized = value == null ? null : value.trim();
-        if (normalized == null || normalized.isEmpty()) {
-            throw new IllegalArgumentException(fieldName + " is required");
-        }
-        return normalized;
-    }
-
-    private String normalizeOptionalValue(String value) {
-        if (value == null) {
-            return null;
-        }
-
-        String normalized = value.trim();
-        return normalized.isEmpty() ? null : normalized;
     }
 }
