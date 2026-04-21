@@ -165,21 +165,10 @@
        overflow-y: auto;
    }
 
-   .right-panel::before {
-       content: '';
-       position: absolute;
-       top: -100px;
-       right: -100px;
-       width: 380px;
-       height: 380px;
-       border-radius: 50%;
-       background: radial-gradient(circle, rgba(200, 169, 110, .07) 0%, transparent 65%);
-       pointer-events: none;
-   }
-
    .form-card {
        width: 100%;
        max-width: 480px;
+       max-height: 100vh;
        animation: riseIn .65s cubic-bezier(.22, 1, .36, 1) both;
    }
 
@@ -200,7 +189,7 @@
        display: flex;
        justify-content: space-between;
        align-items: center;
-       margin-bottom: 2.2rem;
+       margin-bottom: 1.2rem;
    }
 
    .form-topnav a {
@@ -244,34 +233,33 @@
        background: var(--border);
    }
 
-   /* headings */
    .step-heading {
-       margin-bottom: 1.8rem;
+       margin-bottom: 1rem;
    }
 
    .step-heading .step-label {
-       font-size: .72rem;
+       font-size: .6rem;
        font-weight: 500;
-       letter-spacing: .1em;
+       letter-spacing: .08em;
        text-transform: uppercase;
        color: var(--gold);
-       margin-bottom: .4rem;
+       margin-bottom: .2rem;
        display: flex;
        align-items: center;
-       gap: .4rem;
+       gap: .2rem;
    }
 
    .step-heading h2 {
        font-family: 'Playfair Display', serif;
-       font-size: 1.8rem;
+       font-size: 1.25rem;
        color: var(--ink);
        line-height: 1.15;
    }
 
    .step-heading p {
-       font-size: .87rem;
+       font-size: .75rem;
        color: var(--text-muted);
-       margin-top: .35rem;
+       margin-top: .2rem;
    }
 
    /* role cards */
@@ -384,7 +372,7 @@
 
    .field-wrap {
        position: relative;
-       margin-bottom: 1.05rem;
+       margin-bottom: .5rem;
    }
 
    .field-wrap label {
@@ -394,7 +382,7 @@
        color: var(--text-muted);
        letter-spacing: .07em;
        text-transform: uppercase;
-       margin-bottom: .4rem;
+       margin-bottom: .2rem;
    }
 
    .field-wrap .f-icon {
