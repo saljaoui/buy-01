@@ -1,12 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { FooterComponent } from '../../../shared/footer/footer.component';
 
 import { AuthUser } from '../../auth/auth.models';
 import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-product-list',
-  imports: [RouterLink],
+  imports: [RouterLink, FooterComponent],
   templateUrl: './product-list.html',
   styleUrl: './product-list.scss',
 })
