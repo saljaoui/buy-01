@@ -38,6 +38,11 @@ export class ProductListComponent {
     void this.router.navigate(['/login']);
   }
 
+  protected scrollCatalog(): void {
+    const element = document.getElementById('catalog');
+    element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   private getUserInitials(user: AuthUser | null): string {
     if (!user?.name) {
       return 'U';
