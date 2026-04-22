@@ -1,0 +1,266 @@
+/* =========================================
+   Buy01 Premium Footer Styles (Simplified Grid)
+   ========================================= */
+
+.b01-footer {
+  background-color: var(--ink);
+  color: var(--cream);
+  font-family: inherit;
+  position: relative;
+  overflow: hidden;
+}
+
+.b01-footer__accent-line {
+  height: 2px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.5;
+}
+
+.b01-footer__container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 5rem 2rem 2rem;
+}
+
+/* --- Newsletter Section --- */
+.b01-footer__newsletter {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 4rem;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.b01-footer__newsletter-content {
+  max-width: 450px;
+}
+
+.b01-footer__newsletter-title {
+  font-size: 2rem;
+  font-weight: 300;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.5px;
+}
+
+.b01-footer__newsletter-desc {
+  color: var(--text-light);
+  font-size: 1rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.b01-footer__form {
+  display: flex;
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+}
+
+.b01-footer__input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--cream);
+  padding: 0.75rem 0;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.b01-footer__input::placeholder {
+  color: var(--text-muted);
+}
+
+.b01-footer__input:focus {
+  border-bottom-color: var(--gold);
+}
+
+.b01-footer__submit {
+  background: transparent;
+  border: none;
+  color: var(--cream);
+  position: absolute;
+  right: 0;
+  bottom: 0.75rem;
+  cursor: pointer;
+  transition: color 0.3s ease, transform 0.3s ease;
+  padding: 0 0.5rem;
+}
+
+.b01-footer__submit:hover {
+  color: var(--gold);
+  transform: translateX(4px);
+}
+
+/* --- Main Grid (Updated for 3 Columns) --- */
+.b01-footer__grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr; /* Balances the space beautifully */
+  gap: 4rem;
+  margin-bottom: 4rem;
+}
+
+/* Brand Column */
+.b01-footer__logo {
+  display: inline-block;
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: var(--cream);
+  text-decoration: none;
+  margin-bottom: 1rem;
+}
+
+.b01-footer__logo em {
+  color: var(--gold);
+  font-style: normal;
+}
+
+.b01-footer__tagline {
+  color: var(--text-light);
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  max-width: 350px;
+}
+
+/* Socials */
+.b01-footer__socials {
+  display: flex;
+  gap: 1rem;
+}
+
+.b01-footer__social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--cream);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.b01-footer__social-icon:hover {
+  background-color: var(--gold);
+  color: var(--ink);
+  border-color: var(--gold);
+  transform: translateY(-4px);
+}
+
+/* Links Columns */
+.b01-footer__heading {
+  color: var(--cream);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 1.5rem 0;
+  letter-spacing: 0.5px;
+}
+
+.b01-footer__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.b01-footer__link {
+  color: var(--text-light);
+  text-decoration: none;
+  font-size: 0.95rem;
+  width: fit-content;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+.b01-footer__link::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  bottom: -2px;
+  left: 0;
+  background-color: var(--gold);
+  transform: scaleX(0);
+  transform-origin: bottom right;
+  transition: transform 0.4s cubic-bezier(0.86, 0, 0.07, 1);
+}
+
+.b01-footer__link:hover {
+  color: var(--cream);
+}
+
+.b01-footer__link:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+/* Contact List */
+.b01-footer__contact-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  color: var(--text-light);
+  font-size: 0.95rem;
+}
+
+.b01-footer__status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: var(--success);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--success);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--success);
+}
+
+/* --- Bottom Bar --- */
+.b01-footer__bottom {
+  text-align: center;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.b01-footer__copyright {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 992px) {
+  .b01-footer__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .b01-footer__col--brand {
+    grid-column: 1 / -1; 
+  }
+}
+
+@media (max-width: 768px) {
+  .b01-footer__newsletter {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .b01-footer__form {
+    max-width: 100%;
+  }
+  .b01-footer__grid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+}
