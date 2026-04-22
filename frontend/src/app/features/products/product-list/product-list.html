@@ -1,4 +1,5 @@
 <div class="storefront-shell">
+
   <nav class="navbar-buy">
     <div class="container">
       <div class="nav-inner">
@@ -13,37 +14,37 @@
 
         <div class="nav-actions">
           @if (currentUser; as user) {
-            <div class="nav-profile">
-              <div class="nav-avatar">
-                @if (user.avatar) {
-                  <img [src]="user.avatar" [alt]="user.name" />
-                } @else {
-                  <span>{{ userInitials }}</span>
-                }
-              </div>
-              <div class="nav-profile-copy">
-                <strong>{{ user.name }}</strong>
-                <small>{{ profileLabel }}</small>
-              </div>
+          <div class="nav-profile">
+            <div class="nav-avatar">
+              @if (user.avatar) {
+              <img [src]="user.avatar" [alt]="user.name" />
+              } @else {
+              <span>{{ userInitials }}</span>
+              }
             </div>
+            <div class="nav-profile-copy">
+              <strong>{{ user.name }}</strong>
+              <small>{{ profileLabel }}</small>
+            </div>
+          </div>
 
-            @if (sellerDashboardLink; as dashboardLink) {
-              <a [routerLink]="dashboardLink" class="nav-btn hide-mobile">
-                <i class="bi bi-grid-1x2"></i>
-                Dashboard
-              </a>
-            }
+          @if (sellerDashboardLink; as dashboardLink) {
+          <a [routerLink]="dashboardLink" class="nav-btn hide-mobile">
+            <i class="bi bi-grid-1x2"></i>
+            Dashboard
+          </a>
+          }
 
-            <button type="button" class="nav-btn" (click)="logout()">
-              <i class="bi bi-box-arrow-right"></i>
-              <span class="hide-mobile">Sign Out</span>
-            </button>
+          <button type="button" class="nav-btn" (click)="logout()">
+            <i class="bi bi-box-arrow-right"></i>
+            <span class="hide-mobile">Sign Out</span>
+          </button>
           } @else {
-            <a routerLink="/login" class="nav-btn hide-mobile">Sign In</a>
-            <a routerLink="/register" class="nav-btn primary hide-mobile">
-              <i class="bi bi-person-plus"></i>
-              Register
-            </a>
+          <a routerLink="/login" class="nav-btn hide-mobile">Sign In</a>
+          <a routerLink="/register" class="nav-btn primary hide-mobile">
+            <i class="bi bi-person-plus"></i>
+            Register
+          </a>
           }
 
           <button class="cart-btn" type="button">
@@ -55,195 +56,247 @@
     </div>
   </nav>
 
+  <!-- ── TICKER ─────────────────────────────────────────────── -->
+  <div class="hero-ticker">
+    <div class="ticker-track">
+      <span class="ticker-item"><b>10,000+</b> Active Listings</span>
+      <span class="ticker-dot"></span>
+      <span class="ticker-item">New Arrivals <b>Every Day</b></span>
+      <span class="ticker-dot"></span>
+      <span class="ticker-item">Avg. Rating <b>4.8 / 5</b></span>
+      <span class="ticker-dot"></span>
+      <span class="ticker-item"><b>24h</b> Fast Dispatch</span>
+      <span class="ticker-dot"></span>
+      <span class="ticker-item">Verified <b>Top Sellers</b></span>
+      <span class="ticker-dot"></span>
+      <span class="ticker-item">Secure <b>Checkout</b></span>
+      <span class="ticker-dot"></span>
+      <!-- mirror block for seamless loop -->
+      <span class="ticker-item"><b>10,000+</b> Active Listings</span>
+      <span class="ticker-dot"></span>
+      <span class="ticker-item">New Arrivals <b>Every Day</b></span>
+      <span class="ticker-dot"></span>
+      <span class="ticker-item">Avg. Rating <b>4.8 / 5</b></span>
+      <span class="ticker-dot"></span>
+      <span class="ticker-item"><b>24h</b> Fast Dispatch</span>
+      <span class="ticker-dot"></span>
+      <span class="ticker-item">Verified <b>Top Sellers</b></span>
+      <span class="ticker-dot"></span>
+      <span class="ticker-item">Secure <b>Checkout</b></span>
+      <span class="ticker-dot"></span>
+    </div>
+  </div>
+
+  <!-- ── HERO ───────────────────────────────────────────────── -->
   <section class="page-hero catalog-hero">
-    <div class="container page-hero-inner">
-      <div class="hero-copy-block">
-        <div class="eyebrow"><span></span> Curated weekly picks</div>
-        <h1 class="page-title">Find standout <em>products</em><br />from trusted sellers.</h1>
-        <p class="page-copy">
-          Browse elevated essentials across audio, decor, wellness, and creative tools. Every card
-          below is a UI placeholder designed to feel like a polished live storefront.
-        </p>
-        <div class="hero-actions">
-          <a href="#catalog" class="btn-primary">
-            Explore catalog
-            <i class="bi bi-arrow-down"></i>
-          </a>
-          <a routerLink="/register" class="btn-secondary">
-            Sell on Buy01
-            <i class="bi bi-arrow-right"></i>
-          </a>
+
+    <div class="hero-ghost-text">Curated</div>
+    <div class="hero-glow-line"></div>
+
+    <div class="container">
+      <div class="page-hero-inner">
+
+        <!-- LEFT: Copy -->
+        <div class="hero-copy-block">
+
+          <div class="hero-index">
+            <span class="hero-index-num">01</span>
+            <span class="hero-index-line"></span>
+            <span class="hero-index-label">New Arrivals Daily</span>
+          </div>
+
+          <h1 class="page-title">
+            Discover
+            <em>Premium</em>
+            <span class="word-sub">Products for your life</span>
+          </h1>
+
+          <div class="hero-desc-row">
+            <div class="hero-desc-marker"></div>
+            <p class="page-copy">
+              Explore our carefully curated collection of high-quality essentials.
+              Whether you're looking for cutting-edge electronics, modern home decor,
+              or wellness items — find exactly what you need from top-rated sellers.
+            </p>
+          </div>
+
+          <div class="hero-actions">
+            <a href="#catalog" class="btn-primary">
+              Explore catalog
+              <i class="bi bi-arrow-down"></i>
+            </a>
+            <a routerLink="/register" class="btn-secondary">
+              Sell on Buy01
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+
+        </div>
+
+        <!-- RIGHT: Panel -->
+        <div class="hero-panel">
+          <div class="hero-panel-inner">
+
+            <div class="hero-panel-head">
+              <div>
+                <div class="hero-panel-kicker">Trending Now</div>
+                <strong>Most popular this week</strong>
+              </div>
+              <div class="hero-chip">
+                <i class="bi bi-star-fill" style="font-size:0.6rem;"></i>
+                Top Rated
+              </div>
+            </div>
+
+            <div class="hero-highlight">
+              <div class="hero-highlight-art">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path
+                    d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+                  <path d="M5 3v4" />
+                  <path d="M19 17v4" />
+                  <path d="M3 5h4" />
+                  <path d="M17 19h4" />
+                </svg>
+              </div>
+              <div>
+                <h2>Featured Collections</h2>
+                <p>Hand-picked items highly reviewed by our community of shoppers.</p>
+              </div>
+            </div>
+
+            <!-- ✅ Correct classes: hero-panel-grid + hero-mini-card -->
+            <div class="hero-panel-grid">
+              <div class="hero-mini-card">
+                <span>10k+</span>
+                <small>Listings</small>
+              </div>
+              <div class="hero-mini-card">
+                <span>4.8</span>
+                <small>Avg Rating</small>
+              </div>
+              <div class="hero-mini-card">
+                <span>24h</span>
+                <small>Dispatch</small>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="hero-trust">
+            <i class="bi bi-shield-check hero-trust-icon"></i>
+            <p>Verified sellers · Secure payments · Buyer protection</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom strip -->
+      <div class="hero-strip">
+        <div class="hero-strip-item">
+          <div class="hero-strip-num">10k+</div>
+          <div class="hero-strip-info">
+            <strong>Active Listings</strong>
+            <span>Updated daily</span>
+          </div>
+        </div>
+        <div class="hero-strip-item">
+          <div class="hero-strip-num">4.8</div>
+          <div class="hero-strip-info">
+            <strong>Average Rating</strong>
+            <span>From 32,000+ reviews</span>
+          </div>
+        </div>
+        <div class="hero-strip-item">
+          <div class="hero-strip-num">24h</div>
+          <div class="hero-strip-info">
+            <strong>Fast Dispatch</strong>
+            <span>Most orders ship same day</span>
+          </div>
+        </div>
+        <div class="hero-strip-item">
+          <div class="hero-strip-num">98%</div>
+          <div class="hero-strip-info">
+            <strong>Satisfaction</strong>
+            <span>Verified buyer reports</span>
+          </div>
         </div>
       </div>
 
-      <div class="hero-panel">
-        <div class="hero-panel-head">
-          <div>
-            <div class="hero-panel-kicker">This week</div>
-            <strong>Best performing categories</strong>
-          </div>
-          <span class="hero-chip">+18%</span>
-        </div>
-
-        <div class="hero-highlight">
-          <div class="hero-highlight-art">🎧</div>
-          <div>
-            <h2>Audio & Desk Setup</h2>
-            <p>Most saved collection by first-time shoppers this week.</p>
-          </div>
-        </div>
-
-        <div class="hero-panel-grid">
-          <div class="hero-mini-card">
-            <span>48</span>
-            <small>Live listings</small>
-          </div>
-          <div class="hero-mini-card">
-            <span>12</span>
-            <small>Verified shops</small>
-          </div>
-          <div class="hero-mini-card">
-            <span>24h</span>
-            <small>Avg. dispatch</small>
-          </div>
-        </div>
-      </div>
     </div>
   </section>
 
   <main class="container catalog-page" id="catalog">
-    <section class="catalog-toolbar surface-card">
-      <div class="toolbar-copy">
-        <div class="kicker">Catalog experience</div>
-        <h2>Search, filter, and compare quickly</h2>
-        <p>
-          The layout mirrors the rest of the app: soft cards, clear spacing, dark accents, and
-          gold highlights for the primary actions.
-        </p>
-      </div>
-
-      <div class="toolbar-controls">
-        <div class="search-field toolbar-search">
-          <i class="bi bi-search"></i>
-          <input type="text" placeholder="Search for headphones, candles, journals..." />
-        </div>
-
-        <div class="toolbar-selects">
-          <div class="select-field">
-            <select>
-              <option>Newest arrivals</option>
-              <option>Best sellers</option>
-              <option>Price: low to high</option>
-              <option>Price: high to low</option>
-            </select>
-          </div>
-
-          <button class="btn-light" type="button">
-            <i class="bi bi-sliders"></i>
-            Filters
-          </button>
-        </div>
-      </div>
-    </section>
-
     <div class="catalog-layout">
+
       <aside class="filter-panel surface-card">
-        <div class="filter-group">
-          <div class="filter-title">Categories</div>
-          <label class="check-row active"><input checked type="checkbox" /> All products <span>48</span></label>
-          <label class="check-row"><input type="checkbox" /> Electronics <span>12</span></label>
-          <label class="check-row"><input type="checkbox" /> Home & Living <span>9</span></label>
-          <label class="check-row"><input type="checkbox" /> Wellness <span>7</span></label>
-          <label class="check-row"><input type="checkbox" /> Office <span>5</span></label>
-        </div>
-
-        <div class="filter-group">
-          <div class="filter-title">Price range</div>
-          <div class="range-card">
-            <div class="range-bar">
-              <span></span>
-            </div>
-            <div class="range-values">
-              <strong>$25</strong>
-              <strong>$180</strong>
-            </div>
-          </div>
-        </div>
-
-        <div class="filter-group">
-          <div class="filter-title">Shopping options</div>
-          <label class="check-row"><input checked type="checkbox" /> Free delivery</label>
-          <label class="check-row"><input type="checkbox" /> New arrivals</label>
-          <label class="check-row"><input type="checkbox" /> Seller verified</label>
-          <label class="check-row"><input type="checkbox" /> In stock only</label>
-        </div>
-
-        <div class="filter-group">
-          <div class="filter-title">Seller rating</div>
-          <div class="rating-stack">
-            <button type="button" class="rating-btn active">4.8+ stars</button>
-            <button type="button" class="rating-btn">4.5+ stars</button>
-            <button type="button" class="rating-btn">4.0+ stars</button>
-          </div>
-        </div>
-
-        <div class="filter-note">
-          <strong>Fast dispatch across the catalog</strong>
-          <span>Most placeholder sellers here ship within 24 hours and maintain active listings.</span>
-        </div>
-
-        <button class="btn-primary filter-cta" type="button">
-          Apply filters
-          <i class="bi bi-arrow-right"></i>
-        </button>
-      </aside>
-
-      <section class="catalog-content">
-        <div class="section-heading">
-          <div>
-            <div class="kicker">48 products available</div>
-            <h2>Popular right now</h2>
-            <p>Responsive cards with strong hierarchy, lightweight copy, and clean pricing.</p>
-          </div>
-
-          <div class="view-switch">
-            <button class="view-btn active" type="button"><i class="bi bi-grid-3x3-gap"></i></button>
-            <button class="view-btn" type="button"><i class="bi bi-list-task"></i></button>
-          </div>
-        </div>
-
-        <div class="feature-strip">
+        <div class="feature-strip d-flex flex-column gap-4">
           <div class="feature-card">
-            <i class="bi bi-patch-check"></i>
+            <i class="bi bi-patch-check">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <g fill="none" stroke="currentColor" stroke-width="1.5">
+                  <circle cx="12" cy="16" r="3" />
+                  <path
+                    d="m12 19.26l-2.263 2.17c-.324.31-.486.465-.623.52c-.313.122-.66.017-.824-.25c-.072-.117-.095-.328-.14-.75c-.025-.239-.038-.358-.077-.458a.827.827 0 0 0-.5-.48c-.104-.037-.229-.049-.477-.073c-.44-.044-.661-.065-.783-.134a.617.617 0 0 1-.26-.79c.056-.132.218-.287.542-.598L8.073 17l1.04-1.04M12 19.26l2.263 2.17c.324.31.486.465.623.52c.313.122.66.017.824-.25c.072-.117.095-.328.14-.75c.025-.239.038-.358.077-.458a.828.828 0 0 1 .5-.48c.105-.037.229-.049.477-.073c.44-.043.661-.065.783-.134a.617.617 0 0 0 .26-.79c-.056-.132-.218-.287-.542-.598L15.926 17L15 16.073" />
+                  <path
+                    d="M17.32 17.996c1.972-.021 3.072-.145 3.801-.875C22 16.243 22 14.828 22 12V8c0-2.828 0-4.243-.879-5.121C20.243 2 18.828 2 16 2H8c-2.828 0-4.243 0-5.121.879C2 3.757 2 5.172 2 8v4c0 2.828 0 4.243.879 5.121c.768.769 1.946.865 4.121.877" />
+                  <path stroke-linecap="round" d="M9 6h6M7 9.5h10" />
+                </g>
+              </svg>
+            </i>
             <div>
               <strong>Verified sellers</strong>
               <span>Profiles reviewed before publishing</span>
             </div>
           </div>
-
           <div class="feature-card">
-            <i class="bi bi-stars"></i>
+            <i class="bi bi-stars">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <g fill="none">
+                  <path fill="currentColor"
+                    d="M7.506 15.265a.75.75 0 0 0 1.446-.4l-1.446.4Zm-1.43-7.99l.724-.2l-.723.2ZM4.705 5.92l-.2.723l.2-.723ZM3.2 4.725a.75.75 0 1 0-.402 1.445L3.2 4.725Zm16.988 11a.75.75 0 1 0-.378-1.451l.378 1.451Zm-9.991 1.834c.31 1.12-.37 2.303-1.574 2.616L9 21.626c1.977-.513 3.185-2.502 2.643-4.467l-1.446.4Zm-1.574 2.616c-1.212.315-2.428-.389-2.74-1.519l-1.446.4c.54 1.955 2.594 3.082 4.563 2.57l-.377-1.451Zm-2.74-1.519c-.31-1.12.37-2.303 1.574-2.616l-.377-1.45c-1.977.513-3.186 2.502-2.643 4.467l1.446-.4Zm1.574-2.616c1.212-.315 2.428.389 2.74 1.519l1.446-.4c-.54-1.955-2.594-3.082-4.563-2.57l.377 1.451Zm1.494-1.175L6.8 7.075l-1.446.4l2.152 7.79l1.446-.4ZM4.904 5.197l-1.703-.472l-.402 1.445l1.704.473l.401-1.446ZM6.8 7.075a2.707 2.707 0 0 0-1.896-1.878l-.4 1.446c.425.118.742.44.85.831l1.446-.4Zm4.31 11.01l9.079-2.36l-.378-1.451l-9.079 2.36l.377 1.451Z" />
+                  <path stroke="currentColor" stroke-width="1.5"
+                    d="M9.565 8.73c-.485-1.755-.727-2.633-.315-3.324c.411-.692 1.316-.927 3.126-1.398l1.92-.498c1.81-.47 2.715-.706 3.428-.307c.713.4.956 1.277 1.44 3.033l.515 1.862c.485 1.755.728 2.633.316 3.325c-.412.691-1.317.927-3.127 1.397l-1.92.499c-1.81.47-2.715.705-3.428.306c-.713-.4-.955-1.277-1.44-3.032L9.565 8.73Z" />
+                </g>
+              </svg>
+            </i>
             <div>
               <strong>Thoughtful curation</strong>
               <span>Balanced grid with premium visual rhythm</span>
             </div>
           </div>
-
           <div class="feature-card">
-            <i class="bi bi-truck"></i>
+            <i class="bi bi-truck">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <path fill="none" stroke="currentColor" stroke-width="1.5"
+                  d="m5.67 9.914l3.062-4.143c1.979-2.678 2.969-4.017 3.892-3.734c.923.283.923 1.925.923 5.21v.31c0 1.185 0 1.777.379 2.148l.02.02c.387.363 1.003.363 2.236.363c2.22 0 3.329 0 3.704.673l.018.034c.354.683-.289 1.553-1.574 3.29l-3.062 4.144c-1.98 2.678-2.969 4.017-3.892 3.734c-.923-.283-.923-1.925-.923-5.21v-.31c0-1.185 0-1.777-.379-2.148l-.02-.02c-.387-.363-1.003-.363-2.236-.363c-2.22 0-3.329 0-3.704-.673a1.084 1.084 0 0 1-.018-.034c-.354-.683.289-1.552 1.574-3.29Z" />
+              </svg>
+            </i>
             <div>
               <strong>Fast fulfillment</strong>
               <span>Clear shipping cues in the product detail flow</span>
             </div>
           </div>
         </div>
+      </aside>
+
+      <section class="catalog-content">
+        <div class="section-heading">
+          <div>
+            <div class="kicker">48 products available</div>
+          </div>
+          <div class="view-switch">
+            <button class="view-btn active" type="button"><i class="bi bi-grid-3x3-gap"></i></button>
+            <button class="view-btn" type="button"><i class="bi bi-list-task"></i></button>
+          </div>
+        </div>
 
         <div class="product-grid">
+
           <article class="product-card">
             <div class="product-media media-audio">
-              <div class="media-badges">
-                <span class="media-badge featured">Featured</span>
-              </div>
+              <div class="media-badges"><span class="media-badge featured">Featured</span></div>
               <button class="wish-btn liked" type="button"><i class="bi bi-heart-fill"></i></button>
               <span class="product-emoji">🎧</span>
             </div>
@@ -256,8 +309,7 @@
               <p>Adaptive noise control, studio-grade balance, and a clean aluminum finish.</p>
               <div class="product-footer">
                 <div>
-                  <div class="old-price">$199</div>
-                  <strong>$149</strong>
+                  <div class="old-price">$199</div><strong>$149</strong>
                 </div>
                 <a class="mini-btn" [routerLink]="['/products', '1']">View item</a>
               </div>
@@ -266,9 +318,7 @@
 
           <article class="product-card">
             <div class="product-media media-wallet">
-              <div class="media-badges">
-                <span class="media-badge new">New</span>
-              </div>
+              <div class="media-badges"><span class="media-badge new">New</span></div>
               <button class="wish-btn" type="button"><i class="bi bi-heart"></i></button>
               <span class="product-emoji">👜</span>
             </div>
@@ -288,9 +338,7 @@
 
           <article class="product-card">
             <div class="product-media media-lamp">
-              <div class="media-badges">
-                <span class="media-badge sale">Sale</span>
-              </div>
+              <div class="media-badges"><span class="media-badge sale">Sale</span></div>
               <button class="wish-btn" type="button"><i class="bi bi-heart"></i></button>
               <span class="product-emoji">💡</span>
             </div>
@@ -303,8 +351,7 @@
               <p>Warm-to-cool light modes with a rotating head and subtle brass detailing.</p>
               <div class="product-footer">
                 <div>
-                  <div class="old-price">$59</div>
-                  <strong>$39</strong>
+                  <div class="old-price">$59</div><strong>$39</strong>
                 </div>
                 <a class="mini-btn" [routerLink]="['/products', '3']">View item</a>
               </div>
@@ -332,9 +379,7 @@
 
           <article class="product-card">
             <div class="product-media media-yoga">
-              <div class="media-badges">
-                <span class="media-badge featured">Popular</span>
-              </div>
+              <div class="media-badges"><span class="media-badge featured">Popular</span></div>
               <button class="wish-btn liked" type="button"><i class="bi bi-heart-fill"></i></button>
               <span class="product-emoji">🧘</span>
             </div>
@@ -373,9 +418,7 @@
 
           <article class="product-card">
             <div class="product-media media-ceramic">
-              <div class="media-badges">
-                <span class="media-badge new">New</span>
-              </div>
+              <div class="media-badges"><span class="media-badge new">New</span></div>
               <button class="wish-btn" type="button"><i class="bi bi-heart"></i></button>
               <span class="product-emoji">🏺</span>
             </div>
@@ -395,9 +438,7 @@
 
           <article class="product-card">
             <div class="product-media media-speaker">
-              <div class="media-badges">
-                <span class="media-badge sale">Limited</span>
-              </div>
+              <div class="media-badges"><span class="media-badge sale">Limited</span></div>
               <button class="wish-btn" type="button"><i class="bi bi-heart"></i></button>
               <span class="product-emoji">🔊</span>
             </div>
@@ -410,13 +451,13 @@
               <p>Balanced room-filling sound with tactile controls and a woven front grille.</p>
               <div class="product-footer">
                 <div>
-                  <div class="old-price">$129</div>
-                  <strong>$109</strong>
+                  <div class="old-price">$129</div><strong>$109</strong>
                 </div>
                 <a class="mini-btn" [routerLink]="['/products', '8']">View item</a>
               </div>
             </div>
           </article>
+
         </div>
       </section>
     </div>
@@ -435,4 +476,5 @@
       </div>
     </div>
   </footer>
+
 </div>

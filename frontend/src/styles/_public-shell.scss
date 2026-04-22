@@ -9,7 +9,7 @@
   background: rgba(245, 240, 232, 0.92);
   backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border);
-  padding: 0.85rem 0;
+  padding: 0.5rem 0;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -501,7 +501,7 @@
 
 @media (max-width: 575px) {
   .navbar-buy {
-    padding: 0.8rem 0;
+    padding: 0.4rem 0;
   }
 
   .nav-actions {
