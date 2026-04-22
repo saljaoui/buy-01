@@ -61,16 +61,12 @@
   to   { transform: translateX(-50%); }
 }
 
-
-/* ─── HERO SECTION ──────────────────────────────────────────── */
-
 .catalog-hero {
   position: relative;
   overflow: hidden;
   padding: 4.5rem 0 3rem;
 }
 
-/* Subtle grid background */
 .catalog-hero::before {
   content: '';
   position: absolute;
@@ -82,7 +78,6 @@
   pointer-events: none;
 }
 
-/* Ghost watermark */
 .hero-ghost-text {
   position: absolute;
   top: 50%;
@@ -93,15 +88,16 @@
   font-weight: 300;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: transparent;
+  color: var(--gold);
   -webkit-text-stroke: 1px rgba(200,169,110,0.055);
   white-space: nowrap;
   pointer-events: none;
   user-select: none;
   z-index: 0;
+  letter-spacing: -20px;
+  opacity: 0.05;
 }
 
-/* Left edge vertical glow */
 .hero-glow-line {
   position: absolute;
   top: 10%; left: 0;
@@ -110,8 +106,6 @@
   opacity: 0.2;
   pointer-events: none;
 }
-
-/* ─── HERO INNER GRID ───────────────────────────────────────── */
 
 .page-hero-inner {
   display: grid;
@@ -122,14 +116,11 @@
   z-index: 1;
 }
 
-/* ─── LEFT COPY ─────────────────────────────────────────────── */
-
 .hero-copy-block {
   position: relative;
   z-index: 1;
 }
 
-/* Index row */
 .hero-index {
   display: flex;
   align-items: center;
@@ -189,7 +180,6 @@
   50%       { opacity: 0.4; transform: scale(0.7); }
 }
 
-/* Headline */
 .page-title {
   font-family: 'Cormorant Garamond', serif;
   font-weight: 300;
@@ -227,7 +217,6 @@
   text-transform: uppercase;
 }
 
-/* Body copy row */
 .hero-desc-row {
   display: flex;
   align-items: flex-start;
@@ -255,7 +244,6 @@
   font-weight: 300;
 }
 
-/* Actions */
 .hero-actions {
   display: flex;
   align-items: center;
@@ -299,9 +287,6 @@
   border-color: rgba(200,169,110,0.4);
 }
 
-
-/* ─── RIGHT PANEL ───────────────────────────────────────────── */
-
 .hero-panel {
   position: relative;
   z-index: 1;
@@ -310,7 +295,6 @@
   animation: revealLeft 0.9s 0.5s ease forwards;
 }
 
-/* Corner accents */
 .hero-panel::before {
   content: '';
   position: absolute;
@@ -348,7 +332,6 @@
   box-shadow: 0 28px 60px rgba(0,0,0,0.35);
 }
 
-/* Panel head */
 .hero-panel-head {
   display: flex;
   align-items: center;
@@ -390,7 +373,6 @@
   border-radius: 2px;
 }
 
-/* Featured highlight */
 .hero-highlight {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -429,7 +411,6 @@
   font-weight: 300;
 }
 
-/* Stat grid */
 .hero-panel-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -479,7 +460,6 @@
   color: rgba(255,255,255,0.28);
 }
 
-/* Trust strip */
 .hero-trust {
   display: flex;
   align-items: center;
@@ -500,9 +480,6 @@
   font-weight: 300;
   letter-spacing: 0.04em;
 }
-
-
-/* ─── BOTTOM STATS STRIP ────────────────────────────────────── */
 
 .hero-strip {
   display: flex;
@@ -552,9 +529,6 @@
   font-weight: 300;
 }
 
-
-/* ─── ENTRANCE ANIMATIONS ───────────────────────────────────── */
-
 @keyframes revealUp {
   from { opacity: 0; transform: translateY(28px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -564,11 +538,6 @@
   from { opacity: 0; transform: translateX(24px); }
   to   { opacity: 1; transform: translateX(0); }
 }
-
-
-/* ================================================================
-   CATALOG PAGE
-================================================================ */
 
 .catalog-page {
   padding: 1.8rem 0 3rem;
@@ -614,9 +583,6 @@
 }
 
 .toolbar-selects .select-field { flex: 1; }
-
-
-/* ─── CATALOG LAYOUT ────────────────────────────────────────── */
 
 .catalog-layout {
   display: grid;
@@ -757,9 +723,6 @@
   margin-top: 1rem;
 }
 
-
-/* ─── CATALOG CONTENT ───────────────────────────────────────── */
-
 .catalog-content { min-width: 0; }
 
 .view-switch { display: flex; gap: 0.45rem; }
@@ -820,9 +783,6 @@
   font-size: 0.76rem;
   line-height: 1.5;
 }
-
-
-/* ─── PRODUCT GRID ──────────────────────────────────────────── */
 
 .product-grid {
   display: grid;
@@ -997,11 +957,6 @@
   transform: translateY(-1px);
   background: #2d2d29;
 }
-
-
-/* ================================================================
-   RESPONSIVE
-================================================================ */
 
 @media (max-width: 1199px) {
   .feature-strip { grid-template-columns: 1fr; }
