@@ -47,7 +47,6 @@
 
       <!-- top nav -->
       <div class="form-topnav">
-        <a routerLink="/login"><i class="bi bi-arrow-left"></i> Back to Sign In</a>
         <div class="step-pills" id="stepPills">
           <div class="step-pill" id="pill1" [class.active]="currentStep === 1" [class.done]="currentStep > 1"></div>
           <div class="step-pill" id="pill2" [class.active]="currentStep === 2" [class.done]="currentStep > 2"
@@ -118,7 +117,7 @@
 
         <div class="field-wrap">
           <label for="name">Full Name</label>
-          <input type="text" id="name" name="name" placeholder="Sara Ali" autocomplete="name" [(ngModel)]="form.name"
+          <input type="text" id="name" name="name" placeholder="Soufian Alj" autocomplete="name" [(ngModel)]="form.name"
             [class.is-invalid]="isNameInvalid" />
           <i class="bi bi-person f-icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -133,7 +132,7 @@
 
         <div class="field-wrap">
           <label for="email">Email Address</label>
-          <input type="email" id="email" name="email" placeholder="ada@example.com" autocomplete="email"
+          <input type="email" id="email" name="email" placeholder="buy01@example.com" autocomplete="email"
             [(ngModel)]="form.email" [class.is-invalid]="isEmailInvalid" [class.is-valid]="isEmailValid" />
           <i class="bi bi-envelope f-icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">

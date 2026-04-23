@@ -13,7 +13,7 @@
    }
 
    .err-msg {
-    position: absolute;
+       position: absolute;
    }
 
    .left-panel::before {
@@ -193,21 +193,7 @@
        display: flex;
        justify-content: space-between;
        align-items: center;
-       margin-bottom: 1.2rem;
-   }
-
-   .form-topnav a {
-       display: flex;
-       align-items: center;
-       gap: .4rem;
-       font-size: .83rem;
-       color: var(--muted);
-       text-decoration: none;
-       transition: color .2s;
-   }
-
-   .form-topnav a:hover {
-       color: var(--ink);
+       justify-content: flex-end;
    }
 
    .step-pills {
@@ -376,7 +362,7 @@
 
    .field-wrap {
        position: relative;
-       margin-bottom: 1rem;
+       margin-bottom: .8rem;
    }
 
    .field-wrap label {
@@ -604,6 +590,7 @@
    .btn-register {
        width: 100%;
        padding: .85rem;
+       margin-top: 0.5rem;
        background: var(--ink);
        color: var(--gold);
        border: none;
