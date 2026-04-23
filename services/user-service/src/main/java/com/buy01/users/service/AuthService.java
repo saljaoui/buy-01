@@ -21,16 +21,22 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
+<<<<<<< HEAD
     public UserResponse register(RegisterRequest request) {
         String email = normalizeEmail(request.getEmail());
         String name = normalizeRequiredValue(request.getName(), "name");
 
         boolean emailExists = userRepository.existsByEmail(email);
         if (emailExists) {
+=======
+    public AuthResponse register(RegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+>>>>>>> main
             throw new DuplicateEmailException("Email is already in use");
         }
 
         User user = User.builder()
+<<<<<<< HEAD
                 .name(name)
                 .email(email)
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -48,6 +54,28 @@ public class AuthService {
 
         User user = userRepository
                 .findByEmail(email)
+=======
+                .name(request.getName().trim())
+                .email(request.getEmail().trim())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(request.getRole())
+                .avatar(request.getAvatar() != null ? request.getAvatar().trim() : null)
+                .build();
+
+        User saved = userRepository.save(user);
+        String token = jwtUtil.generateToken(user.getId(), user.getRole());
+
+        return AuthResponse.builder()
+                .token(token)
+                .type("Bearer")
+                .user(toUserResponse(saved))
+                .build();
+    }
+
+    public AuthResponse login(LoginRequest request) {
+        User user = userRepository
+                .findByEmail(request.getEmail())
+>>>>>>> main
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
@@ -58,6 +86,11 @@ public class AuthService {
 
         return AuthResponse.builder()
                 .token(token)
+<<<<<<< HEAD
+=======
+                .type("Bearer")
+                .user(toUserResponse(user))
+>>>>>>> main
                 .build();
     }
 
@@ -70,6 +103,7 @@ public class AuthService {
                 .avatar(user.getAvatar())
                 .build();
     }
+<<<<<<< HEAD
 
     private String normalizeEmail(String email) {
         return normalizeRequiredValue(email, "email").toLowerCase();
@@ -92,3 +126,6 @@ public class AuthService {
         return normalized.isEmpty() ? null : normalized;
     }
 }
+=======
+}
+>>>>>>> main

@@ -1,0 +1,144 @@
+/* =========================================
+   Buy01 Compact Premium Footer
+   ========================================= */
+
+.b01-mini-footer {
+  background-color: var(--ink);
+  color: var(--cream);
+  font-family: inherit;
+  position: relative;
+}
+
+.b01-mini-footer__accent {
+  height: 2px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.4;
+}
+
+.b01-mini-footer__container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 1.5rem 2rem; /* Much smaller vertical padding */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+/* Brand Group */
+.b01-mini-footer__brand-group {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.b01-mini-footer__logo {
+  font-size: 1.5rem; /* Scaled down */
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--cream);
+  text-decoration: none;
+}
+
+.b01-mini-footer__logo em {
+  color: var(--gold);
+  font-style: normal;
+}
+
+.b01-mini-footer__copyright {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  padding-left: 1.5rem;
+}
+
+/* Navigation Links */
+.b01-mini-footer__nav {
+  display: flex;
+  gap: 2rem;
+}
+
+.b01-mini-footer__link {
+  color: var(--text-light);
+  text-decoration: none;
+  font-size: 0.9rem;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+/* Luxury Underline Hover */
+.b01-mini-footer__link::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 1px;
+  bottom: -4px;
+  left: 0;
+  background-color: var(--gold);
+  transform: scaleX(0);
+  transform-origin: bottom right;
+  transition: transform 0.4s cubic-bezier(0.86, 0, 0.07, 1);
+}
+
+.b01-mini-footer__link:hover {
+  color: var(--cream);
+}
+
+.b01-mini-footer__link:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+/* Social Icons */
+.b01-mini-footer__socials {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.b01-mini-footer__social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px; /* Scaled down */
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--cream);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.b01-mini-footer__social-icon:hover {
+  background-color: var(--gold);
+  color: var(--ink);
+  border-color: var(--gold);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(200, 169, 110, 0.2);
+}
+
+/* Responsive Stacking */
+@media (max-width: 768px) {
+  .b01-mini-footer__container {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem 1.5rem;
+  }
+  
+  .b01-mini-footer__brand-group {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .b01-mini-footer__copyright {
+    border-left: none;
+    padding-left: 0;
+  }
+  
+  .b01-mini-footer__nav {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+}

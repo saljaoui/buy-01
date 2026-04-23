@@ -1,78 +1,5 @@
 <div class="storefront-shell">
-  <nav class="navbar-buy">
-    <div class="container">
-      <div class="nav-inner">
-        <a class="nav-brand" href="/products">
-          <div class="nav-brand-icon"><i class="bi bi-bag-heart-fill"></i></div>
-          <span class="nav-brand-name">Buy01</span>
-        </a>
-
-        <div class="nav-search">
-          <i class="bi bi-search s-icon"></i>
-          <input type="text" placeholder="Search the catalog" />
-        </div>
-
-        <div class="nav-actions">
-          <a href="/products" class="nav-btn hide-mobile">Browse</a>
-          <a href="/register" class="nav-btn primary hide-mobile">
-            <i class="bi bi-shop"></i>
-            Become a seller
-          </a>
-          <button class="cart-btn" type="button">
-            <i class="bi bi-bag"></i>
-            <span class="cart-badge">3</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </nav>
-
-  <section class="page-hero detail-hero">
-    <div class="container page-hero-inner detail-hero-inner">
-      <div class="detail-hero-copy">
-        <div class="eyebrow"><span></span> Product spotlight</div>
-        <h1 class="page-title">Noise-Cancelling Pro <em>Headphones</em></h1>
-        <p class="page-copy">
-          Premium over-ear headphones with adaptive noise control, all-day battery life, and a
-          refined matte-metal finish designed for focus-heavy workspaces.
-        </p>
-        <div class="hero-actions">
-          <button class="btn-primary" type="button">
-            Add to cart
-            <i class="bi bi-bag-plus"></i>
-          </button>
-          <a href="/products" class="btn-secondary">
-            Back to products
-            <i class="bi bi-arrow-left"></i>
-          </a>
-        </div>
-      </div>
-
-      <div class="detail-hero-card">
-        <div class="hero-card-row">
-          <div>
-            <span>Seller rating</span>
-            <strong>4.9 / 5</strong>
-          </div>
-          <small>Based on 212 reviews</small>
-        </div>
-        <div class="hero-card-row">
-          <div>
-            <span>Dispatch time</span>
-            <strong>Within 24h</strong>
-          </div>
-          <small>Verified shop</small>
-        </div>
-        <div class="hero-card-row">
-          <div>
-            <span>Coverage</span>
-            <strong>2-year warranty</strong>
-          </div>
-          <small>Free returns</small>
-        </div>
-      </div>
-    </div>
-  </section>
+ <app-navbar></app-navbar>
 
   <main class="container detail-page">
     <div class="breadcrumb-row">
@@ -116,19 +43,42 @@
 
         <div class="support-grid">
           <div class="surface-card support-card">
-            <i class="bi bi-truck"></i>
+            <i class="bi bi-truck">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <g fill="none">
+                  <path fill="currentColor"
+                    d="M7.506 15.265a.75.75 0 0 0 1.446-.4l-1.446.4Zm-1.43-7.99l.724-.2l-.723.2ZM4.705 5.92l-.2.723l.2-.723ZM3.2 4.725a.75.75 0 1 0-.402 1.445L3.2 4.725Zm16.988 11a.75.75 0 1 0-.378-1.451l.378 1.451Zm-9.991 1.834c.31 1.12-.37 2.303-1.574 2.616L9 21.626c1.977-.513 3.185-2.502 2.643-4.467l-1.446.4Zm-1.574 2.616c-1.212.315-2.428-.389-2.74-1.519l-1.446.4c.54 1.955 2.594 3.082 4.563 2.57l-.377-1.451Zm-2.74-1.519c-.31-1.12.37-2.303 1.574-2.616l-.377-1.45c-1.977.513-3.186 2.502-2.643 4.467l1.446-.4Zm1.574-2.616c1.212-.315 2.428.389 2.74 1.519l1.446-.4c-.54-1.955-2.594-3.082-4.563-2.57l.377 1.451Zm1.494-1.175L6.8 7.075l-1.446.4l2.152 7.79l1.446-.4ZM4.904 5.197l-1.703-.472l-.402 1.445l1.704.473l.401-1.446ZM6.8 7.075a2.707 2.707 0 0 0-1.896-1.878l-.4 1.446c.425.118.742.44.85.831l1.446-.4Zm4.31 11.01l9.079-2.36l-.378-1.451l-9.079 2.36l.377 1.451Z" />
+                  <path stroke="currentColor" stroke-width="1.5"
+                    d="M9.565 8.73c-.485-1.755-.727-2.633-.315-3.324c.411-.692 1.316-.927 3.126-1.398l1.92-.498c1.81-.47 2.715-.706 3.428-.307c.713.4.956 1.277 1.44 3.033l.515 1.862c.485 1.755.728 2.633.316 3.325c-.412.691-1.317.927-3.127 1.397l-1.92.499c-1.81.47-2.715.705-3.428.306c-.713-.4-.955-1.277-1.44-3.032L9.565 8.73Z" />
+                </g>
+              </svg>
+            </i>
             <strong>Free shipping</strong>
             <span>Delivered in 2 to 4 business days.</span>
           </div>
 
           <div class="surface-card support-card">
-            <i class="bi bi-shield-check"></i>
+            <i class="bi bi-shield-check">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <g fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path
+                    d="M3 10.417c0-3.198 0-4.797.378-5.335c.377-.537 1.88-1.052 4.887-2.081l.573-.196C10.405 2.268 11.188 2 12 2c.811 0 1.595.268 3.162.805l.573.196c3.007 1.029 4.51 1.544 4.887 2.081C21 5.62 21 7.22 21 10.417v1.574c0 5.638-4.239 8.375-6.899 9.536C13.38 21.842 13.02 22 12 22s-1.38-.158-2.101-.473C7.239 20.365 3 17.63 3 11.991v-1.574Z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m9.5 12.4l1.429 1.6l3.571-4" />
+                </g>
+              </svg>
+            </i>
             <strong>2-year warranty</strong>
             <span>Support coverage included with every order.</span>
           </div>
 
           <div class="surface-card support-card">
-            <i class="bi bi-arrow-repeat"></i>
+            <i class="bi bi-arrow-repeat">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                  stroke-width="1.5"
+                  d="M4 7h11c1.87 0 2.804 0 3.5.402A3 3 0 0 1 19.598 8.5C20 9.196 20 10.13 20 12s0 2.804-.402 3.5a3 3 0 0 1-1.098 1.098C17.804 17 16.87 17 15 17H8M4 7l3-3M4 7l3 3" />
+              </svg>
+            </i>
             <strong>Easy returns</strong>
             <span>Return window available for 30 days.</span>
           </div>
@@ -138,18 +88,12 @@
       <section class="info-column">
         <div class="surface-card detail-card">
           <div class="detail-pills">
-            <span class="detail-pill">Studio audio</span>
-            <span class="detail-pill">Wireless</span>
-            <span class="detail-pill">Fast dispatch</span>
+            <span class="detail-pill">Premium Quality</span>
+            <span class="detail-pill">Verified Seller</span>
+            <span class="detail-pill">Ready to ship</span>
           </div>
 
           <h2>Designed for focused listening and everyday comfort</h2>
-
-          <div class="rating-row">
-            <div class="stars">★★★★★</div>
-            <span>4.8 average rating</span>
-            <small>212 reviews</small>
-          </div>
 
           <div class="price-row">
             <div class="price-stack">
@@ -169,25 +113,6 @@
             noise-cancelling, soft memory-foam ear cups, USB-C charging, and up to 40 hours of
             playback in a compact travel-ready silhouette.
           </p>
-
-          <div class="highlight-grid">
-            <div class="highlight-item">
-              <strong>40h battery</strong>
-              <span>Enough power for multi-day sessions.</span>
-            </div>
-            <div class="highlight-item">
-              <strong>Bluetooth 5.3</strong>
-              <span>Stable pairing across mobile and desktop.</span>
-            </div>
-            <div class="highlight-item">
-              <strong>Quick charge</strong>
-              <span>Five hours of playback in 10 minutes.</span>
-            </div>
-            <div class="highlight-item">
-              <strong>Built-in mic</strong>
-              <span>Clear voice pickup for calls and meetings.</span>
-            </div>
-          </div>
 
           <div class="purchase-card">
             <div class="qty-box">
@@ -233,31 +158,12 @@
             <div class="seller-verified">Verified</div>
           </div>
 
-          <div class="seller-stats">
-            <div>
-              <strong>128</strong>
-              <span>Products sold</span>
-            </div>
-            <div>
-              <strong>4.9</strong>
-              <span>Average rating</span>
-            </div>
-            <div>
-              <strong>3y</strong>
-              <span>On Buy01</span>
-            </div>
-          </div>
-
           <p>
             SoundWave Studio focuses on premium listening gear with a clean industrial look,
             detailed setup guides, and fast customer support for creators and remote teams.
           </p>
 
           <div class="seller-actions">
-            <button class="secondary-btn" type="button">
-              <i class="bi bi-chat-left-text"></i>
-              Contact seller
-            </button>
             <button class="ghost-btn" type="button">
               <i class="bi bi-shop-window"></i>
               View store
@@ -266,91 +172,6 @@
         </div>
       </section>
     </div>
-
-    <div class="detail-bottom-grid">
-      <section class="surface-card info-panel">
-        <div class="kicker">About this item</div>
-        <h3>What buyers can expect</h3>
-        <ul>
-          <li>Adaptive noise-cancelling tuned for office, commute, and travel scenarios.</li>
-          <li>Multi-device pairing for switching between laptop, tablet, and phone.</li>
-          <li>Soft-touch carrying case, braided charging cable, and flight adapter included.</li>
-          <li>Balanced sound signature with subtle bass lift and crisp dialogue clarity.</li>
-        </ul>
-      </section>
-
-      <section class="surface-card info-panel">
-        <div class="kicker">Delivery & care</div>
-        <h3>Shipping details and upkeep</h3>
-        <ul>
-          <li>Orders placed before 4:00 PM are packed and dispatched the same day.</li>
-          <li>Clean ear cushions with a dry microfiber cloth and store inside the provided case.</li>
-          <li>Battery health is optimized automatically during overnight charging cycles.</li>
-          <li>Replacement cushions and extra cables can be ordered directly from the seller.</li>
-        </ul>
-      </section>
-    </div>
-
-    <section class="related-section">
-      <div class="section-heading">
-        <div>
-          <div class="kicker">More to explore</div>
-          <h2>Related picks</h2>
-          <p>Secondary cards keep the same visual rhythm as the listing page.</p>
-        </div>
-      </div>
-
-      <div class="related-grid">
-        <article class="related-card">
-          <div class="related-art">🔊</div>
-          <div class="related-body">
-            <strong>Wireless Studio Speaker</strong>
-            <span>North Tone</span>
-            <div class="related-footer">
-              <em>$109</em>
-              <a href="/products/8">View</a>
-            </div>
-          </div>
-        </article>
-
-        <article class="related-card">
-          <div class="related-art">📷</div>
-          <div class="related-body">
-            <strong>Creator Camera Grip</strong>
-            <span>Frame Lab</span>
-            <div class="related-footer">
-              <em>$68</em>
-              <a href="/products/6">View</a>
-            </div>
-          </div>
-        </article>
-
-        <article class="related-card">
-          <div class="related-art">💡</div>
-          <div class="related-body">
-            <strong>Smart LED Desk Lamp</strong>
-            <span>LumiStore</span>
-            <div class="related-footer">
-              <em>$39</em>
-              <a href="/products/3">View</a>
-            </div>
-          </div>
-        </article>
-      </div>
-    </section>
   </main>
-
-  <footer class="footer-strip">
-    <div class="container">
-      <div class="footer-inner">
-        <div class="footer-brand">Buy<em>01</em></div>
-        <div class="footer-links">
-          <a href="#">Support</a>
-          <a href="#">Returns</a>
-          <a href="#">Seller standards</a>
-          <a href="#">Privacy</a>
-        </div>
-      </div>
-    </div>
-  </footer>
+  <app-footer />
 </div>

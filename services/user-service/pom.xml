@@ -57,24 +57,43 @@
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
 		</dependency>
 
+<<<<<<< HEAD
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
 			<version>0.12.5</version>
+=======
+		<!-- JWT -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>0.12.6</version>
+>>>>>>> main
 		</dependency>
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-impl</artifactId>
+<<<<<<< HEAD
 			<version>0.12.5</version>
+=======
+			<version>0.12.6</version>
+>>>>>>> main
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-jackson</artifactId>
+<<<<<<< HEAD
 			<version>0.12.5</version>
 			<scope>runtime</scope>
 		</dependency>
 
+=======
+			<version>0.12.6</version>
+			<scope>runtime</scope>
+		</dependency>
+		
+>>>>>>> main
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>

@@ -9,42 +9,7 @@
         </div>
       </a>
 
-      <nav class="seller-nav">
-        <div class="seller-nav-label">Overview</div>
-        <a class="seller-nav-link active" href="/seller">
-          <i class="bi bi-grid-1x2"></i>
-          Dashboard
-        </a>
-        <a class="seller-nav-link" href="#">
-          <i class="bi bi-bar-chart-line"></i>
-          Analytics
-        </a>
-
-        <div class="seller-nav-label">Catalog</div>
-        <a class="seller-nav-link" href="/seller">
-          <i class="bi bi-box-seam"></i>
-          Products
-          <span class="seller-nav-badge">12</span>
-        </a>
-        <a class="seller-nav-link" href="/seller/products/new">
-          <i class="bi bi-plus-square"></i>
-          Create product
-        </a>
-        <a class="seller-nav-link" href="/seller/media">
-          <i class="bi bi-images"></i>
-          Media library
-        </a>
-
-        <div class="seller-nav-label">Account</div>
-        <a class="seller-nav-link" href="/seller/profile">
-          <i class="bi bi-person-circle"></i>
-          Profile
-        </a>
-        <a class="seller-nav-link" href="/products">
-          <i class="bi bi-shop-window"></i>
-          Storefront
-        </a>
-      </nav>
+      <app-seller-nav activeItem="dashboard"></app-seller-nav>
 
       <div class="seller-account">
         <div class="seller-account-avatar">A</div>
@@ -64,13 +29,19 @@
       </div>
 
       <div class="seller-topbar-actions">
-        <button class="icon-btn" type="button"><i class="bi bi-bell"></i></button>
-        <button class="ghost-btn" type="button">
-          <i class="bi bi-download"></i>
-          Export
-        </button>
         <a class="primary-btn" href="/seller/products/new">
-          <i class="bi bi-plus-lg"></i>
+          <i class="bi bi-plus-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+              <g fill="none">
+                <path stroke="currentColor" stroke-width="1.5"
+                  d="M7.5 18a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3Zm9 0a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3Z" />
+                <path fill="currentColor"
+                  d="m2.261 3.092l.249-.708l-.249.708Zm-.012-.8a.75.75 0 1 0-.498 1.416l.498-1.416Zm2.337 2.031l.62-.423l-.62.423Zm1.302 10.263l-.545.516l.545-.516Zm14.77-4.703l.734.151l.001-.004l-.735-.147Zm-.5 2.425l.735.15l-.735-.15Zm.576-5.61l-.594.456l.595-.457Zm-1.6 8.352l-.474-.581l.474.581ZM5.708 9.76V7.038h-1.5V9.76h1.5ZM2.51 2.384l-.261-.092l-.498 1.416l.261.091l.498-1.415Zm8.428 13.866h5.302v-1.5h-5.302v1.5Zm-5.23-9.212c0-.707.001-1.297-.05-1.776c-.055-.497-.171-.95-.453-1.362l-1.238.846c.09.132.16.314.199.677c.041.38.042.875.042 1.615h1.5ZM2.012 3.8c.668.235 1.107.39 1.43.55c.303.148.437.268.525.397L5.205 3.9c-.284-.416-.662-.682-1.103-.899c-.42-.206-.958-.394-1.592-.617L2.012 3.8Zm2.196 5.96c0 1.453.014 2.5.15 3.3c.147.854.44 1.466.985 2.042l1.089-1.032c-.32-.338-.493-.668-.595-1.263c-.11-.65-.129-1.558-.129-3.047h-1.5Zm6.73 4.99c-1.417 0-2.4-.002-3.141-.107c-.715-.101-1.092-.285-1.365-.573l-1.089 1.032c.594.627 1.347.9 2.243 1.026c.87.124 1.98.122 3.351.122v-1.5Zm-5.98-7.88h12.13v-1.5H4.959v1.5Zm14.965 2.861l-.5 2.425l1.47.303l.5-2.425l-1.47-.303ZM17.09 6.87c.856 0 1.61.001 2.205.067c.295.034.517.08.672.134c.161.057.187.1.174.083l1.189-.914c-.235-.306-.565-.479-.866-.584a4.616 4.616 0 0 0-1.003-.21c-.695-.077-1.543-.076-2.371-.076v1.5Zm4.304 3.16c.17-.848.313-1.56.348-2.13c.037-.586-.03-1.164-.412-1.66l-1.189.914c.062.081.13.226.104.654c-.027.444-.144 1.037-.322 1.928l1.471.294Zm-5.153 6.22c.762 0 1.401.001 1.917-.062c.535-.065 1.024-.209 1.45-.556l-.947-1.163c-.125.102-.303.184-.686.23c-.403.05-.934.051-1.734.051v1.5Zm3.184-4.094c-.162.783-.27 1.303-.4 1.688c-.123.366-.239.523-.364.625l.947 1.163c.427-.348.666-.797.838-1.309c.166-.492.294-1.118.448-1.864l-1.47-.303Z" />
+                <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5"
+                  d="M13 13v-2m0 0V9m0 2h2m-2 0h-2" />
+              </g>
+            </svg>
+          </i>
           New product
         </a>
       </div>
@@ -86,23 +57,22 @@
             seller workspace.
           </p>
         </div>
-
-        <div class="seller-banner-actions">
-          <a class="secondary-btn" href="/seller/media">
-            <i class="bi bi-images"></i>
-            Open media
-          </a>
-          <a class="primary-btn" href="/seller/products/new">
-            <i class="bi bi-plus-lg"></i>
-            Add listing
-          </a>
-        </div>
       </section>
 
       <div class="stats-grid">
         <article class="metric-card">
           <div class="metric-top">
-            <div class="metric-icon gold"><i class="bi bi-box-seam"></i></div>
+            <div class="metric-icon gold"><i class="bi bi-box-seam">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                  <g fill="none">
+                    <path stroke="currentColor" stroke-width="1.5"
+                      d="M3.794 12.03C4.331 9.342 4.6 8 5.487 7.134a4 4 0 0 1 .53-.434C7.04 6 8.41 6 11.15 6h1.703c2.739 0 4.108 0 5.13.7c.19.13.367.276.53.435c.888.865 1.157 2.208 1.694 4.894c.771 3.856 1.157 5.784.269 7.15c-.16.248-.348.477-.56.683C18.75 21 16.785 21 12.853 21H11.15c-3.933 0-5.899 0-7.065-1.138a3.998 3.998 0 0 1-.559-.683c-.888-1.366-.502-3.294.27-7.15Z" />
+                    <circle cx="15" cy="9" r="1" fill="currentColor" />
+                    <circle cx="9" cy="9" r="1" fill="currentColor" />
+                    <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M9 6V5a3 3 0 1 1 6 0v1" />
+                  </g>
+                </svg>
+              </i></div>
             <div class="metric-trend up"><i class="bi bi-arrow-up-short"></i> 3 this week</div>
           </div>
           <div class="metric-value">12</div>
@@ -111,7 +81,16 @@
 
         <article class="metric-card">
           <div class="metric-top">
-            <div class="metric-icon green"><i class="bi bi-check-circle"></i></div>
+            <div class="metric-icon green"><i class="bi bi-check-circle">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                  <g fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path
+                      d="M3.742 20.555C4.942 22 7.174 22 11.639 22h.722c4.465 0 6.698 0 7.898-1.445m-16.517 0c-1.2-1.446-.788-3.64.035-8.03c.585-3.12.877-4.681 1.988-5.603M3.742 20.555Zm16.517 0c1.2-1.446.788-3.64-.035-8.03c-.585-3.12-.878-4.681-1.989-5.603m2.024 13.633ZM18.235 6.922C17.125 6 15.536 6 12.361 6h-.722c-3.175 0-4.763 0-5.874.922m12.47 0Zm-12.47 0Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m10 14.3l1.333 1.2l2.667-3" />
+                    <path stroke-linecap="round" d="M9 6V5a3 3 0 1 1 6 0v1" />
+                  </g>
+                </svg>
+              </i></div>
             <div class="metric-trend up"><i class="bi bi-arrow-up-short"></i> 9 live</div>
           </div>
           <div class="metric-value">9</div>
@@ -120,16 +99,15 @@
 
         <article class="metric-card">
           <div class="metric-top">
-            <div class="metric-icon blue"><i class="bi bi-images"></i></div>
-            <div class="metric-trend up"><i class="bi bi-arrow-up-short"></i> 34 files</div>
-          </div>
-          <div class="metric-value">34</div>
-          <div class="metric-label">Media assets</div>
-        </article>
-
-        <article class="metric-card">
-          <div class="metric-top">
-            <div class="metric-icon red"><i class="bi bi-journal-check"></i></div>
+            <div class="metric-icon red"><i class="bi bi-journal-check">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                  <g fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path
+                      d="M3.742 20.555C4.942 22 7.174 22 11.639 22h.722c4.465 0 6.698 0 7.898-1.445m-16.517 0c-1.2-1.446-.788-3.64.035-8.03c.585-3.12.877-4.681 1.988-5.603M3.742 20.555Zm16.517 0c1.2-1.446.788-3.64-.035-8.03c-.585-3.12-.878-4.681-1.989-5.603m2.024 13.633ZM18.235 6.922C17.125 6 15.536 6 12.361 6h-.722c-3.175 0-4.763 0-5.874.922m12.47 0Zm-12.47 0Z" />
+                    <path stroke-linecap="round" d="m14 12l-4 4m0-4l4 4M9 6V5a3 3 0 1 1 6 0v1" />
+                  </g>
+                </svg>
+              </i></div>
             <div class="metric-trend down"><i class="bi bi-arrow-down-short"></i> 3 pending</div>
           </div>
           <div class="metric-value">3</div>
@@ -177,8 +155,22 @@
                   <td>4 files</td>
                   <td>
                     <div class="row-actions">
-                      <a class="row-btn" href="/seller/products/1/edit"><i class="bi bi-pencil"></i></a>
-                      <button class="row-btn danger" type="button"><i class="bi bi-trash"></i></button>
+                      <a class="row-btn" href="/seller/products/1/edit"><i class="bi bi-pencil">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                            <g fill="none" stroke="currentColor" stroke-width="1.5">
+                              <path
+                                d="m16.652 3.455l.649-.649A2.753 2.753 0 0 1 21.194 6.7l-.65.649m-3.892-3.893s.081 1.379 1.298 2.595c1.216 1.217 2.595 1.298 2.595 1.298m-3.893-3.893L10.687 9.42c-.404.404-.606.606-.78.829c-.205.262-.38.547-.524.848c-.121.255-.211.526-.392 1.068L8.412 13.9m12.133-6.552l-5.965 5.965c-.404.404-.606.606-.829.78a4.59 4.59 0 0 1-.848.524c-.255.121-.526.211-1.068.392l-1.735.579m0 0l-1.123.374a.742.742 0 0 1-.939-.94l.374-1.122m1.688 1.688L8.412 13.9" />
+                              <path stroke-linecap="round"
+                                d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2" />
+                            </g>
+                          </svg>
+                        </i></a>
+                      <button class="row-btn danger" type="button"><i class="bi bi-trash">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 28 28">
+                            <path fill="currentColor"
+                              d="M11.5 6h5a2.5 2.5 0 0 0-5 0ZM10 6a4 4 0 0 1 8 0h6.25a.75.75 0 0 1 0 1.5h-1.31l-1.217 14.603A4.25 4.25 0 0 1 17.488 26h-6.976a4.25 4.25 0 0 1-4.235-3.897L5.06 7.5H3.75a.75.75 0 0 1 0-1.5H10ZM7.772 21.978a2.75 2.75 0 0 0 2.74 2.522h6.976a2.75 2.75 0 0 0 2.74-2.522L21.436 7.5H6.565l1.207 14.478ZM11.75 11a.75.75 0 0 1 .75.75v8.5a.75.75 0 0 1-1.5 0v-8.5a.75.75 0 0 1 .75-.75Zm5.25.75a.75.75 0 0 0-1.5 0v8.5a.75.75 0 0 0 1.5 0v-8.5Z" />
+                          </svg>
+                        </i></button>
                     </div>
                   </td>
                 </tr>
@@ -246,83 +238,6 @@
             </table>
           </div>
         </section>
-
-        <div class="aside-stack">
-          <section class="panel">
-            <div class="panel-head">
-              <div>
-                <h3>Quick actions</h3>
-                <p>Common seller workflows</p>
-              </div>
-            </div>
-
-            <div class="panel-body">
-              <div class="quick-actions-grid">
-                <a class="quick-action" href="/seller/products/new">
-                  <i class="bi bi-plus-square"></i>
-                  <strong>Create product</strong>
-                  <span>Start a fresh listing draft.</span>
-                </a>
-
-                <a class="quick-action" href="/seller/media">
-                  <i class="bi bi-images"></i>
-                  <strong>Upload media</strong>
-                  <span>Add new gallery assets.</span>
-                </a>
-
-                <a class="quick-action" href="/seller/profile">
-                  <i class="bi bi-pencil-square"></i>
-                  <strong>Edit profile</strong>
-                  <span>Refresh shop details and bio.</span>
-                </a>
-
-                <a class="quick-action" href="/products">
-                  <i class="bi bi-shop-window"></i>
-                  <strong>Preview store</strong>
-                  <span>Check how customers see it.</span>
-                </a>
-              </div>
-            </div>
-          </section>
-
-          <section class="panel">
-            <div class="panel-head">
-              <div>
-                <h3>Recent activity</h3>
-                <p>Latest updates on your account</p>
-              </div>
-            </div>
-
-            <div class="panel-body activity-list">
-              <div class="activity-item">
-                <div class="activity-icon green"><i class="bi bi-check-lg"></i></div>
-                <div>
-                  <strong>Headphones listing published</strong>
-                  <span>Noise-Cancelling Pro is now visible in the storefront.</span>
-                </div>
-                <small>2h ago</small>
-              </div>
-
-              <div class="activity-item">
-                <div class="activity-icon blue"><i class="bi bi-image"></i></div>
-                <div>
-                  <strong>Four images uploaded</strong>
-                  <span>Media set added to the audio collection.</span>
-                </div>
-                <small>5h ago</small>
-              </div>
-
-              <div class="activity-item">
-                <div class="activity-icon gold"><i class="bi bi-star"></i></div>
-                <div>
-                  <strong>New 5-star review</strong>
-                  <span>Buyer praised build quality and packaging.</span>
-                </div>
-                <small>1d ago</small>
-              </div>
-            </div>
-          </section>
-        </div>
       </div>
 
       <div class="insights-grid">

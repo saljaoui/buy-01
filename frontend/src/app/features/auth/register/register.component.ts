@@ -194,7 +194,7 @@ export class RegisterComponent implements OnDestroy {
       score += 1;
     }
 
-    if (password.length >= 12) {
+    if (password.length >= 8) {
       score += 1;
     }
 

@@ -244,25 +244,6 @@
   margin-bottom: 0.8rem;
 }
 
-.rating-row {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  flex-wrap: wrap;
-  color: var(--text-muted);
-  font-size: 0.82rem;
-  margin-bottom: 1rem;
-}
-
-.rating-row .stars {
-  color: var(--gold);
-  letter-spacing: 0.08em;
-}
-
-.rating-row small {
-  color: var(--text-light);
-}
-
 .price-row {
   display: flex;
   align-items: center;
@@ -314,32 +295,6 @@
   color: var(--text-muted);
   font-size: 0.88rem;
   line-height: 1.75;
-}
-
-.highlight-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.8rem;
-}
-
-.highlight-item {
-  padding: 0.85rem 0.9rem;
-  border-radius: 14px;
-  background: #faf8f4;
-  border: 1px solid #efe6d8;
-}
-
-.highlight-item strong {
-  display: block;
-  color: var(--ink);
-  font-size: 0.84rem;
-  margin-bottom: 0.18rem;
-}
-
-.highlight-item span {
-  color: var(--text-muted);
-  font-size: 0.76rem;
-  line-height: 1.55;
 }
 
 .purchase-card {
@@ -479,30 +434,6 @@
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-}
-
-.seller-stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.7rem;
-  padding: 0.95rem 0;
-  border-top: 1px solid #efe7da;
-  border-bottom: 1px solid #efe7da;
-  margin-bottom: 1rem;
-}
-
-.seller-stats strong {
-  display: block;
-  font-family: 'Playfair Display', serif;
-  font-size: 1.35rem;
-  color: var(--ink);
-}
-
-.seller-stats span {
-  display: block;
-  color: var(--text-muted);
-  font-size: 0.74rem;
-  line-height: 1.45;
 }
 
 .seller-card p {
@@ -649,9 +580,7 @@
   }
 
   .detail-hero-inner,
-  .thumb-grid,
-  .highlight-grid,
-  .seller-stats {
+  .thumb-grid {
     grid-template-columns: 1fr;
   }
 
