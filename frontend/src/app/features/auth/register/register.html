@@ -6,8 +6,8 @@
     </div>
 
     <div class="steps-visual">
-      <div class="d-flex" >
-      <h2>Join our<em> marketplace</em><br>in minutes.</h2>
+      <div class="d-flex">
+        <h2>Join our<em> marketplace</em><br>in minutes.</h2>
       </div>
       <p>Create an account to start browsing products or build your seller storefront today.</p>
       <ul class="step-list" id="leftStepList">
@@ -118,9 +118,16 @@
 
         <div class="field-wrap">
           <label for="name">Full Name</label>
-          <input type="text" id="name" name="name" placeholder="Sara Ali" autocomplete="name"
-            [(ngModel)]="form.name" [class.is-invalid]="isNameInvalid" />
-          <i class="bi bi-person f-icon"></i>
+          <input type="text" id="name" name="name" placeholder="Sara Ali" autocomplete="name" [(ngModel)]="form.name"
+            [class.is-invalid]="isNameInvalid" />
+          <i class="bi bi-person f-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+              <g fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="6" r="4" />
+                <path d="M20 17.5c0 2.485 0 4.5-8 4.5s-8-2.015-8-4.5S7.582 13 12 13s8 2.015 8 4.5Z" />
+              </g>
+            </svg>
+          </i>
           <div class="err-msg"><i class="bi bi-exclamation-circle"></i> Required</div>
         </div>
 
@@ -128,7 +135,16 @@
           <label for="email">Email Address</label>
           <input type="email" id="email" name="email" placeholder="ada@example.com" autocomplete="email"
             [(ngModel)]="form.email" [class.is-invalid]="isEmailInvalid" [class.is-valid]="isEmailValid" />
-          <i class="bi bi-envelope f-icon"></i>
+          <i class="bi bi-envelope f-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+              <g fill="none" stroke="currentColor" stroke-width="1.5">
+                <path
+                  d="M2 12c0-3.771 0-5.657 1.172-6.828C4.343 4 6.229 4 10 4h4c3.771 0 5.657 0 6.828 1.172C22 6.343 22 8.229 22 12c0 3.771 0 5.657-1.172 6.828C19.657 20 17.771 20 14 20h-4c-3.771 0-5.657 0-6.828-1.172C2 17.657 2 15.771 2 12Z" />
+                <path stroke-linecap="round"
+                  d="m6 8l2.159 1.8c1.837 1.53 2.755 2.295 3.841 2.295c1.086 0 2.005-.765 3.841-2.296L18 8" />
+              </g>
+            </svg>
+          </i>
           <div class="err-msg"><i class="bi bi-exclamation-circle"></i> Enter a valid email</div>
           <div class="ok-msg"><i class="bi bi-check-circle"></i> Looks good!</div>
         </div>
@@ -137,9 +153,25 @@
           <label for="password">Password</label>
           <input [type]="passwordInputType" id="password" name="password" placeholder="••••••••"
             autocomplete="new-password" [(ngModel)]="form.password" [class.is-invalid]="isPasswordInvalid" />
-          <i class="bi bi-lock f-icon"></i>
+          <i class="bi bi-lock f-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+              <g fill="none" stroke="currentColor" stroke-width="1.5">
+                <path
+                  d="M2 16c0-2.828 0-4.243.879-5.121C3.757 10 5.172 10 8 10h8c2.828 0 4.243 0 5.121.879C22 11.757 22 13.172 22 16c0 2.828 0 4.243-.879 5.121C20.243 22 18.828 22 16 22H8c-2.828 0-4.243 0-5.121-.879C2 20.243 2 18.828 2 16Z" />
+                <path stroke-linecap="round" d="M6 10V8a6 6 0 1 1 12 0v2" />
+              </g>
+            </svg>
+          </i>
           <button type="button" class="pw-toggle" (click)="togglePassword('password')">
-            <i class="bi" id="pwIcon1" [class.bi-eye]="!passwordVisible" [class.bi-eye-slash]="passwordVisible"></i>
+            <i class="bi" id="pwIcon1" [class.bi-eye]="!passwordVisible" [class.bi-eye-slash]="passwordVisible">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <g fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path
+                    d="M3.275 15.296C2.425 14.192 2 13.639 2 12c0-1.64.425-2.191 1.275-3.296C4.972 6.5 7.818 4 12 4c4.182 0 7.028 2.5 8.725 4.704C21.575 9.81 22 10.361 22 12c0 1.64-.425 2.191-1.275 3.296C19.028 17.5 16.182 20 12 20c-4.182 0-7.028-2.5-8.725-4.704Z" />
+                  <path d="M15 12a3 3 0 1 1-6 0a3 3 0 0 1 6 0Z" />
+                </g>
+              </svg>
+            </i>
           </button>
           <div class="err-msg"><i class="bi bi-exclamation-circle"></i> Min 8 chars required</div>
           <!-- strength bar -->
@@ -157,10 +189,26 @@
           <input [type]="confirmPasswordInputType" id="confirmPw" name="confirmPassword" placeholder="••••••••"
             autocomplete="new-password" [(ngModel)]="form.confirmPassword"
             [class.is-invalid]="isConfirmPasswordInvalid" />
-          <i class="bi bi-lock-fill f-icon"></i>
+          <i class="bi bi-lock-fill f-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+              <g fill="none" stroke="currentColor" stroke-width="1.5">
+                <path
+                  d="M2 16c0-2.828 0-4.243.879-5.121C3.757 10 5.172 10 8 10h8c2.828 0 4.243 0 5.121.879C22 11.757 22 13.172 22 16c0 2.828 0 4.243-.879 5.121C20.243 22 18.828 22 16 22H8c-2.828 0-4.243 0-5.121-.879C2 20.243 2 18.828 2 16Z" />
+                <path stroke-linecap="round" d="M6 10V8a6 6 0 1 1 12 0v2" />
+              </g>
+            </svg>
+          </i>
           <button type="button" class="pw-toggle" (click)="togglePassword('confirmPassword')">
             <i class="bi" id="pwIcon2" [class.bi-eye]="!confirmPasswordVisible"
-              [class.bi-eye-slash]="confirmPasswordVisible"></i>
+              [class.bi-eye-slash]="confirmPasswordVisible">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <g fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path
+                    d="M3.275 15.296C2.425 14.192 2 13.639 2 12c0-1.64.425-2.191 1.275-3.296C4.972 6.5 7.818 4 12 4c4.182 0 7.028 2.5 8.725 4.704C21.575 9.81 22 10.361 22 12c0 1.64-.425 2.191-1.275 3.296C19.028 17.5 16.182 20 12 20c-4.182 0-7.028-2.5-8.725-4.704Z" />
+                  <path d="M15 12a3 3 0 1 1-6 0a3 3 0 0 1 6 0Z" />
+                </g>
+              </svg>
+            </i>
           </button>
           <div class="err-msg"><i class="bi bi-exclamation-circle"></i> Passwords don't match</div>
         </div>

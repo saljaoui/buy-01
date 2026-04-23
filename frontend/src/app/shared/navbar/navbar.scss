@@ -1,3 +1,8 @@
 .brand-logo {
   width: 54px;
 }
+
+.logout:hover {
+  color: var(--error);
+  border-color: var(--error);
+}

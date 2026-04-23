@@ -313,7 +313,7 @@
 .field-wrap .err-msg {
   font-size: .75rem;
   color: var(--error);
-  margin-top: .35rem;
+  position: absolute;
   display: none;
 }
 
