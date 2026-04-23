@@ -1,20 +1,11 @@
 server:
-<<<<<<< HEAD
-  port: 8761
-=======
   port: ${SERVER_PORT:8761}
->>>>>>> main
 
 spring:
   application:
     name: discovery-service
 
 eureka:
-<<<<<<< HEAD
-  client:
-    register-with-eureka: false
-    fetch-registry: false
-=======
   instance:
     hostname: ${EUREKA_HOSTNAME:localhost}
     prefer-ip-address: ${EUREKA_PREFER_IP_ADDRESS:false}
@@ -33,4 +24,3 @@ management:
   endpoint:
     health:
       show-details: always
->>>>>>> main

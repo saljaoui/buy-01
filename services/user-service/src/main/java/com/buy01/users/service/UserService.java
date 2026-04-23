@@ -22,20 +22,6 @@ public class UserService {
         User user = getUserById(userId);
         boolean updated = false;
 
-<<<<<<< HEAD
-        if (request.getName() != null) {
-            String name = request.getName().trim();
-            if (name.isEmpty()) {
-                throw new IllegalArgumentException("name must not be blank");
-            }
-            user.setName(name);
-            updated = true;
-        }
-
-        if (request.getAvatar() != null) {
-            String avatar = request.getAvatar().trim();
-            user.setAvatar(avatar.isEmpty() ? null : avatar);
-=======
         if (request.getName() != null && !request.getName().equals(user.getName())) {
             user.setName(request.getName());
             updated = true;
@@ -43,7 +29,6 @@ public class UserService {
 
         if (request.getAvatar() != null && !request.getAvatar().equals(user.getAvatar())) {
             user.setAvatar(request.getAvatar().isEmpty() ? null : request.getAvatar());
->>>>>>> main
             updated = true;
         }
 
@@ -68,8 +53,4 @@ public class UserService {
                 .avatar(user.getAvatar())
                 .build();
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> main
