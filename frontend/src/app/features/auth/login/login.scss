@@ -42,8 +42,7 @@
 
 .brand-logo {
   display: block;
-  width: 100px;
-  max-width: 100%;
+  width: 84px;
   height: auto;
 }
 
@@ -102,12 +101,12 @@
   right: 28px;
   top: 50%;
   transform: translateY(-50%);
-  width: 180px;
+  width: 190px;
   background: rgba(255, 255, 255, .07);
   border: 1px solid rgba(200, 169, 110, .25);
   backdrop-filter: blur(12px);
   border-radius: 16px;
-  padding: 1rem 1.1rem;
+  padding: .8rem 1rem;
   z-index: 3;
   animation: floatCard 5s ease-in-out infinite;
 }
@@ -126,13 +125,23 @@
 
 .float-card .fc-thumb {
   width: 100%;
-  height: 90px;
+  height: 100px;
   background: linear-gradient(135deg, rgba(200, 169, 110, .3), rgba(200, 169, 110, .08));
   border-radius: 10px;
   display: grid;
   place-items: center;
   font-size: 2rem;
   margin-bottom: .75rem;
+  overflow: hidden;
+}
+
+.float-card .fc-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  border-radius: 10px;
 }
 
 .float-card .fc-name {
