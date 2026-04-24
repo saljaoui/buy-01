@@ -34,7 +34,7 @@
           Preview
         </a>
         <a class="secondary-btn" href="/seller">Cancel</a>
-        <button class="primary-btn" type="button" (click)="saveProduct()">
+        <button class="primary-btn" type="button" (click)="printProductInfo()">
           <i class="bi bi-check2"></i>
           Save product
         </button>
@@ -73,7 +73,7 @@
               <div class="field-grid">
                 <div class="field full invalid">
                   <label for="title">Product title</label>
-                  <input id="title" type="text" placeholder="Noise-Cancelling Pro Headphones" />
+                  <input id="title" type="text" placeholder="Noise-Cancelling Pro Headphones" [(ngModel)]="productInfo.name" />
                   <div class="message">Title is required before publishing.</div>
                 </div>
 
@@ -81,7 +81,7 @@
                   <label for="shortDescription">description</label>
                   <textarea
                     id="shortDescription"
-                    placeholder="Write a concise summary that will appear in cards and previews."></textarea>
+                    placeholder="Write a concise summary that will appear in cards and previews." [(ngModel)]="productInfo.description"></textarea>
                   <div class="helper">Keep it focused on materials, benefits, and visual style.</div>
                 </div>
               </div>
@@ -96,13 +96,13 @@
               <div class="field-grid">
                 <div class="field invalid">
                   <label for="price">Price</label>
-                  <input id="price" type="text" placeholder="$149.00" />
+                  <input id="price" type="text" placeholder="$149.00" [(ngModel)]="productInfo.price" />
                   <div class="message">Enter a valid sale price.</div>
                 </div>
 
                 <div class="field">
                   <label for="stock">Stock quantity</label>
-                  <input id="stock" type="number" placeholder="12" />
+                  <input id="stock" type="number" placeholder="12" [(ngModel)]="productInfo.quantity" />
                 </div>
               </div>
             </section>

@@ -234,170 +234,31 @@
         </div>
 
         <div class="product-grid">
-
-          <article class="product-card">
-            <div class="product-media media-audio">
-              <div class="media-badges"><span class="media-badge featured">Featured</span></div>
-              <button class="wish-btn liked" type="button"><i class="bi bi-heart-fill"></i></button>
-              <span class="product-emoji">🎧</span>
-            </div>
-            <div class="product-body">
-              <div class="product-meta">
-                <span class="seller-pill">SoundWave</span>
-                <span class="rating-pill">4.8</span>
+          @for (product of productList(); track product.id) {
+            <article class="product-card">
+              <div class="product-media media-ceramic">
+                <div class="media-badges"><span class="media-badge new">New</span></div>
+                <button class="wish-btn" type="button"><i class="bi bi-heart"></i></button>
+                <span class="product-emoji">🏺</span>
               </div>
-              <h3><a [routerLink]="['/products', '1']">Noise-Cancelling Pro Headphones</a></h3>
-              <p>Adaptive noise control, studio-grade balance, and a clean aluminum finish.</p>
-              <div class="product-footer">
-                <div>
-                  <div class="old-price">$199</div><strong>$149</strong>
+              <div class="product-body">
+                <div class="product-meta">
+                  <span class="seller-pill">Terra Studio</span>
+                  <span class="rating-pill">4.8</span>
                 </div>
-                <a class="mini-btn" [routerLink]="['/products', '1']">View item</a>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <div class="product-media media-wallet">
-              <div class="media-badges"><span class="media-badge new">New</span></div>
-              <button class="wish-btn" type="button"><i class="bi bi-heart"></i></button>
-              <span class="product-emoji">👜</span>
-            </div>
-            <div class="product-body">
-              <div class="product-meta">
-                <span class="seller-pill">CraftHouse</span>
-                <span class="rating-pill">4.6</span>
-              </div>
-              <h3><a [routerLink]="['/products', '2']">Minimalist Leather Wallet</a></h3>
-              <p>Slim silhouette with hand-stitched edges and premium matte leather.</p>
-              <div class="product-footer">
-                <strong>$49</strong>
-                <a class="mini-btn" [routerLink]="['/products', '2']">View item</a>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <div class="product-media media-lamp">
-              <div class="media-badges"><span class="media-badge sale">Sale</span></div>
-              <button class="wish-btn" type="button"><i class="bi bi-heart"></i></button>
-              <span class="product-emoji">💡</span>
-            </div>
-            <div class="product-body">
-              <div class="product-meta">
-                <span class="seller-pill">LumiStore</span>
-                <span class="rating-pill">4.5</span>
-              </div>
-              <h3><a [routerLink]="['/products', '3']">Smart LED Desk Lamp</a></h3>
-              <p>Warm-to-cool light modes with a rotating head and subtle brass detailing.</p>
-              <div class="product-footer">
-                <div>
-                  <div class="old-price">$59</div><strong>$39</strong>
+                <h3><a [routerLink]="['/products', '7']">{{ product.name }}</a></h3>
+                <p>{{ product.description }}</p>
+                <div class="product-footer">
+                  <strong>${{product.price}}</strong>
+                  <a class="mini-btn" [routerLink]="['/products', '7']">View item</a>
                 </div>
-                <a class="mini-btn" [routerLink]="['/products', '3']">View item</a>
               </div>
-            </div>
           </article>
 
-          <article class="product-card">
-            <div class="product-media media-journal">
-              <button class="wish-btn" type="button"><i class="bi bi-heart"></i></button>
-              <span class="product-emoji">📓</span>
-            </div>
-            <div class="product-body">
-              <div class="product-meta">
-                <span class="seller-pill">PaperForm</span>
-                <span class="rating-pill">4.9</span>
-              </div>
-              <h3><a [routerLink]="['/products', '4']">Bound Daily Planning Journal</a></h3>
-              <p>Undated weekly spreads with textured covers and heavyweight paper stock.</p>
-              <div class="product-footer">
-                <strong>$24</strong>
-                <a class="mini-btn" [routerLink]="['/products', '4']">View item</a>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <div class="product-media media-yoga">
-              <div class="media-badges"><span class="media-badge featured">Popular</span></div>
-              <button class="wish-btn liked" type="button"><i class="bi bi-heart-fill"></i></button>
-              <span class="product-emoji">🧘</span>
-            </div>
-            <div class="product-body">
-              <div class="product-meta">
-                <span class="seller-pill">Balance Co.</span>
-                <span class="rating-pill">4.7</span>
-              </div>
-              <h3><a [routerLink]="['/products', '5']">Premium Yoga Mat 6mm</a></h3>
-              <p>High-grip surface, balanced cushioning, and neutral studio-ready colorways.</p>
-              <div class="product-footer">
-                <strong>$35</strong>
-                <a class="mini-btn" [routerLink]="['/products', '5']">View item</a>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <div class="product-media media-camera">
-              <button class="wish-btn" type="button"><i class="bi bi-heart"></i></button>
-              <span class="product-emoji">📷</span>
-            </div>
-            <div class="product-body">
-              <div class="product-meta">
-                <span class="seller-pill">Frame Lab</span>
-                <span class="rating-pill">4.4</span>
-              </div>
-              <h3><a [routerLink]="['/products', '6']">Portable Creator Camera Grip</a></h3>
-              <p>Compact rig for mobile filming with tripod mount and wireless shutter control.</p>
-              <div class="product-footer">
-                <strong>$68</strong>
-                <a class="mini-btn" [routerLink]="['/products', '6']">View item</a>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <div class="product-media media-ceramic">
-              <div class="media-badges"><span class="media-badge new">New</span></div>
-              <button class="wish-btn" type="button"><i class="bi bi-heart"></i></button>
-              <span class="product-emoji">🏺</span>
-            </div>
-            <div class="product-body">
-              <div class="product-meta">
-                <span class="seller-pill">Terra Studio</span>
-                <span class="rating-pill">4.8</span>
-              </div>
-              <h3><a [routerLink]="['/products', '7']">Handcrafted Ceramic Vase</a></h3>
-              <p>Matte glazed vessel with a sculpted silhouette designed for modern interiors.</p>
-              <div class="product-footer">
-                <strong>$72</strong>
-                <a class="mini-btn" [routerLink]="['/products', '7']">View item</a>
-              </div>
-            </div>
-          </article>
-
-          <article class="product-card">
-            <div class="product-media media-speaker">
-              <div class="media-badges"><span class="media-badge sale">Limited</span></div>
-              <button class="wish-btn" type="button"><i class="bi bi-heart"></i></button>
-              <span class="product-emoji">🔊</span>
-            </div>
-            <div class="product-body">
-              <div class="product-meta">
-                <span class="seller-pill">North Tone</span>
-                <span class="rating-pill">4.7</span>
-              </div>
-              <h3><a [routerLink]="['/products', '8']">Wireless Studio Speaker</a></h3>
-              <p>Balanced room-filling sound with tactile controls and a woven front grille.</p>
-              <div class="product-footer">
-                <div>
-                  <div class="old-price">$129</div><strong>$109</strong>
-                </div>
-                <a class="mini-btn" [routerLink]="['/products', '8']">View item</a>
-              </div>
-            </div>
-          </article>
+          }
+      
+        
+        
         </div>
       </section>
     </div>
