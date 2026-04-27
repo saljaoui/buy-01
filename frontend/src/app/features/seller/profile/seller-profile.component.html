@@ -12,9 +12,9 @@
       <app-seller-nav activeItem="profile"></app-seller-nav>
 
       <div class="seller-account">
-        <div class="seller-account-avatar">A</div>
+        <div class="seller-account-avatar">{{ userInitials }}</div>
         <div class="seller-account-copy">
-          <strong>Ada Lovelace</strong>
+          <strong>{{ displayName }}</strong>
           <span>Seller</span>
         </div>
       </div>
@@ -29,20 +29,44 @@
       </div>
 
       <div class="seller-topbar-actions">
-        <button class="primary-btn" type="button">
-          <i class="bi bi-check2"></i>
-          Save changes
+        <button
+          class="primary-btn"
+          type="button"
+          (click)="saveChanges()"
+          [disabled]="isSaving || isLoading"
+        >
+          <i class="bi" [class.bi-check2]="!isSaving" [class.bi-arrow-repeat]="isSaving" [class.bi-spin]="isSaving"></i>
+          {{ isSaving ? 'Saving...' : 'Save changes' }}
         </button>
       </div>
     </header>
 
     <main class="seller-body">
-      <section class="seller-banner profile-banner">
+      <!-- Loading state -->
+      <div *ngIf="isLoading" class="panel" style="text-align: center; padding: 2rem;">
+        <i class="bi bi-arrow-repeat bi-spin" style="font-size: 2rem; color: var(--gold);"></i>
+        <p style="margin-top: 1rem; color: var(--text-muted);">Loading profile...</p>
+      </div>
+
+      <!-- Error/Success messages -->
+      <div *ngIf="errorMessage && !isLoading" class="panel" style="background: #fff0f0; border: 1px solid #e8b4b4; color: #c44;">
+        <div class="panel-body">
+          <i class="bi bi-exclamation-triangle-fill"></i> {{ errorMessage }}
+        </div>
+      </div>
+
+      <div *ngIf="successMessage && !isLoading" class="panel" style="background: #f0fff4; border: 1px solid #b4e8c4; color: #2a6;">
+        <div class="panel-body">
+          <i class="bi bi-check-circle-fill"></i> {{ successMessage }}
+        </div>
+      </div>
+
+      <section *ngIf="!isLoading" class="seller-banner profile-banner">
         <div class="profile-banner-head">
-          <div class="profile-avatar">A</div>
+          <div class="profile-avatar">{{ userInitials }}</div>
           <div class="text-white">
             <div class="eyebrow"><span></span> Seller identity</div>
-            <h1>Ada Lovelace <em>/ Seller</em></h1>
+            <h1>{{ displayName }} <em>/ Seller</em></h1>
             <p>Update your personal details and profile image.</p>
           </div>
         </div>
@@ -55,7 +79,7 @@
         </div>
       </section>
 
-      <div class="profile-layout">
+      <div *ngIf="!isLoading" class="profile-layout">
         <div class="profile-stack">
           <section class="panel">
             <div class="panel-head">
@@ -69,17 +93,34 @@
               <div class="field-grid">
                 <div class="field">
                   <label for="fullName">Full name</label>
-                  <input id="fullName" type="text" placeholder="Ada Lovelace" />
+                  <input
+                    id="fullName"
+                    type="text"
+                    [(ngModel)]="editableName"
+                    placeholder="Your full name"
+                    [disabled]="isSaving"
+                  />
                 </div>
 
                 <div class="field">
                   <label for="email">Email address</label>
-                  <input id="email" type="email" placeholder="ada@example.com" />
+                  <input
+                    id="email"
+                    type="email"
+                    [value]="displayEmail"
+                    placeholder="your@email.com"
+                    readonly
+                  />
                 </div>
 
                 <div class="field">
                   <label for="role">Account role</label>
-                  <input id="role" type="text" placeholder="Seller" readonly />
+                  <input
+                    id="role"
+                    type="text"
+                    [value]="displayRole"
+                    readonly
+                  />
                 </div>
               </div>
             </div>
@@ -98,10 +139,10 @@
 
               <div class="panel-body">
                 <div class="avatar-dropzone">
-                  <div class="avatar-preview">A</div>
+                  <div class="avatar-preview">{{ userInitials }}</div>
                   <strong>Upload a new profile image</strong>
                   <span>Recommended size: 800 × 800 px, square crop.</span>
-                  <button class="ghost-btn" type="button">Choose image</button>
+                  <button class="ghost-btn" type="button" [disabled]="isSaving">Choose image</button>
                 </div>
               </div>
             </section>
@@ -111,3 +152,4 @@
     </main>
   </div>
 </div>
+

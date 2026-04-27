@@ -87,6 +87,19 @@ export class AuthService {
     }
   }
 
+  updateStoredUser(user: AuthUser): void {
+    const storedToken =
+      localStorage.getItem(AUTH_TOKEN_KEY) ?? sessionStorage.getItem(AUTH_TOKEN_KEY);
+
+    if (storedToken) {
+      if (localStorage.getItem(AUTH_TOKEN_KEY)) {
+        localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+      } else {
+        sessionStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+      }
+    }
+  }
+
   getErrorMessage(error: unknown, fallback = 'Something went wrong.'): string {
     if (error instanceof HttpErrorResponse) {
       if (typeof error.error === 'string' && error.error.trim()) {
