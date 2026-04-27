@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.buy01.products.dto.ProductDto;
 import com.buy01.products.model.Product;
 import com.buy01.products.service.ProductService;
+import com.example.events.ProductCreatedEvent;
 
 @RestController
 @RequestMapping("/api/products")
@@ -23,7 +24,6 @@ import com.buy01.products.service.ProductService;
 
 public class ProductController {
     private final ProductService productService;
-
     @PostMapping
     @PreAuthorize("hasRole('ROLE_SELLER')")
     public ResponseEntity<Product> create(@RequestBody ProductDto product, Authentication authentication) {

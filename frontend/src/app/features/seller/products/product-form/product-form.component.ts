@@ -19,10 +19,8 @@ export class ProductFormComponent {
     quantity:0
   };
   saveProduct() {
-    this.productService.getProducts().subscribe({
+    this.productService.publishProduct(this.productInfo).subscribe({
       next : (response) => {
-      console.log('products : ');
-      console.log(response);
       },
       error: (err) => {
         console.error('error : ', err);

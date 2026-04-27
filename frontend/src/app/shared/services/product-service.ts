@@ -46,6 +46,19 @@ export class ProductService {
     return this.http.get<ProductResponse[]>(`${this.API}/products`, { headers });
   }
 
+  getProduct(productId: string) : Observable<ProductResponse> {
+    const token = this.storage.get('buy01.auth.token');
+    if (!token) {
+      this.router.navigate(['/login']);
+      return EMPTY;
+    }
+    const headers = new HttpHeaders({
+      'Authorization':'Bearer ' + token,
+      'Content-Type':'application/json'
+    })
+    return this.http.get<ProductResponse>(`${this.API}/products/${productId}`, { headers });
+  }
+
   publishProduct(product: ProductRequest) : Observable<any> {
     const token = this.storage.get('buy01.auth.token');
     if (!token) {

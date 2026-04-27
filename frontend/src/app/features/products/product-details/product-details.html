@@ -93,25 +93,23 @@
             <span class="detail-pill">Ready to ship</span>
           </div>
 
-          <h2>Designed for focused listening and everyday comfort</h2>
+          <h2> {{ productDetails()?.name }}</h2>
 
           <div class="price-row">
             <div class="price-stack">
               <span>Current price</span>
-              <strong>$149</strong>
+              <strong>${{ productDetails()?.price }}</strong>
               <small>$199 before</small>
             </div>
 
             <div class="stock-pill">
               <i class="bi bi-check-circle-fill"></i>
-              12 units left
+              {{ productDetails()?.quantity }} units left
             </div>
           </div>
 
           <p class="detail-description">
-            Tuned for deep focus and balanced warmth, these headphones combine adaptive
-            noise-cancelling, soft memory-foam ear cups, USB-C charging, and up to 40 hours of
-            playback in a compact travel-ready silhouette.
+            {{ productDetails()?.description }}
           </p>
 
           <div class="purchase-card">
@@ -137,7 +135,7 @@
             </button>
             <button class="btn-light" type="button">
               <i class="bi bi-heart"></i>
-              Save for later
+              update product
             </button>
           </div>
 

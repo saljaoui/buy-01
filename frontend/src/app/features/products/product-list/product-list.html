@@ -32,31 +32,24 @@
       <span class="ticker-dot"></span>
     </div>
   </div>
-
   <!-- ── HERO ───────────────────────────────────────────────── -->
   <section class="page-hero catalog-hero">
-
     <div class="hero-ghost-text">S O U F I A N</div>
     <div class="hero-glow-line"></div>
-
     <div class="container">
       <div class="page-hero-inner">
-
         <!-- LEFT: Copy -->
         <div class="hero-copy-block">
-
           <div class="hero-index">
             <span class="hero-index-num">01</span>
             <span class="hero-index-line"></span>
             <span class="hero-index-label">New Arrivals Daily</span>
           </div>
-
           <h1 class="page-title">
             Discover
             <em>Premium</em>
             <span class="word-sub">Products for your life</span>
           </h1>
-
           <div class="hero-desc-row">
             <div class="hero-desc-marker"></div>
             <p class="page-copy">
@@ -65,7 +58,6 @@
               or wellness items — find exactly what you need from top-rated sellers.
             </p>
           </div>
-
           <div class="hero-actions">
             <a (click)="scrollCatalog()" class="btn-primary">
               Explore catalog
@@ -76,13 +68,10 @@
               <i class="bi bi-arrow-right"></i>
             </a>
           </div>
-
         </div>
-
         <!-- RIGHT: Panel -->
         <div class="hero-panel">
           <div class="hero-panel-inner">
-
             <div class="hero-panel-head">
               <div>
                 <div class="hero-panel-kicker">Trending Now</div>
@@ -93,7 +82,6 @@
                 Top Rated
               </div>
             </div>
-
             <div class="hero-highlight">
               <div class="hero-highlight-art">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -111,7 +99,6 @@
                 <p>Hand-picked items highly reviewed by our community of shoppers.</p>
               </div>
             </div>
-
             <div class="hero-panel-grid">
               <div class="hero-mini-card">
                 <span>10k+</span>
@@ -126,13 +113,9 @@
                 <small>Dispatch</small>
               </div>
             </div>
-
           </div>
         </div>
-        
-
       </div>
-
       <!-- Bottom strip -->
       <div class="hero-strip">
         <div class="hero-strip-item">
@@ -164,13 +147,10 @@
           </div>
         </div>
       </div>
-
     </div>
   </section>
-
   <main class="container catalog-page" id="catalog">
     <div class="catalog-layout">
-
       <aside class="filter-panel surface-card">
         <div class="feature-strip d-flex flex-column gap-4">
           <div class="feature-card">
@@ -221,7 +201,6 @@
           </div>
         </div>
       </aside>
-
       <section class="catalog-content">
         <div class="section-heading">
           <div>
@@ -232,7 +211,6 @@
             <button class="view-btn" type="button"><i class="bi bi-list-task"></i></button>
           </div>
         </div>
-
         <div class="product-grid">
           @for (product of productList(); track product.id) {
             <article class="product-card">
@@ -246,22 +224,17 @@
                   <span class="seller-pill">Terra Studio</span>
                   <span class="rating-pill">4.8</span>
                 </div>
-                <h3><a [routerLink]="['/products', '7']">{{ product.name }}</a></h3>
+                <h3><a [routerLink]="['/products', product.id]">{{ product.name }}</a></h3>
                 <p>{{ product.description }}</p>
                 <div class="product-footer">
                   <strong>${{product.price}}</strong>
-                  <a class="mini-btn" [routerLink]="['/products', '7']">View item</a>
+                  <a class="mini-btn" [routerLink]="['/products', product.id]">View item</a>
                 </div>
               </div>
           </article>
-
           }
-      
-        
-        
         </div>
       </section>
     </div>
   </main>
-
 <app-footer />
