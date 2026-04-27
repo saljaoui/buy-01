@@ -2,6 +2,16 @@ server:
   port: ${SERVER_PORT:8083}
 
 spring:
+  kafka:
+    bootstrap-servers: kafka:9092
+    consumer:
+      group-id: media-service-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.use.type.headers: false
+        spring.json.trusted.packages: "com.example.events"
   application:
     name: media-service
   servlet:
@@ -29,3 +39,13 @@ management:
     web:
       exposure:
         include: health,info
+logging:
+  level:
+    root: WARN
+    org.apache.kafka: WARN
+    org.apache.kafka.clients.NetworkClient: ERROR
+    org.apache.kafka.clients.consumer.internals: ERROR
+    org.springframework.kafka: WARN
+    com.netflix.discovery: WARN
+    com.netflix.eureka: WARN
+    org.springframework.cloud.netflix.eureka: WARN

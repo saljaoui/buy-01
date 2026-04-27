@@ -9,6 +9,9 @@ import com.buy01.products.Exceptions.ForbiddenException;
 import com.buy01.products.Exceptions.ProductNotFoundException;
 import com.buy01.products.dto.ProductDto;
 import com.buy01.products.model.Product;
+import com.example.events.ProductEvent;
+import com.buy01.products.service.ProductEventProducer;
+
 import com.buy01.products.repository.ProductRepository;
 
 import lombok.AllArgsConstructor;
@@ -20,6 +23,7 @@ import lombok.Data;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final ProductEventProducer eventProducer;
 
     public Product createProduct(ProductDto productData, String userId) {
         Product product = new Product();
@@ -28,7 +32,9 @@ public class ProductService {
         product.setPrice(productData.getPrice());
         product.setQuantity(productData.getQuantity());
         product.setUserId(userId);
-        return this.productRepository.save(product);
+        Product saved = this.productRepository.save(product);
+        this.eventProducer.sendEvent(new ProductEvent("CREATED", saved.getId(), saved.getUserId(), saved.getPrice()));
+        return saved;
     }
 
     public Product getProduct(String id) {
@@ -62,6 +68,7 @@ public class ProductService {
             return;
         }
         this.productRepository.delete(deletedProduct);
+        eventProducer.sendEvent(new ProductEvent("DELETED", productId, null, null));
     }
     
     public List<Product> getProductsOwnedBy(String OwnerId) {

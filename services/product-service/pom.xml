@@ -90,6 +90,10 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+    <groupId>org.springframework.kafka</groupId>
+    <artifactId>spring-kafka</artifactId>
+</dependency>
+		<dependency>
     <groupId>com.example.services</groupId>
     <artifactId>shared-events</artifactId>
     <version>1.0-SNAPSHOT</version>
