@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SellerNavComponent } from '../seller-nav/seller-nav.component';
@@ -16,88 +16,80 @@ export class SellerProfileComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly userService = inject(UserService);
 
-  user: User | null = null;
-  editableName = '';
-  isSaving = false;
-  errorMessage: string | null = null;
-  successMessage: string | null = null;
+  user = signal<User | null>(null);
+  editableName = signal('');
+  isSaving = signal(false);
+  isLoading = signal(true);
+  errorMessage = signal<string | null>(null);
+  successMessage = signal<string | null>(null);
+
+  userInitials = computed(() => this.getInitials(this.user()?.name ?? ''));
+  displayName = computed(() => this.user()?.name ?? 'Unknown');
+  displayEmail = computed(() => this.user()?.email ?? '');
+  displayRole = computed(() => this.user()?.role ?? 'SELLER');
 
   ngOnInit(): void {
     this.loadUser();
   }
 
-  async loadUser(): Promise<void> {
-    this.errorMessage = null;
+  loadUser(): void {
+    this.errorMessage.set(null);
+    this.isLoading.set(true);
 
     this.userService.getCurrentUser().subscribe({
       next: (user) => {
-        this.user = user;
-        this.editableName = user.name;
+        this.user.set(user);
+        this.editableName.set(user.name);
+        this.isLoading.set(false);
       },
       error: (err) => {
-        this.errorMessage = this.authService.getErrorMessage(err, 'Failed to load profile.');
+        this.errorMessage.set(this.authService.getErrorMessage(err, 'Failed to load profile.'));
+        this.isLoading.set(false);
       },
     });
   }
 
   saveChanges(): void {
-    if (!this.user || this.isSaving) return;
+    if (!this.user() || this.isSaving()) return;
 
-    const trimmedName = this.editableName.trim();
+    const trimmedName = this.editableName().trim();
     if (!trimmedName || trimmedName.length < 2) {
-      this.errorMessage = 'Name must be at least 2 characters.';
-      this.successMessage = null;
+      this.errorMessage.set('Name must be at least 2 characters.');
+      this.successMessage.set(null);
       return;
     }
 
-    this.isSaving = true;
-    this.errorMessage = null;
-    this.successMessage = null;
+    this.isSaving.set(true);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
 
     this.userService
-      .updateCurrentUser({ name: trimmedName, avatar: this.user.avatar })
+      .updateCurrentUser({ name: trimmedName, avatar: this.user()!.avatar })
       .subscribe({
         next: (updatedUser) => {
-          this.user = updatedUser;
-          this.editableName = updatedUser.name;
+          this.user.set(updatedUser);
+          this.editableName.set(updatedUser.name);
           this.authService.updateStoredUser(updatedUser);
-          this.successMessage = 'Profile updated successfully.';
-          this.isSaving = false;
+          this.successMessage.set('Profile updated successfully.');
+          this.isSaving.set(false);
         },
         error: (err) => {
-          this.errorMessage = this.authService.getErrorMessage(err, 'Failed to update profile.');
-          this.isSaving = false;
+          this.errorMessage.set(this.authService.getErrorMessage(err, 'Failed to update profile.'));
+          this.isSaving.set(false);
         },
       });
   }
 
-  get userInitials(): string {
-    return this.getInitials(this.user?.name ?? '');
-  }
-
-  get displayName(): string {
-    return this.user?.name ?? 'Unknown';
-  }
-
-  get displayEmail(): string {
-    return this.user?.email ?? '';
-  }
-
-  get displayRole(): string {
-    return this.user?.role ?? 'SELLER';
-  }
-
-  ngOnDestroy(): void {}
-
   private getInitials(name: string): string {
     if (!name) return 'U';
-    const initials = name
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part[0]?.toUpperCase() ?? '')
-      .join('');
-    return initials || 'U';
+    return (
+      name
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0]?.toUpperCase() ?? '')
+        .join('') || 'U'
+    );
   }
 }
