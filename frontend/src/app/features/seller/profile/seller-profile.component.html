@@ -33,7 +33,7 @@
           class="primary-btn"
           type="button"
           (click)="saveChanges()"
-          [disabled]="isSaving || isLoading"
+          [disabled]="isSaving"
         >
           <i class="bi" [class.bi-check2]="!isSaving" [class.bi-arrow-repeat]="isSaving" [class.bi-spin]="isSaving"></i>
           {{ isSaving ? 'Saving...' : 'Save changes' }}
@@ -42,26 +42,20 @@
     </header>
 
     <main class="seller-body">
-      <!-- Loading state -->
-      <div *ngIf="isLoading" class="panel" style="text-align: center; padding: 2rem;">
-        <i class="bi bi-arrow-repeat bi-spin" style="font-size: 2rem; color: var(--gold);"></i>
-        <p style="margin-top: 1rem; color: var(--text-muted);">Loading profile...</p>
-      </div>
 
-      <!-- Error/Success messages -->
-      <div *ngIf="errorMessage && !isLoading" class="panel" style="background: #fff0f0; border: 1px solid #e8b4b4; color: #c44;">
+      <div *ngIf="errorMessage" class="panel" style="background: #fff0f0; border: 1px solid #e8b4b4; color: #c44;">
         <div class="panel-body">
           <i class="bi bi-exclamation-triangle-fill"></i> {{ errorMessage }}
         </div>
       </div>
 
-      <div *ngIf="successMessage && !isLoading" class="panel" style="background: #f0fff4; border: 1px solid #b4e8c4; color: #2a6;">
+      <div *ngIf="successMessage" class="panel" style="background: #f0fff4; border: 1px solid #b4e8c4; color: #2a6;">
         <div class="panel-body">
           <i class="bi bi-check-circle-fill"></i> {{ successMessage }}
         </div>
       </div>
 
-      <section *ngIf="!isLoading" class="seller-banner profile-banner">
+      <section class="seller-banner profile-banner">
         <div class="profile-banner-head">
           <div class="profile-avatar">{{ userInitials }}</div>
           <div class="text-white">
@@ -70,7 +64,6 @@
             <p>Update your personal details and profile image.</p>
           </div>
         </div>
-
         <div class="seller-banner-actions">
           <button class="secondary-btn" type="button">
             <i class="bi bi-camera"></i>
@@ -79,7 +72,7 @@
         </div>
       </section>
 
-      <div *ngIf="!isLoading" class="profile-layout">
+      <div class="profile-layout">
         <div class="profile-stack">
           <section class="panel">
             <div class="panel-head">
@@ -152,4 +145,3 @@
     </main>
   </div>
 </div>
-

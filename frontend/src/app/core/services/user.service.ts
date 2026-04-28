@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AuthUser } from '../../features/auth/auth.models';
+import { User } from '../models/user.model';
 
 function resolveApiBaseUrl(): string {
   const location = globalThis.location;
@@ -27,12 +28,12 @@ export class UserService {
   private readonly http = inject(HttpClient);
   private readonly usersUrl = `${resolveApiBaseUrl()}/api/users`;
 
-  getCurrentUser(): Observable<AuthUser> {
-    return this.http.get<AuthUser>(`${this.usersUrl}/me`);
+  getCurrentUser(): Observable<User> {
+    return this.http.get<User>(`${this.usersUrl}/me`);
   }
 
-  updateCurrentUser(payload: UpdateUserRequest): Observable<AuthUser> {
-    return this.http.put<AuthUser>(`${this.usersUrl}/me`, payload);
+  updateCurrentUser(payload: UpdateUserRequest): Observable<User> {
+    return this.http.put<User>(`${this.usersUrl}/me`, payload);
   }
 }
 
