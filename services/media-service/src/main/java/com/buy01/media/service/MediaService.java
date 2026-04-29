@@ -1,6 +1,5 @@
 package com.buy01.media.service;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -9,19 +8,14 @@ import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.buy01.media.dto.MediaResponse;
 import com.buy01.media.model.Media;
 import com.buy01.media.repository.MediaRepository;
-
-import io.jsonwebtoken.io.IOException;
 import jakarta.ws.rs.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.Data;

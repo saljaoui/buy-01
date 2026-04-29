@@ -40,3 +40,13 @@ info:
     name: User Service
     description: Handles auth, users, roles
     version: 1.0.0
+logging:
+  level:
+    root: WARN
+    org.apache.kafka: WARN
+    org.apache.kafka.clients.NetworkClient: ERROR
+    org.apache.kafka.clients.consumer.internals: ERROR
+    org.springframework.kafka: WARN
+    com.netflix.discovery: WARN
+    com.netflix.eureka: WARN
+    org.springframework.cloud.netflix.eureka: WARN

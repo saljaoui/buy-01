@@ -16,17 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 import com.buy01.products.dto.ProductDto;
 import com.buy01.products.model.Product;
 import com.buy01.products.service.ProductService;
-import com.example.events.ProductCreatedEvent;
 
 @RestController
 @RequestMapping("/api/products")
 @AllArgsConstructor
-
 public class ProductController {
     private final ProductService productService;
     @PostMapping
     @PreAuthorize("hasRole('ROLE_SELLER')")
-    public ResponseEntity<Product> create(@RequestBody ProductDto product, Authentication authentication) {
+public ResponseEntity<Product> create(@RequestBody ProductDto product, Authentication authentication) {
         String userID = authentication.getName();
         Product product2 = this.productService.createProduct(product, userID);
         return ResponseEntity.ok(product2);

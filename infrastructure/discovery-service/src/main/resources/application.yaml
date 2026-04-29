@@ -24,3 +24,8 @@ management:
   endpoint:
     health:
       show-details: always
+logging:
+  level:
+    info: WARN
+    com.netflix.discovery: WARN
+    com.netflix.eureka: WARN

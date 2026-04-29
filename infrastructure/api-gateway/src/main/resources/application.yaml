@@ -45,3 +45,8 @@ management:
     web:
       exposure:
         include: health,info,gateway
+logging:
+  level:
+    info: WARN
+    com.netflix.discovery: WARN
+    com.netflix.eureka: WARN
