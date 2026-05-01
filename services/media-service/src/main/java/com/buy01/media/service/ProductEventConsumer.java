@@ -10,7 +10,7 @@ import com.buy01.media.repository.MediaRepository;
 @Service
 public class ProductEventConsumer {
 
-    private final MediaRepository mediaRepository;
+    private final MediaService mediaService;
 
     @KafkaListener(topics = "product-events", groupId = "media-service-group")
     public void handleProductEvent(ProductEvent event) {
@@ -20,7 +20,9 @@ public class ProductEventConsumer {
             case "DELETED" ->
                 // Auto-clean media when product is deleted
                 //mediaRepository.deleteByProductId(event.getProductId());
-                System.out.println("Product deleted: " + event.getProductId());
+                //System.out.println("Product deleted: " + event.getProductId());
+                this.mediaService.deleteAllByProductId(event.getProductId());
+                
 
             case "CREATED" ->
                 // Maybe initialize a media placeholder

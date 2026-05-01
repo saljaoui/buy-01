@@ -14,6 +14,9 @@ build_service() {
   )
 }
 
+# =========================
+# 1. BUILD ALL SERVICES
+# =========================
 build_service "infrastructure/discovery-service"
 build_service "infrastructure/api-gateway"
 build_service "services/user-service"
@@ -30,27 +33,45 @@ echo "==> Building frontend"
   npm run build
 )
 
-# ✅ Start Kafka and Zookeeper first, wait until ready
-echo
-echo "==> Starting Zookeeper & Kafka..."
 cd "${ROOT_DIR}"
-docker compose up -d zookeeper kafka
 
-echo "==> Waiting for Kafka to be ready..."
-MAX_RETRIES=30
+# =========================
+# 2. START INFRA FIRST
+# =========================
+echo
+echo "==> Starting Kafka, Zookeeper, Eureka..."
+
+docker compose up -d zookeeper kafka discovery-service
+
+# =========================
+# 3. WAIT FOR EUREKA
+# =========================
+echo "==> Waiting for Eureka (discovery-service) to be READY..."
+
+MAX_RETRIES=60
 COUNT=0
-until docker compose exec kafka kafka-topics --bootstrap-server kafka:9092 --list > /dev/null 2>&1; do
+
+until docker exec buy-01-discovery-service-1 wget -qO- http://localhost:8761/actuator/health | grep '"status":"UP"' > /dev/null 2>&1; do
   COUNT=$((COUNT + 1))
+
   if [ "$COUNT" -ge "$MAX_RETRIES" ]; then
-    echo "❌ Kafka did not become ready in time. Aborting."
+    echo "❌ Eureka did not become ready in time. Aborting."
     exit 1
   fi
-  echo "   Kafka not ready yet... retrying ($COUNT/$MAX_RETRIES)"
+
+  echo "   Eureka not ready yet... retrying ($COUNT/$MAX_RETRIES)"
   sleep 2
 done
-echo "✅ Kafka is ready!"
 
-# ✅ Start the rest of the stack
+echo "✅ Eureka is UP!"
+
+# =========================
+# 4. START REMAINING SERVICES
+# =========================
 echo
-echo "==> Starting full Docker stack..."
-docker compose up --build "$@"
+echo "==> Starting full microservices stack..."
+
+docker compose up -d api-gateway user-service product-service media-service frontend
+
+echo
+echo "🚀 All services are running!"

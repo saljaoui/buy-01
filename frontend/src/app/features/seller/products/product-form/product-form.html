@@ -73,15 +73,16 @@
               <div class="field-grid">
                 <div class="field full invalid">
                   <label for="title">Product title</label>
-                  <input id="title" type="text" placeholder="Noise-Cancelling Pro Headphones" [(ngModel)]="productInfo.name" />
+                  <input id="title" type="text" placeholder="Noise-Cancelling Pro Headphones"
+                    [(ngModel)]="productInfo.name" />
                   <div class="message">Title is required before publishing.</div>
                 </div>
 
                 <div class="field full">
                   <label for="shortDescription">description</label>
-                  <textarea
-                    id="shortDescription"
-                    placeholder="Write a concise summary that will appear in cards and previews." [(ngModel)]="productInfo.description"></textarea>
+                  <textarea id="shortDescription"
+                    placeholder="Write a concise summary that will appear in cards and previews."
+                    [(ngModel)]="productInfo.description"></textarea>
                   <div class="helper">Keep it focused on materials, benefits, and visual style.</div>
                 </div>
               </div>
@@ -113,14 +114,34 @@
                 <p>Dropzone and file cards stay visually aligned with the dashboard and media library.</p>
               </div>
 
-              <div class="upload-dropzone media-dropzone">
-                <div class="drop-icon"><i class="bi bi-cloud-arrow-up"></i></div>
+              <!--<div class="upload-dropzone media-dropzone">
+              <div class="drop-icon"><i class="bi bi-cloud-arrow-up"></i></div>
                 <strong>Upload product imagery</strong>
                 <span>Drag and drop hero shots, detail crops, or packaging images here.</span>
                 <div class="drop-actions">
                   <button class="primary-btn" type="button">Choose files</button>
                   <a class="ghost-btn" href="/seller/media">Open library</a>
                 </div>
+                <small>Allowed: JPG, PNG, WEBP up to 5 MB each.</small>
+              </div>-->
+
+              <div class="upload-dropzone media-dropzone">
+                <div class="drop-icon"><i class="bi bi-cloud-arrow-up"></i></div>
+                <strong>Upload product imagery</strong>
+                <span>Drag and drop hero shots, detail crops, or packaging images here.</span>
+
+                <div class="drop-actions">
+                  <!-- Hidden file input -->
+                  <input type="file" id="imageInput" accept="image/*" multiple (change)="onFilesSelected($event)" style="display: none;">
+
+                  <!-- Button triggers file picker -->
+                  <button class="primary-btn" type="button">
+                    Choose images
+                  </button>
+
+                  <a class="ghost-btn" href="/seller/media">Open library</a>
+                </div>
+
                 <small>Allowed: JPG, PNG, WEBP up to 5 MB each.</small>
               </div>
 

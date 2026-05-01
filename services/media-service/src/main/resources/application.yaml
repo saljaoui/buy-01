@@ -10,8 +10,7 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
-        spring.json.use.type.headers: false
-        spring.json.trusted.packages: "com.example.events"
+        spring.json.trusted.packages: com.example.events
   application:
     name: media-service
   servlet:

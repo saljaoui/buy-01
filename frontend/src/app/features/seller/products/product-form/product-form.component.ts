@@ -27,7 +27,10 @@ export class ProductFormComponent {
       }
     });
   }
-
+onFilesSelected(event: Event): void {
+  console.log('file changed ...');
+  
+}
   printProductInfo() {
     if (this.productInfo) {
       console.log('name : ', this.productInfo.name);

@@ -39,6 +39,6 @@ public class MediaController {
     public ResponseEntity<List<MediaResponse>> findAllByProductId(@PathVariable("id") String id) {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(this.mediaService.findAllByProductId2(id));
+                .body(this.mediaService.findAllMediaByProductId(id));
     }
 }

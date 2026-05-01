@@ -36,6 +36,15 @@ public class MediaService {
         return media.getImagePath();
     }
 
+    public void upload(List<MultipartFile> files, String productId) {
+        if (files == null || files.isEmpty()) {
+            return;
+        }
+        for (MultipartFile file : files) {
+            this.upload(file, productId);
+        }
+    }
+
     private String save(MultipartFile file) {
         // 1. Validate file is not empty
         if (file == null || file.isEmpty()) {
@@ -77,9 +86,9 @@ public class MediaService {
                 .stream().map(media -> this.find(media.getId())).toList();
     }
 
-    public List<MediaResponse> findAllByProductId2(String productId) {
-        List<Media> mediaList = mediaRepository.findAllByProductId(productId);
+    public List<MediaResponse> findAllMediaByProductId(String productId) {
 
+        List<Media> mediaList = mediaRepository.findAllByProductId(productId);
         return mediaList.stream().map(media -> {
             try {
                 Resource image = new FileSystemResource("uploads/" + media.getImagePath());
@@ -95,5 +104,17 @@ public class MediaService {
 
     public List<Media> findAll() {
         return this.mediaRepository.findAll();
+    }
+
+    public void deleteAllByProductId(String productId) {
+        this.mediaRepository.deleteAllByProductId(productId);
+    }
+
+    public void delete(Media media) {
+        this.mediaRepository.delete(media);
+    }
+
+    public void getAllMedia(String productId) {
+        this.mediaRepository.findAllByProductId(productId);
     }
 }
