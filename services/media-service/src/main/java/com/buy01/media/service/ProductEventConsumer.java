@@ -24,9 +24,12 @@ public class ProductEventConsumer {
                 this.mediaService.deleteAllByProductId(event.getProductId());
                 
 
-            case "CREATED" ->
+            case "CREATED" -> {
                 // Maybe initialize a media placeholder
                 System.out.println("Product created: " + event.getProductId());
+                this.mediaService.upload(event.getMedias(), event.getProductId());
+            }
+                
 
             case "UPDATED" ->
                 // Handle update logic if needed

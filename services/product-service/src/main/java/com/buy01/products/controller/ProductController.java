@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
+
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.buy01.products.dto.ProductDto;
@@ -24,9 +28,10 @@ public class ProductController {
     private final ProductService productService;
     @PostMapping
     @PreAuthorize("hasRole('ROLE_SELLER')")
-public ResponseEntity<Product> create(@RequestBody ProductDto product, Authentication authentication) {
+public ResponseEntity<Product> create(@RequestPart("product") ProductDto product,
+            @RequestPart("files") List<MultipartFile> files, Authentication authentication) {
         String userID = authentication.getName();
-        Product product2 = this.productService.createProduct(product, userID);
+        Product product2 = this.productService.createProduct(product, files, userID);
         return ResponseEntity.ok(product2);
     }
 

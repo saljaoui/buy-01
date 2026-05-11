@@ -5,11 +5,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import com.buy01.products.Exceptions.ForbiddenException;
 import com.buy01.products.Exceptions.ProductNotFoundException;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.buy01.products.dto.ProductDto;
 import com.buy01.products.model.Product;
 import com.example.events.ProductEvent;
 import com.buy01.products.repository.ProductRepository;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -21,7 +22,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductEventProducer eventProducer;
 
-    public Product createProduct(ProductDto productData, String userId) {
+    public Product createProduct(ProductDto productData, List<MultipartFile> files, String userId) {
         Product product = new Product();
         product.setName(productData.getName());
         product.setDescription(productData.getDescription());
@@ -29,7 +30,7 @@ public class ProductService {
         product.setQuantity(productData.getQuantity());
         product.setUserId(userId);
         Product saved = this.productRepository.save(product);
-        this.eventProducer.sendEvent(new ProductEvent("CREATED", saved.getId(), saved.getUserId(), saved.getPrice()));
+        this.eventProducer.sendEvent(new ProductEvent("CREATED", saved.getId(), saved.getUserId(), files));
         return saved;
     }
 

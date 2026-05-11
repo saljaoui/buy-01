@@ -27,6 +27,8 @@ public class MediaService {
     private final MediaRepository mediaRepository;
 
     public String upload(MultipartFile file, String productId) {
+
+        System.out.println("image: " + file);
         String filePath = this.save(file);
         Media media = Media.builder()
                 .productId(productId)

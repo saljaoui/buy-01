@@ -132,10 +132,10 @@
 
                 <div class="drop-actions">
                   <!-- Hidden file input -->
-                  <input type="file" id="imageInput" accept="image/*" multiple (change)="onFilesSelected($event)" style="display: none;">
+                  <input #imageInput type="file" id="imageInput" accept="image/*" multiple (change)="onFilesSelected($event)" style="display: none;">
 
                   <!-- Button triggers file picker -->
-                  <button class="primary-btn" type="button">
+                  <button class="primary-btn" type="button" (click)="imageInput.click()">
                     Choose images
                   </button>
 
@@ -146,23 +146,18 @@
               </div>
 
               <div class="upload-preview-grid">
-                <article class="upload-card">
-                  <div class="preview-art">🎧</div>
-                  <strong>hero-front.jpg</strong>
-                  <span>1600 x 1200 px</span>
-                </article>
 
-                <article class="upload-card">
-                  <div class="preview-art">🎚️</div>
-                  <strong>control-closeup.png</strong>
-                  <span>1200 x 1200 px</span>
-                </article>
-
-                <article class="upload-card empty">
-                  <div class="preview-art"><i class="bi bi-plus-lg"></i></div>
-                  <strong>Add another file</strong>
-                  <span>Placeholder slot</span>
-                </article>
+                @for(item of selectedFiles; track item.file.lastModified) {
+                  <article class="upload-card">
+                    <div class="preview-art">
+                      <img [src]="getPreview(item.file)" [alt]="item.file.name">
+                    </div>
+                    <strong>{{ item.file.name }}</strong>
+                    <span>1600 x 1200 px</span>
+                    <button (click)="deleteImage(item.file)">delete</button>
+                  </article>
+                }
+                
               </div>
             </section>
           </div>

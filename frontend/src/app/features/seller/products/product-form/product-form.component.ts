@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
 import { SellerNavComponent } from '../../seller-nav/seller-nav.component';
 import { ProductRequest, ProductService } from '../../../../shared/services/product-service';
 import { FormsModule } from '@angular/forms';
@@ -9,28 +9,60 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './product-form.html',
   styleUrl: './product-form.scss',
 })
-export class ProductFormComponent {
+export class ProductFormComponent implements OnDestroy {
   private readonly productService = inject(ProductService);
+  selectedFilesArray: File[] = [];
 
   productInfo: ProductRequest = {
-    name:'',
-    description:'',
-    price:0,
-    quantity:0
+    name: '',
+    description: '',
+    price: 0,
+    quantity: 0
   };
   saveProduct() {
-    this.productService.publishProduct(this.productInfo).subscribe({
-      next : (response) => {
+    this.productService.publishProduct(this.productInfo, this.selectedFilesArray).subscribe({
+      next: (response) => {
       },
       error: (err) => {
         console.error('error : ', err);
       }
     });
   }
-onFilesSelected(event: Event): void {
-  console.log('file changed ...');
-  
-}
+
+  selectedFiles: { file: File; preview: string }[] = [];
+
+  onFilesSelected(event: any): void {
+    if (this.selectedFilesArray.length == 3) {
+      return;
+    }
+    const files: File[] = Array.from(event.target.files);
+    const mappedFiles = files.map(file => ({
+      file,
+      preview: URL.createObjectURL(file)
+    }));
+    this.selectedFiles.push(...mappedFiles);
+    this.selectedFilesArray.push(files[0]);
+    event.target.value = '';
+  }
+
+  deleteImage(fileToDelete: File): void {
+    const item = this.selectedFiles.find(
+      item => item.file === fileToDelete
+    );
+    if (item) {
+      URL.revokeObjectURL(item.preview);
+    }
+    this.selectedFiles = this.selectedFiles.filter(
+      item => item.file !== fileToDelete
+    );
+    
+  }
+
+  ngOnDestroy(): void {
+    this.selectedFiles.forEach(item => {
+      URL.revokeObjectURL(item.preview);
+    });
+  }
   printProductInfo() {
     if (this.productInfo) {
       console.log('name : ', this.productInfo.name);
@@ -40,5 +72,10 @@ onFilesSelected(event: Event): void {
       return;
     }
     console.log('product is null');
+  }
+
+
+  getPreview(file: File): string {
+    return URL.createObjectURL(file);
   }
 }
