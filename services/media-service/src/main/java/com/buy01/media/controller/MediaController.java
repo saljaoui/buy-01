@@ -9,11 +9,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import com.buy01.media.dto.MediaResponse;
 import com.buy01.media.service.MediaService;
 import lombok.AllArgsConstructor;
+import java.util.Map;
+
 
 @AllArgsConstructor
 @RestController
@@ -21,10 +25,12 @@ import lombok.AllArgsConstructor;
 public class MediaController {
     private final MediaService mediaService;
 
-    @PostMapping("/upload")
-    public ResponseEntity<String> upload(@RequestParam("image") MultipartFile file,
-            @RequestParam("productId") String productId) {
-        return ResponseEntity.ok("file name : " + this.mediaService.upload(file, productId));
+    @PostMapping(value = "/upload",
+    consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> upload(@RequestPart("images") List<MultipartFile> files,
+            @RequestPart("productId") String productId) {
+                this.mediaService.upload(files, productId);
+        return ResponseEntity.ok(Map.of("message","media added succesfuly"));
     }
 
     @GetMapping("/{id}")

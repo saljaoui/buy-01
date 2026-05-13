@@ -22,7 +22,7 @@ export interface ProductResponse {
   userId: string
 }
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 
 
@@ -59,7 +59,7 @@ export class ProductService {
     return this.http.get<ProductResponse>(`${this.API}/products/${productId}`, { headers });
   }
 
-  publishProduct(product: ProductRequest, files: File[]): Observable<any> {
+  publishProduct(product: ProductRequest): Observable<any> {
     const token = this.storage.get('buy01.auth.token');
     if (!token) {
       this.router.navigate(['/login']);
@@ -73,14 +73,10 @@ export class ProductService {
         type: 'application/json'
       })
     );
-    files.forEach((file) => {
-      formData.append('files', file);
-    })
-
     const headers = new HttpHeaders({
       'Authorization': 'Bearer ' + token
     })
-    return this.http.post<ProductRequest>(`${this.API}/products`, formData, { headers });
+    return this.http.post<any>(`${this.API}/products`, formData, { headers});
   }
 
   deleteProduct(productId: string): Observable<any> {

@@ -27,7 +27,6 @@ public class ProductEventConsumer {
             case "CREATED" -> {
                 // Maybe initialize a media placeholder
                 System.out.println("Product created: " + event.getProductId());
-                this.mediaService.upload(event.getMedias(), event.getProductId());
             }
                 
 

@@ -65,6 +65,7 @@ public class MediaService {
             // 5. Write file to disk
             Path targetPath = uploadPath.resolve(uniqueFilename);
             Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("Saving to: " + uploadPath.toAbsolutePath());
             return uniqueFilename; // return saved filename to store in DB
         } catch (Exception e) {
             throw new IllegalAccessError(e.getMessage());
@@ -97,7 +98,8 @@ public class MediaService {
                 byte[] imageBytes = Files.readAllBytes(image.getFile().toPath());
                 String base64 = Base64.getEncoder().encodeToString(imageBytes);
                 String contentType = Files.probeContentType(image.getFile().toPath());
-                return new MediaResponse(media.getId(), base64, contentType);
+                String path = media.getImagePath();
+                return new MediaResponse(media.getId(), base64, contentType, path);
             } catch (Exception e) {
                 throw new RuntimeException("Failed to read image", e);
             }

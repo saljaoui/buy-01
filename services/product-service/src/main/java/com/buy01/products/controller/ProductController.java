@@ -13,12 +13,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
-
-
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.buy01.products.dto.ProductDto;
 import com.buy01.products.model.Product;
+import java.util.Map;
 import com.buy01.products.service.ProductService;
 
 @RestController
@@ -28,11 +27,10 @@ public class ProductController {
     private final ProductService productService;
     @PostMapping
     @PreAuthorize("hasRole('ROLE_SELLER')")
-public ResponseEntity<Product> create(@RequestPart("product") ProductDto product,
-            @RequestPart("files") List<MultipartFile> files, Authentication authentication) {
+    public ResponseEntity<?> create(@RequestPart("product") ProductDto product, Authentication authentication) {
         String userID = authentication.getName();
-        Product product2 = this.productService.createProduct(product, files, userID);
-        return ResponseEntity.ok(product2);
+        Product product2 = this.productService.createProduct(product, userID);
+        return ResponseEntity.ok(Map.of("id", product2.getId()));
     }
 
     @PreAuthorize("hasRole('ROLE_SELLER') and isAuthenticated()")

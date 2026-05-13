@@ -2,6 +2,7 @@ import { Component, inject, OnDestroy } from '@angular/core';
 import { SellerNavComponent } from '../../seller-nav/seller-nav.component';
 import { ProductRequest, ProductService } from '../../../../shared/services/product-service';
 import { FormsModule } from '@angular/forms';
+import { MediaService } from '../../../../shared/services/media-service';
 
 @Component({
   selector: 'app-product-form',
@@ -11,6 +12,8 @@ import { FormsModule } from '@angular/forms';
 })
 export class ProductFormComponent implements OnDestroy {
   private readonly productService = inject(ProductService);
+  private readonly mediaService = inject(MediaService);
+
   selectedFilesArray: File[] = [];
 
   productInfo: ProductRequest = {
@@ -20,8 +23,17 @@ export class ProductFormComponent implements OnDestroy {
     quantity: 0
   };
   saveProduct() {
-    this.productService.publishProduct(this.productInfo, this.selectedFilesArray).subscribe({
-      next: (response) => {
+    this.productService.publishProduct(this.productInfo).subscribe({
+      next: (product: any) => {
+        console.log("product created with id = ", product.id);
+        this.mediaService.publishMedia(product.id, this.selectedFilesArray).subscribe({
+          next: (response: any) => {
+            console.log('response: ', response);
+          },
+          error: (err) => {
+            console.error('error: ', err);
+          }
+        });
       },
       error: (err) => {
         console.error('error : ', err);

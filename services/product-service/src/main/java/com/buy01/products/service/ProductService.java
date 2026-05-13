@@ -22,7 +22,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final ProductEventProducer eventProducer;
 
-    public Product createProduct(ProductDto productData, List<MultipartFile> files, String userId) {
+    public Product createProduct(ProductDto productData, String userId) {
         Product product = new Product();
         product.setName(productData.getName());
         product.setDescription(productData.getDescription());
@@ -30,7 +30,7 @@ public class ProductService {
         product.setQuantity(productData.getQuantity());
         product.setUserId(userId);
         Product saved = this.productRepository.save(product);
-        this.eventProducer.sendEvent(new ProductEvent("CREATED", saved.getId(), saved.getUserId(), files));
+        this.eventProducer.sendEvent(new ProductEvent("CREATED", saved.getId(), saved.getUserId()));
         return saved;
     }
 
@@ -65,7 +65,7 @@ public class ProductService {
             return;
         }
         this.productRepository.delete(deletedProduct);
-        this.eventProducer.sendEvent(new ProductEvent("DELETED", productId, null, null));
+        this.eventProducer.sendEvent(new ProductEvent("DELETED", productId, null));
     }
     
     public List<Product> getProductsOwnedBy(String OwnerId) {
