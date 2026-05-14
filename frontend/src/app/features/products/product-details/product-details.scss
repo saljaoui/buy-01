@@ -110,6 +110,15 @@
   overflow: hidden;
 }
 
+gallery-stage img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
 .gallery-emoji {
   font-size: 7rem;
   user-select: none;
@@ -169,8 +178,13 @@
   align-items: center;
 }
 
-.thumb-btn span {
-  font-size: 1.3rem;
+.thumb-btn img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
 }
 
 .thumb-btn:hover,
@@ -363,7 +377,7 @@
   margin-top: 1rem;
 }
 
-.action-row > * {
+.action-row>* {
   flex: 1;
 }
 
@@ -563,6 +577,7 @@
 }
 
 @media (max-width: 1199px) {
+
   .detail-layout,
   .detail-bottom-grid,
   .related-grid {

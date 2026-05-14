@@ -26,7 +26,7 @@ import lombok.Data;
 public class MediaService {
     private final MediaRepository mediaRepository;
 
-    public String upload(MultipartFile file, String productId) {
+    public void upload(MultipartFile file, String productId) {
 
         System.out.println("image: " + file);
         String filePath = this.save(file);
@@ -35,7 +35,6 @@ public class MediaService {
                 .imagePath(filePath)
                 .build();
         this.mediaRepository.save(media);
-        return media.getImagePath();
     }
 
     public void upload(List<MultipartFile> files, String productId) {
@@ -98,8 +97,7 @@ public class MediaService {
                 byte[] imageBytes = Files.readAllBytes(image.getFile().toPath());
                 String base64 = Base64.getEncoder().encodeToString(imageBytes);
                 String contentType = Files.probeContentType(image.getFile().toPath());
-                String path = media.getImagePath();
-                return new MediaResponse(media.getId(), base64, contentType, path);
+                return new MediaResponse(media.getId(), base64, contentType);
             } catch (Exception e) {
                 throw new RuntimeException("Failed to read image", e);
             }

@@ -1,5 +1,5 @@
 <div class="storefront-shell">
- <app-navbar></app-navbar>
+  <app-navbar></app-navbar>
 
   <main class="container detail-page">
     <div class="breadcrumb-row">
@@ -13,31 +13,23 @@
     <div class="detail-layout">
       <section class="gallery-column">
         <div class="surface-card gallery-card">
+          @if (MediaDetails()?.[0] ; as media) {
           <div class="gallery-stage">
             <div class="gallery-badges">
               <span class="gallery-badge featured">Best seller</span>
               <span class="gallery-badge stock">In stock</span>
             </div>
-            <span class="gallery-emoji">🎧</span>
+
+            <img [src]="'data:' + media.contentType + ';base64,' + media.base64Image" alt="Product Image">
           </div>
+          }
 
           <div class="thumb-grid">
+            @for (mediaData of MediaDetails(); track mediaData.id) {
             <button class="thumb-btn active" type="button">
-              <span>🎧</span>
-              Front view
+              <img [src]="'data:' + mediaData.contentType + ';base64,' + mediaData.base64Image" alt="Product Image">
             </button>
-            <button class="thumb-btn" type="button">
-              <span>📦</span>
-              Packaging
-            </button>
-            <button class="thumb-btn" type="button">
-              <span>🎚️</span>
-              Controls
-            </button>
-            <button class="thumb-btn" type="button">
-              <span>🛋️</span>
-              Lifestyle
-            </button>
+            }
           </div>
         </div>
 

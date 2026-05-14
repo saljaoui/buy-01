@@ -10,5 +10,4 @@ public class MediaResponse {
     private String id;
     private String base64Image;
     private String contentType;
-    private String path;
 }

@@ -25,8 +25,9 @@ import java.util.Map;
 public class MediaController {
     private final MediaService mediaService;
 
-    @PostMapping(value = "/upload",
-    consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping( value = "/upload",
+                  consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+                )
     public ResponseEntity<?> upload(@RequestPart("images") List<MultipartFile> files,
             @RequestPart("productId") String productId) {
                 this.mediaService.upload(files, productId);

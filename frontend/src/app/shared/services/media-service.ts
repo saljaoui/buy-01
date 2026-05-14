@@ -5,6 +5,12 @@ import { Router } from '@angular/router';
 import { GlobalService } from '../global/global-service';
 import { EMPTY, Observable } from 'rxjs';
 
+
+export interface MediaUploadData {
+  id:string;
+  base64Image:string;
+  contentType:string;
+}
 @Injectable({
   providedIn: 'root',
 })
@@ -30,5 +36,19 @@ export class MediaService {
       'Authorization': 'Bearer ' + token
     })
     return this.http.post<any>(`${this.API}/media/upload`, formData, { headers });
+  }
+
+
+  getMediaByPost(productId: string): Observable<MediaUploadData[]> {
+    const token = this.storage.get('buy01.auth.token');
+    if (!token) {
+      this.router.navigate(['/login']);
+      return EMPTY;
+    }
+    const headers = new HttpHeaders({
+      'Authorization': 'Bearer ' + token,
+      'Content-Type':'application/json'
+    })
+    return this.http.get<MediaUploadData[]>(`${this.API}/media/product/${productId}`, { headers });
   }
 }
