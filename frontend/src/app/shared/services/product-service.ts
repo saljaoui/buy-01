@@ -66,7 +66,6 @@ export class ProductService {
       return EMPTY;
     }
     const formData = new FormData();
-
     formData.append(
       'product',
       new Blob([JSON.stringify(product)], {
@@ -91,7 +90,7 @@ export class ProductService {
     })
     return this.http.delete<string>(`${this.API}/products/${productId}`, { headers });
   }
-
+  
   updateProduct(productId: string, product: ProductRequest): Observable<any> {
     const token = this.storage.get('buy01.auth.token');
     if (!token) {

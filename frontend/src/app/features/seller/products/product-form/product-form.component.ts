@@ -3,6 +3,7 @@ import { SellerNavComponent } from '../../seller-nav/seller-nav.component';
 import { ProductRequest, ProductService } from '../../../../shared/services/product-service';
 import { FormsModule } from '@angular/forms';
 import { MediaService } from '../../../../shared/services/media-service';
+import { ToastService } from '../../../../shared/services/toast-service';
 
 @Component({
   selector: 'app-product-form',
@@ -13,6 +14,7 @@ import { MediaService } from '../../../../shared/services/media-service';
 export class ProductFormComponent implements OnDestroy {
   private readonly productService = inject(ProductService);
   private readonly mediaService = inject(MediaService);
+  private readonly toasrService = inject(ToastService);
 
   selectedFilesArray: File[] = [];
 
@@ -23,6 +25,11 @@ export class ProductFormComponent implements OnDestroy {
     quantity: 0
   };
   saveProduct() {
+
+    if (this.selectedFilesArray.length == 0) {
+      this.toasrService.error("product most have at least one Image");
+      return;
+    }
     this.productService.publishProduct(this.productInfo).subscribe({
       next: (product: any) => {
         console.log("product created with id = ", product.id);

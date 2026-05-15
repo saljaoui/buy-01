@@ -27,7 +27,6 @@ public class MediaService {
     private final MediaRepository mediaRepository;
 
     public void upload(MultipartFile file, String productId) {
-
         System.out.println("image: " + file);
         String filePath = this.save(file);
         Media media = Media.builder()
@@ -71,6 +70,7 @@ public class MediaService {
         }
     }
 
+    
     public Resource find(String imageId) {
         Media media = this.mediaRepository.findById(imageId)
                 .orElseThrow(() -> new NotFoundException("media not found"));
@@ -108,15 +108,44 @@ public class MediaService {
         return this.mediaRepository.findAll();
     }
 
+    private void deleteMediaFile(Media media) {
+        if (media == null || media.getImagePath() == null || media.getImagePath().isBlank()) {
+            throw new IllegalArgumentException("Invalid media or image path");
+        }
+        try {
+            // 1. Sanitize filename to prevent path traversal
+            String filename = StringUtils.cleanPath(media.getImagePath());
+            // 2. Build path inside uploads directory
+            Path uploadPath = Paths.get("uploads/");
+            Path filePath = uploadPath.resolve(filename).normalize();
+            // 3. Extra safety: ensure file is still inside uploads folder
+            if (!filePath.startsWith(uploadPath.toAbsolutePath().normalize())) {
+                throw new SecurityException("Invalid file path detected");
+            }
+            // 4. Delete file if it exists
+            boolean deleted = Files.deleteIfExists(filePath);
+            if (!deleted) {
+                System.out.println("File not found: " + filePath);
+            } else {
+                System.out.println("Deleted file: " + filePath);
+            }
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to delete file: " + e.getMessage(), e);
+        }
+    }
+
     public void deleteAllByProductId(String productId) {
+        List<Media> mediaList = this.getAllMedia(productId);
+        mediaList.forEach(this::deleteMediaFile);
         this.mediaRepository.deleteAllByProductId(productId);
+
     }
 
     public void delete(Media media) {
         this.mediaRepository.delete(media);
     }
 
-    public void getAllMedia(String productId) {
-        this.mediaRepository.findAllByProductId(productId);
+    public List<Media> getAllMedia(String productId) {
+        return this.mediaRepository.findAllByProductId(productId);
     }
 }

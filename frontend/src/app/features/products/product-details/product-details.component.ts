@@ -2,8 +2,9 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FooterComponent } from '../../../shared/footer/footer.component';
 import { NavbarComponent } from '../../../shared/navbar/navbar.component';
 import { ProductResponse, ProductService } from '../../../shared/services/product-service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MediaService, MediaUploadData } from '../../../shared/services/media-service';
+import { ToastService } from '../../../shared/services/toast-service';
 
 @Component({
   selector: 'app-product-details',
@@ -17,10 +18,17 @@ export class ProductDetailsComponent implements OnInit {
 
   MediasDetailsSignal = signal<MediaUploadData[] | undefined>(undefined);
   MediaDetails = computed(() => this.MediasDetailsSignal());
+
+  selectedImageSignal = signal<MediaUploadData | undefined>(undefined);
+  selectedImage = computed(() => this.selectedImageSignal());
+
   productId: string = '';
   private readonly productService = inject(ProductService);
   private readonly route = inject(ActivatedRoute);
   private readonly mediaService = inject(MediaService);
+  private readonly toastService = inject(ToastService);
+  private readonly router = inject(Router);
+
 
 
   ngOnInit(): void {
@@ -33,7 +41,6 @@ export class ProductDetailsComponent implements OnInit {
     this.findProduct();
     this.loadMedia();
   }
-
   findProduct() {
     this.productService.getProduct(this.productId).subscribe({
       next: (response: ProductResponse) => {
@@ -44,21 +51,37 @@ export class ProductDetailsComponent implements OnInit {
       }
     })
   }
-
   loadMedia() {
     this.mediaService.getMediaByPost(this.productId).subscribe({
       next: (response: MediaUploadData[]) => {
-        console.log('response: ', response);
-        
         this.MediasDetailsSignal.set(response);
+        if (this.MediaDetails()?.[0]) {
+          this.selectedImageSignal.set(this.MediaDetails()?.[0]);
+        }
       },
       error: (err) => {
         console.error('error: ', err);
       }
     })
   }
+  selectImage(selectedId : any) {
+    const selectedImage = this.MediaDetails()?.filter((media) => {
+      return media.id == selectedId;
+    })[0];
+    this.selectedImageSignal.set(selectedImage);
+  }
+  updateProduct() {  
+  }
 
-  updateProduct() {
-    
+  delete() {
+    this.productService.deleteProduct(this.productId).subscribe({
+      next: (response) => {
+        this.toastService.success("product deleted successfuly");
+        this.router.navigate(['/products']);
+      },
+      error: (err) => {
+        this.toastService.error("product doesn't deleted!");
+      }
+    })
   }
 }

@@ -1,0 +1,18 @@
+<!-- toast.component.html -->
+<div class="toast-container">
+
+  @for (toast of toastService.toasts(); track toast.id) {
+
+    <div class="toast" [class]="toast.type">
+
+      <span>{{ toast.message }}</span>
+
+      <button (click)="toastService.remove(toast.id)">
+        ×
+      </button>
+
+    </div>
+
+  }
+
+</div>
