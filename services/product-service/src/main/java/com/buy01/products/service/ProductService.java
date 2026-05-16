@@ -79,7 +79,6 @@ public class ProductService {
         if (!product.getUserId().equals(userId)) {
             throw new ForbiddenException("You are not allowed to access this product");
         }
-
         return product;
     }
 }

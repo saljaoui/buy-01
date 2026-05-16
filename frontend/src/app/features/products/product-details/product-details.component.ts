@@ -22,6 +22,8 @@ export class ProductDetailsComponent implements OnInit {
   selectedImageSignal = signal<MediaUploadData | undefined>(undefined);
   selectedImage = computed(() => this.selectedImageSignal());
 
+ 
+
   productId: string = '';
   private readonly productService = inject(ProductService);
   private readonly route = inject(ActivatedRoute);
@@ -34,8 +36,9 @@ export class ProductDetailsComponent implements OnInit {
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       const productId = params.get('id');
-      if (productId) {
-        this.productId = productId;
+      console.log('id: ', productId);
+      if (productId) { 
+        this.productId = productId;      
       }
     });
     this.findProduct();
@@ -64,13 +67,14 @@ export class ProductDetailsComponent implements OnInit {
       }
     })
   }
-  selectImage(selectedId : any) {
+  selectImage(selectedId: any) {
     const selectedImage = this.MediaDetails()?.filter((media) => {
       return media.id == selectedId;
     })[0];
     this.selectedImageSignal.set(selectedImage);
   }
-  updateProduct() {  
+  updateProduct() {
+    this.router.navigate(['/seller/products', this.productId, 'edit']);
   }
 
   delete() {

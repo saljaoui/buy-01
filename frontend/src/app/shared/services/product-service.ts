@@ -21,6 +21,15 @@ export interface ProductResponse {
   quantity: number;
   userId: string
 }
+
+
+export interface ProductImage {
+  id: string;
+  isNew: boolean;
+  deleted: boolean;
+  file: File;
+  preview: string;
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -75,7 +84,7 @@ export class ProductService {
     const headers = new HttpHeaders({
       'Authorization': 'Bearer ' + token
     })
-    return this.http.post<any>(`${this.API}/products`, formData, { headers});
+    return this.http.post<any>(`${this.API}/products`, formData, { headers });
   }
 
   deleteProduct(productId: string): Observable<any> {
@@ -90,7 +99,7 @@ export class ProductService {
     })
     return this.http.delete<string>(`${this.API}/products/${productId}`, { headers });
   }
-  
+
   updateProduct(productId: string, product: ProductRequest): Observable<any> {
     const token = this.storage.get('buy01.auth.token');
     if (!token) {
