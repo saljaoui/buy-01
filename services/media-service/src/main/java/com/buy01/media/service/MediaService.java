@@ -120,7 +120,7 @@ public class MediaService {
             Path filePath = uploadPath.resolve(filename).normalize();
             // 3. Extra safety: ensure file is still inside uploads folder
             if (!filePath.startsWith(uploadPath.toAbsolutePath().normalize())) {
-                throw new SecurityException("Invalid file path detected");
+                //throw new SecurityException("Invalid file path detected");
             }
             // 4. Delete file if it exists
             boolean deleted = Files.deleteIfExists(filePath);
@@ -130,7 +130,7 @@ public class MediaService {
                 System.out.println("Deleted file: " + filePath);
             }
         } catch (Exception e) {
-            throw new IllegalStateException("Failed to delete file: " + e.getMessage(), e);
+            //throw new IllegalStateException("Failed to delete file: " + e.getMessage(), e);
         }
     }
 

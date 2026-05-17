@@ -33,9 +33,9 @@ public class ProductController {
         return ResponseEntity.ok(Map.of("id", product2.getId()));
     }
 
-    @PreAuthorize("hasRole('ROLE_SELLER') and isAuthenticated()")
+    @PreAuthorize("hasRole('ROLE_SELLER')")
     @PutMapping("/{id}")
-    public ResponseEntity<Product> update(@PathVariable String id, @RequestBody ProductDto product, Authentication authentication) {
+    public ResponseEntity<Product> update(@PathVariable("id") String id, @RequestBody ProductDto product, Authentication authentication) {
         
         return ResponseEntity.ok(this.productService.updateProduct(id, product, authentication));
     }

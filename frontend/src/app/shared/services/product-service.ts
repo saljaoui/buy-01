@@ -110,7 +110,7 @@ export class ProductService {
       'Authorization': 'Bearer ' + token,
       'Content-Type': 'application/json'
     })
-    return this.http.put<string>(`${this.API}/products/${productId}`, { headers });
+    return this.http.put<string>(`${this.API}/products/${productId}`, product , { headers });
   }
 
 }

@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { SellerNavComponent } from '../../seller-nav/seller-nav.component';
 import { ProductImage, ProductRequest, ProductResponse, ProductService } from '../../../../shared/services/product-service';
 import { FormsModule } from '@angular/forms';
@@ -18,6 +18,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   private readonly toasrService = inject(ToastService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
 
   mode: 'create' | 'edit' = 'create';
@@ -27,10 +28,8 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   MediasDetailsSignal = signal<MediaUploadData[] | undefined>(undefined);
   MediaDetails = computed(() => this.MediasDetailsSignal());
   selectedFilesArray: File[] = [];
-  productId: string = '';
 
-  productIdSignal = signal<string>('');
-  productDetailsId = computed(() => this.productIdSignal());
+  productId = signal<string>('');
 
   selectedImages: ProductImage[] = [];
 
@@ -38,26 +37,22 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     name: '',
     description: '',
     price: 0,
-    quantity: 0
+    quantity: 100
   };
 
   ngOnInit() {
-
-
     this.route.paramMap.subscribe(params => {
       const productId = params.get('id');
       console.log('before ... is');
       if (productId) {
         console.log('yeah...');
-        console.log('productID is : ', productId);
-        this.productIdSignal.set(productId);
-        this.productId = this.productDetailsId();
+        this.productId.set(productId);
         this.mode = 'edit';
+        this.loadProductData();
+        this.loadMediaData();
 
       }
     });
-    this.loadProductData();
-    this.loadMediaData();
   }
 
   saveProduct() {
@@ -65,29 +60,43 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       this.toasrService.error("product most have at least one Image");
       return;
     }
-
-
-    this.productService.publishProduct(this.productInfo).subscribe({
-      next: (product: any) => {
-        console.log("product created with id = ", product.id);
-        this.selectedFilesArray = this.selectedImages.map((m) => m.file);
-        this.mediaService.publishMedia(product.id, this.selectedFilesArray).subscribe({
-          next: (response: any) => {
-            console.log('response: ', response);
-            this.router.navigate(['/products']);
-          },
-          error: (err) => {
-            console.error('error: ', err);
-          }
-        });
-      },
-      error: (err) => {
-        console.error('error : ', err);
-      }
-    });
+    if (this.mode === 'edit') {
+      this.productService.updateProduct(this.productId(), this.productInfo).subscribe({
+        next: (response) => {
+          this.mediaService.updateMedia(this.productId(), this.selectedImages).subscribe({
+            next: (response) => {
+              console.log('response: ', response);
+            },
+            error: (err) => {
+              console.error('error: ', err);
+            }
+          });
+        },
+        error: (err) => {
+          console.error("error: ", err);
+        }
+      });
+    } else {
+      this.productService.publishProduct(this.productInfo).subscribe({
+        next: (product: any) => {
+          console.log("product created with id = ", product.id);
+          this.selectedFilesArray = this.selectedImages.map((m) => m.file);
+          this.mediaService.publishMedia(product.id, this.selectedFilesArray).subscribe({
+            next: (response: any) => {
+              console.log('response: ', response);
+              this.router.navigate(['/products']);
+            },
+            error: (err) => {
+              console.error('error: ', err);
+            }
+          });
+        },
+        error: (err) => {
+          console.error('error : ', err);
+        }
+      });
+    }
   }
-
-  selectedFiles: { id: string; isNew: boolean; deleted: boolean; file: File; preview: string }[] = [];
 
   onFilesSelected(event: any): void {
     if (this.selectedImages.length == 3) {
@@ -101,27 +110,27 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       file,
       preview: URL.createObjectURL(file)
     }));
-    this.selectedFiles.push(...mappedFiles);
+
     this.selectedImages = [...this.selectedImages, ...mappedFiles];
     event.target.value = '';
     console.log('images: ', this.selectedImages);
   }
 
-  deleteImage(fileToDelete: File): void {
-    const item = this.selectedFiles.find(
-      item => item.file === fileToDelete
+  deleteImage(fileToDelete: ProductImage): void {
+    const item = this.selectedImages.find(
+      item => item === fileToDelete
     );
     if (item) {
       URL.revokeObjectURL(item.preview);
     }
-    this.selectedFiles = this.selectedFiles.filter(
-      item => item.file !== fileToDelete
+    this.selectedImages = this.selectedImages.filter(
+      item => item !== fileToDelete
     );
 
   }
 
   ngOnDestroy(): void {
-    this.selectedFiles.forEach(item => {
+    this.selectedImages.forEach(item => {
       URL.revokeObjectURL(item.preview);
     });
   }
@@ -143,16 +152,15 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
 
   loadProductData() {
-    this.productService.getProduct(this.productId).subscribe({
+    this.productService.getProduct(this.productId()).subscribe({
       next: (response: ProductResponse) => {
-        console.log('response: ', response);
-        //this.productDetailsSignal.set(response);
-        this.productInfo = {
-          name: response.name,
-          description: response.description,
-          price: response.price,
-          quantity: response.quantity
-        }
+        this.productDetailsSignal.set(response);
+        this.productInfo.name = response.name;
+        this.productInfo.description = response.description;
+        this.productInfo.price = response.price;
+        this.productInfo.quantity = response.quantity;
+        this.cdr.detectChanges();
+        console.log('productInfo : ', this.productInfo);
       },
       error: (err: ProductResponse) => {
         console.error('error: ', err);
@@ -161,7 +169,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   }
 
   loadMediaData() {
-    this.mediaService.getMediaByPost(this.productId).subscribe({
+    this.mediaService.getMediaByPost(this.productId()).subscribe({
       next: (response: MediaUploadData[]) => {
         console.log('response: ', response);
         response.forEach((media) => {
@@ -179,6 +187,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
           });
         })
         this.MediasDetailsSignal.set(response);
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('error: ', err);

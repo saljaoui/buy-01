@@ -7,12 +7,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
 import com.buy01.media.dto.MediaResponse;
 import com.buy01.media.service.MediaService;
 import lombok.AllArgsConstructor;
@@ -47,5 +50,15 @@ public class MediaController {
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(this.mediaService.findAllMediaByProductId(id));
+    }
+
+    @PutMapping( value = "/product",
+                  consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateMedia(@RequestPart("images") List<MultipartFile> files,
+            @RequestPart("productId") String productId) {
+                System.out.println("🚀 🚀 🚀 🚀 🚀 🚀 Nice 🚀🚀🚀🚀🚀🚀🚀");
+                this.mediaService.deleteAllByProductId(productId);
+                this.mediaService.upload(files, productId);
+        return ResponseEntity.ok(Map.of("message","media updated succesfuly"));
     }
 }
