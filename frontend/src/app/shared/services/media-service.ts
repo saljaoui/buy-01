@@ -69,4 +69,5 @@ export class MediaService {
     })
     return this.http.put<any>(`${this.API}/media/product`, formData, { headers });
   }
+
 }

@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { FooterComponent } from '../../../shared/footer/footer.component';
 import { NavbarComponent } from '../../../shared/navbar/navbar.component';
 import { ProductResponse, ProductService } from '../../../shared/services/product-service';
+import { MediaService } from '../../../shared/services/media-service';
 
 @Component({
   selector: 'app-product-list',
@@ -15,13 +16,14 @@ export class ProductListComponent implements OnInit {
     this.loadProducts();
   }
   private readonly productService = inject(ProductService);
+  private readonly mediaService = inject(MediaService);
+
   productListSignal = signal<ProductResponse[] | null>(null);
   productList = computed(() => this.productListSignal());
   protected scrollCatalog(): void {
     const element = document.getElementById('catalog');
     element?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
-
 
   loadProducts() {
     this.productService.getProducts().subscribe({
@@ -34,5 +36,9 @@ export class ProductListComponent implements OnInit {
         console.error('error: ', err);
       }
     })
+  }
+
+  loadProductImage() {
+    
   }
 }

@@ -7,6 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.buy01.products.dto.ErrorResponse;
 
@@ -33,9 +37,29 @@ public class GlobalExceptionHandler {
                 .message(message)
                 .path(request.getRequestURI())
                 .build();
-
         return new ResponseEntity<>(error, status);
     }
 
-   
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<?> handleParseError(HttpMessageNotReadableException ex) {
+        return ResponseEntity
+            .badRequest()
+            .body(Map.of(
+                    "error", "Invalid request format",
+                    "message", "One or more fields have invalid types (e.g. price must be a number)"
+            ));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<?> handleValidation(MethodArgumentNotValidException ex) {
+
+        Map<String, String> errors = new HashMap<>();
+
+        ex.getBindingResult().getFieldErrors()
+            .forEach(err -> errors.put(err.getField(), err.getDefaultMessage()));
+
+    return ResponseEntity
+            .badRequest()
+            .body(errors);
+}
 }

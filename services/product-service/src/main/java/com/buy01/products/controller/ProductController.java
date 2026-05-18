@@ -16,9 +16,12 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.buy01.products.dto.ProductDto;
+import com.buy01.products.dto.ProductResponseDto;
+
 import com.buy01.products.model.Product;
 import java.util.Map;
 import com.buy01.products.service.ProductService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/products")
@@ -27,7 +30,7 @@ public class ProductController {
     private final ProductService productService;
     @PostMapping
     @PreAuthorize("hasRole('ROLE_SELLER')")
-    public ResponseEntity<?> create(@RequestPart("product") ProductDto product, Authentication authentication) {
+    public ResponseEntity<?> create(@Valid @RequestPart("product") ProductDto product, Authentication authentication) {
         String userID = authentication.getName();
         Product product2 = this.productService.createProduct(product, userID);
         return ResponseEntity.ok(Map.of("id", product2.getId()));
@@ -35,7 +38,7 @@ public class ProductController {
 
     @PreAuthorize("hasRole('ROLE_SELLER')")
     @PutMapping("/{id}")
-    public ResponseEntity<Product> update(@PathVariable("id") String id, @RequestBody ProductDto product, Authentication authentication) {
+    public ResponseEntity<Product> update(@PathVariable("id") String id, @Valid @RequestBody ProductDto product, Authentication authentication) {
         
         return ResponseEntity.ok(this.productService.updateProduct(id, product, authentication));
     }
@@ -56,8 +59,8 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> find(@PathVariable String id) {
-        return ResponseEntity.ok(this.productService.getProduct(id));
+    public ResponseEntity<ProductResponseDto> find(@PathVariable String id,  Authentication authentication) {
+        return ResponseEntity.ok(this.productService.getProductDetails(id, authentication));
     }
 
     @GetMapping("/ownedBy/{id}")

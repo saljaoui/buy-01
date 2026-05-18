@@ -5,6 +5,7 @@ import { ProductResponse, ProductService } from '../../../shared/services/produc
 import { ActivatedRoute, Router } from '@angular/router';
 import { MediaService, MediaUploadData } from '../../../shared/services/media-service';
 import { ToastService } from '../../../shared/services/toast-service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-product-details',
@@ -47,9 +48,19 @@ export class ProductDetailsComponent implements OnInit {
   findProduct() {
     this.productService.getProduct(this.productId).subscribe({
       next: (response: ProductResponse) => {
+        console.log('product: ', response);
         this.productDetailsSignal.set(response);
       },
-      error: (err: ProductResponse) => {
+      error: (err: HttpErrorResponse) => {
+        switch (err.status) {
+          case 404:
+            this.toastService.error('The product you’re looking for doesn’t exist or may have been removed.');
+            this.router.navigate(['/not-found']);
+            break;
+        
+          default:
+            break;
+        }
         console.error('error: ', err);
       }
     })

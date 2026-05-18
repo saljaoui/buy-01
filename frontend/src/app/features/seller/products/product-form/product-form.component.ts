@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { MediaService, MediaUploadData } from '../../../../shared/services/media-service';
 import { ToastService } from '../../../../shared/services/toast-service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-product-form',
@@ -15,7 +16,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class ProductFormComponent implements OnInit, OnDestroy {
   private readonly productService = inject(ProductService);
   private readonly mediaService = inject(MediaService);
-  private readonly toasrService = inject(ToastService);
+  private readonly toastService = inject(ToastService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
@@ -28,6 +29,8 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   MediasDetailsSignal = signal<MediaUploadData[] | undefined>(undefined);
   MediaDetails = computed(() => this.MediasDetailsSignal());
   selectedFilesArray: File[] = [];
+
+
 
   productId = signal<string>('');
 
@@ -57,7 +60,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
   saveProduct() {
     if (this.selectedImages.length == 0) {
-      this.toasrService.error("product most have at least one Image");
+      this.toastService.error("product most have at least one Image");
       return;
     }
     if (this.mode === 'edit') {
@@ -65,15 +68,31 @@ export class ProductFormComponent implements OnInit, OnDestroy {
         next: (response) => {
           this.mediaService.updateMedia(this.productId(), this.selectedImages).subscribe({
             next: (response) => {
-              console.log('response: ', response);
+              this.toastService.success("product updated succesfully");
+              this.router.navigate(['/products']);
             },
-            error: (err) => {
-              console.error('error: ', err);
+            error: (err: HttpErrorResponse) => {
+              switch (err.status) {
+                case 400:
+                  this.toastService.error(err.error.message);
+                  this.router.navigate(['/products']);
+
+                  break;
+                default:
+                  break;
+              }
             }
           });
         },
-        error: (err) => {
-          console.error("error: ", err);
+        error: (err: HttpErrorResponse) => {
+          switch (err.status) {
+            case 400:
+              this.toastService.error(err.error.message);
+              break;
+
+            default:
+              break;
+          }
         }
       });
     } else {
@@ -84,15 +103,30 @@ export class ProductFormComponent implements OnInit, OnDestroy {
           this.mediaService.publishMedia(product.id, this.selectedFilesArray).subscribe({
             next: (response: any) => {
               console.log('response: ', response);
+              this.toastService.success("product created succesfully");
               this.router.navigate(['/products']);
             },
-            error: (err) => {
-              console.error('error: ', err);
+            error: (err: HttpErrorResponse) => {
+              switch (err.status) {
+                case 400:
+                  this.toastService.error(err.error.message);
+                  this.router.navigate(['/products']);
+                  break;
+                default:
+                  break;
+              }
             }
           });
         },
-        error: (err) => {
-          console.error('error : ', err);
+        error: (err: HttpErrorResponse) => {
+          switch (err.status) {
+            case 400:
+              this.toastService.error(err.error.message);
+              break;
+
+            default:
+              break;
+          }
         }
       });
     }

@@ -37,9 +37,9 @@ public class MediaController {
         return ResponseEntity.ok(Map.of("message","media added succesfuly"));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/primary/product/{id}")
     public ResponseEntity<Resource> find(@PathVariable("id") String id) {
-        Resource resource = this.mediaService.find(id);
+        Resource resource = this.mediaService.findPrimaryImage(id);
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_JPEG)
                 .body(resource);

@@ -12,6 +12,7 @@ public class RouteValidator {
             "/api/auth/register",
             "/api/auth/login",
             "/api/auth/ping",
+            "/api/media/primary/product",
             "/products",
             "/actuator"
     );

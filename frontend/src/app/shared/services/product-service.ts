@@ -19,7 +19,7 @@ export interface ProductResponse {
   description: string;
   price: number;
   quantity: number;
-  userId: string
+  owner: boolean;
 }
 
 

@@ -28,6 +28,7 @@ public class MediaService {
 
     public void upload(MultipartFile file, String productId) {
         System.out.println("image: " + file);
+        
         String filePath = this.save(file);
         Media media = Media.builder()
                 .productId(productId)
@@ -41,7 +42,39 @@ public class MediaService {
             return;
         }
         for (MultipartFile file : files) {
+            this.validateImage(file);
             this.upload(file, productId);
+        }
+    }
+
+    private void validateImage(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("File is empty");
+        }
+        String contentType = file.getContentType();
+        if (contentType == null ||
+            !(contentType.equals("image/jpeg") ||
+              contentType.equals("image/png") ||
+              contentType.equals("image/webp")
+                .equals("image/avif"))) {
+            throw new IllegalArgumentException("Only JPG, PNG, WEBP, AVIF images are allowed");
+        }
+        String filename = file.getOriginalFilename();
+        if (filename == null ||
+                !(filename.endsWith(".jpg") ||
+              filename.endsWith(".jpeg") ||
+              filename.endsWith(".png") ||
+              filename.endsWith(".webp")
+            filename.endsWith(".avif"))) {
+
+            throw new IllegalArgumentException("Invalid image file extension");
+        }
+
+        // 3. Optional: check file size (e.g. max 5MB)
+        long maxSize = 2 * 1024 * 1024;
+
+        if (file.getSize() > maxSize) {
+            throw new IllegalArgumentException("File too large (max 2MB)");
         }
     }
 
@@ -81,6 +114,16 @@ public class MediaService {
             throw new NotFoundException("image not found");
         }
         return image;
+    }
+
+    public Resource findPrimaryImage(String productId) {
+
+        List<Media> arrayOfMedia =
+            this.mediaRepository.findAllByProductId(productId);
+        if (!arrayOfMedia.isEmpty()) {
+            return this.find(arrayOfMedia.get(0).getId());
+        }
+        return null;
     }
 
     public List<Resource> findAllByProductId(String productId) {

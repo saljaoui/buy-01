@@ -8,6 +8,7 @@ import com.buy01.products.Exceptions.ProductNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.buy01.products.dto.ProductDto;
+import com.buy01.products.dto.ProductResponseDto;
 import com.buy01.products.model.Product;
 import com.example.events.ProductEvent;
 import com.buy01.products.repository.ProductRepository;
@@ -35,7 +36,16 @@ public class ProductService {
     }
 
     public Product getProduct(String id) {
-        return this.productRepository.findById(id).orElse(null);
+        return this.productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product Not Found"));
+    }
+
+    public ProductResponseDto getProductDetails(String productId, Authentication authentication) {
+        Product product = this.getProduct(productId);
+        ProductResponseDto productResponseDto = ProductResponseDto.toDto(product);
+        String userId = authentication.getName();
+        boolean isOwner = (product.getUserId().equals(userId)) ? true:false;
+        productResponseDto.setOwner(isOwner);
+        return productResponseDto;
     }
 
     public List<Product> getProducts() {

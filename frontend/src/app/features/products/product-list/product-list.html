@@ -217,7 +217,7 @@
               <div class="product-media media-ceramic">
                 <div class="media-badges"><span class="media-badge new">New</span></div>
                 <button class="wish-btn" type="button"><i class="bi bi-heart"></i></button>
-                <span class="product-emoji">🏺</span>
+                <img [src]="'http://localhost:8080/api/media/primary/product/' + product.id" [alt]="product.name">
               </div>
               <div class="product-body">
                 <div class="product-meta">

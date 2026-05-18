@@ -25,7 +25,8 @@
 
           <div class="thumb-grid">
             @for (mediaData of MediaDetails(); track mediaData.id) {
-            <button [class]="(selectedImage()?.id==mediaData.id)? 'thumb-btn active':'thumb-btn'" type="button" (click)="selectImage(mediaData.id)">
+            <button [class]="(selectedImage()?.id==mediaData.id)? 'thumb-btn active':'thumb-btn'" type="button"
+              (click)="selectImage(mediaData.id)">
               <img [src]="'data:' + mediaData.contentType + ';base64,' + mediaData.base64Image" alt="Product Image">
             </button>
             }
@@ -118,7 +119,7 @@
               Ships today if ordered before 4:00 PM.
             </div>
           </div>
-
+          @if(productDetails()?.owner) {
           <div class="action-row">
             <button class="btn-primary" type="button" (click)="delete()">
               <i class="bi bi-bag-plus"></i>
@@ -129,6 +130,8 @@
               Update
             </button>
           </div>
+          }
+
 
           <div class="trust-row">
             <span><i class="bi bi-lock"></i> Secure checkout</span>
