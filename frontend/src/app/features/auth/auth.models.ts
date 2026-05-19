@@ -1,4 +1,4 @@
-export type UserRole = 'CLIENT' | 'SELLER';
+import { UserRole } from '../../core/models/user.model';
 
 export interface LoginRequest {
   email: string;

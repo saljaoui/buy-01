@@ -3,8 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
-import { UserRole } from '../auth.models';
 import { AuthService } from '../auth.service';
+import { UserRole } from '../../../core/models/user.model';
 
 type RegisterStep = 1 | 2 | 3;
 type ToastKind = 'error' | 'success' | 'warning';
