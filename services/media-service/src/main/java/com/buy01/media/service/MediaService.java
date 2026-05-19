@@ -52,23 +52,16 @@ public class MediaService {
             throw new IllegalArgumentException("File is empty");
         }
         String contentType = file.getContentType();
+        System.out.println("contentType = " + contentType);
         if (contentType == null ||
             !(contentType.equals("image/jpeg") ||
               contentType.equals("image/png") ||
-              contentType.equals("image/webp")
-                .equals("image/avif"))) {
+              contentType.equals("image/webp") ||
+                contentType.equals("image/avif"))) {
             throw new IllegalArgumentException("Only JPG, PNG, WEBP, AVIF images are allowed");
         }
         String filename = file.getOriginalFilename();
-        if (filename == null ||
-                !(filename.endsWith(".jpg") ||
-              filename.endsWith(".jpeg") ||
-              filename.endsWith(".png") ||
-              filename.endsWith(".webp")
-            filename.endsWith(".avif"))) {
-
-            throw new IllegalArgumentException("Invalid image file extension");
-        }
+        System.out.println("filename = " + filename);
 
         // 3. Optional: check file size (e.g. max 5MB)
         long maxSize = 2 * 1024 * 1024;
