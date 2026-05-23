@@ -40,7 +40,7 @@ pipeline {
         }
         stage('Run Docker Build') {
             steps {
-                bat 'docker build -t buy-01-app .'
+                bat 'docker compose up -d --build'
             }
         }
     }
