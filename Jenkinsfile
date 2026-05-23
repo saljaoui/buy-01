@@ -29,7 +29,7 @@ pipeline {
                 dir('infrastructure/api-gateway') {
                     bat 'mvn test'
                 }
-                dir('infrastructure/service-discovery') {
+                dir('infrastructure/discovery-service') {
                     bat 'mvn test'
                 }
 
