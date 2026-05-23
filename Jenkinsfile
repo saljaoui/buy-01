@@ -6,25 +6,38 @@ pipeline {
     }
 
     stages {
-
         stage('Git Test') {
             steps {
                 bat 'git --version'
             }
         }
-
         stage('Build') {
             steps {
-                bat 'mvn clean package'
+                dir('infrastructure/api-gateway') {
+                    bat 'mvn clean package'
+                }
+                dir('infrastructure/discovery-service') {
+                    bat 'mvn clean package'
+                }
+                dir('services') {
+                    bat 'mvn clean package' 
+                }
             }
         }
-
         stage('Test') {
             steps {
-                bat 'mvn test'
+                dir('infrastructure/api-gateway') {
+                    bat 'mvn test'
+                }
+                dir('infrastructure/service-discovery') {
+                    bat 'mvn test'
+                }
+
+                dir('services') {
+                    bat 'mvn test'
+                }
             }
         }
-
         stage('Run Docker Build') {
             steps {
                 bat 'docker build -t buy-01-app .'
