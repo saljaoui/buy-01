@@ -6,14 +6,10 @@ pipeline {
     }
 
     stages {
+
         stage('Git Test') {
             steps {
                 bat 'git --version'
-            }
-        }
-        stage('Clone') {
-            steps {
-                git 'https://github.com/saljaoui/buy-01.git'
             }
         }
 
@@ -28,8 +24,6 @@ pipeline {
                 bat 'mvn test'
             }
         }
-
-        
 
         stage('Run Docker Build') {
             steps {
