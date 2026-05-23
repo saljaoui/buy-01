@@ -25,6 +25,12 @@ pipeline {
             }
         }
 
+        stage('Git Test') {
+            steps {
+                bat 'git --version'
+            }
+        }
+
         stage('Run Docker Build') {
             steps {
                 bat 'docker build -t buy-01-app .'
