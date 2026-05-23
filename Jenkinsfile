@@ -22,15 +22,6 @@ pipeline {
                 dir('services') {
                     bat 'mvn clean package' 
                 }
-                dir('services/user-service') {
-                    bat 'mvn clean package' 
-                }
-                dir('services/product-service') {
-                    bat 'mvn clean package' 
-                }
-                dir('services/media-service') {
-                    bat 'mvn clean package' 
-                }
             }
         }
         stage('Test') {
