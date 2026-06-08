@@ -15,12 +15,15 @@
 
       <div class="seller-topbar-actions">
         <a class="ghost-btn" routerLink="/products">
-          <i class="bi bi-eye"></i>
+          <app-icon name="eye" [size]="16"></app-icon>
           Preview
         </a>
-        <a class="secondary-btn" routerLink="/seller">Cancel</a>
+        <a class="secondary-btn" routerLink="/seller">
+          <app-icon name="x" [size]="16"></app-icon>
+          Cancel
+        </a>
         <button class="primary-btn" type="button" (click)="saveProduct()" [disabled]="isSaving() || isLoading()">
-          <i class="bi bi-check2"></i>
+          <app-icon [name]="isSaving() ? 'spinner' : 'check'" [class.spin]="isSaving()" [size]="16"></app-icon>
           {{ isSaving() ? 'Saving...' : 'Save product' }}
         </button>
       </div>
@@ -41,6 +44,7 @@
       @if (isLoading()) {
       <section class="panel">
         <div class="panel-body">
+          <app-icon class="spin" name="spinner" [size]="24"></app-icon>
           <strong>Loading product...</strong>
         </div>
       </section>
@@ -50,7 +54,7 @@
       <section class="panel form-error-panel">
         <div class="panel-body">
           @for (error of formErrors(); track error) {
-          <div>{{ error }}</div>
+          <div><app-icon name="alert" [size]="16"></app-icon>{{ error }}</div>
           }
         </div>
       </section>
@@ -119,7 +123,7 @@
               </div>
 
               <div class="upload-dropzone media-dropzone">
-                <div class="drop-icon"><i class="bi bi-cloud-arrow-up"></i></div>
+                <div class="drop-icon"><app-icon name="upload-cloud" [size]="30"></app-icon></div>
                 <strong>Upload product imagery</strong>
                 <span>Drag and drop hero shots, detail crops, or packaging images here.</span>
 
@@ -128,10 +132,14 @@
                     (change)="onFilesSelected($event)" style="display: none;">
 
                   <button class="primary-btn" type="button" (click)="imageInput.click()">
+                    <app-icon name="upload-cloud" [size]="16"></app-icon>
                     Choose images
                   </button>
 
-                  <a class="ghost-btn" routerLink="/seller/media">Open library</a>
+                  <a class="ghost-btn" routerLink="/seller/media">
+                    <app-icon name="media" [size]="16"></app-icon>
+                    Open library
+                  </a>
                 </div>
 
                 <small>Allowed: JPG, PNG, WEBP, AVIF up to 2 MB each.</small>
@@ -147,7 +155,10 @@
                   </div>
                   <strong>{{ item.file.name }}</strong>
                   <span>{{ (item.file.size / 1024 / 1024).toFixed(2) }} MB</span>
-                  <button (click)="deleteImage(item)">delete</button>
+                  <button type="button" (click)="deleteImage(item)">
+                    <app-icon name="trash" [size]="15"></app-icon>
+                    Delete
+                  </button>
                 </article>
                 }
 
@@ -181,7 +192,7 @@
                 </div>
                 @if (formErrors().length > 0) {
                 <div class="summary-alert">
-                  <i class="bi bi-exclamation-triangle"></i>
+                  <app-icon name="alert" [size]="16"></app-icon>
                   {{ formErrors()[0] }}
                 </div>
                 }
@@ -198,15 +209,15 @@
 
               <div class="panel-body note-list">
                 <div class="note-item">
-                  <i class="bi bi-circle"></i>
+                  <app-icon name="circle" [size]="16"></app-icon>
                   Add a valid price
                 </div>
                 <div class="note-item">
-                  <i class="bi bi-circle"></i>
+                  <app-icon name="circle" [size]="16"></app-icon>
                   Upload product images
                 </div>
                 <div class="note-item">
-                  <i class="bi bi-circle"></i>
+                  <app-icon name="circle" [size]="16"></app-icon>
                   Review final storefront preview
                 </div>
               </div>

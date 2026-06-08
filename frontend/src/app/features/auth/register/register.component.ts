@@ -5,6 +5,7 @@ import { finalize } from 'rxjs';
 
 import { AuthService } from '../auth.service';
 import { UserRole } from '../../../core/models/user.model';
+import { IconComponent } from '../../../shared/icon/icon.component';
 
 type RegisterStep = 1 | 2 | 3;
 type ToastKind = 'error' | 'success' | 'warning';
@@ -13,7 +14,7 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 @Component({
   selector: 'app-register',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, IconComponent],
   templateUrl: './register.html',
   styleUrl: './register.scss',
 })

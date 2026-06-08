@@ -125,6 +125,13 @@
   font-size: 0.74rem;
 }
 
+.upload-card button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.7rem;
+}
+
 .form-side .sticky-side {
   position: sticky;
   top: 6.1rem;
@@ -176,6 +183,12 @@
   color: #9f2f23;
 }
 
+.form-error-panel .panel-body div {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
 .note-list,
 .action-stack {
   display: grid;
@@ -193,11 +206,13 @@
   font-size: 0.8rem;
 }
 
-.note-item i {
+.note-item i,
+.note-item app-icon {
   color: var(--text-light);
 }
 
-.note-item.done i {
+.note-item.done i,
+.note-item.done app-icon {
   color: var(--success);
 }
 

@@ -4,19 +4,21 @@
   <main class="container detail-page">
     <div class="breadcrumb-row">
       <a routerLink="/products">Products</a>
-      <i class="bi bi-chevron-right"></i>
+      <app-icon name="chevron-right" [size]="14"></app-icon>
       <span>Catalog</span>
-      <i class="bi bi-chevron-right"></i>
+      <app-icon name="chevron-right" [size]="14"></app-icon>
       <strong>{{ productDetails()?.name || 'Product details' }}</strong>
     </div>
 
     @if (isLoading()) {
     <div class="surface-card detail-state">
+      <app-icon class="spin" name="spinner" [size]="24"></app-icon>
       <strong>Loading product...</strong>
       <span>Fetching product details from Buy01.</span>
     </div>
     } @else if (errorMessage()) {
     <div class="surface-card detail-state error-state">
+      <app-icon name="alert" [size]="24" [decorative]="false" ariaLabel="Product error"></app-icon>
       <strong>Product could not load</strong>
       <span>{{ errorMessage() }}</span>
     </div>
@@ -26,10 +28,12 @@
         <div class="surface-card gallery-card">
           @if (isMediaLoading()) {
           <div class="gallery-stage gallery-empty-state">
+            <app-icon class="spin" name="spinner" [size]="24"></app-icon>
             <strong>Loading images...</strong>
           </div>
           } @else if (mediaErrorMessage()) {
           <div class="gallery-stage gallery-empty-state">
+            <app-icon name="alert" [size]="24" [decorative]="false" ariaLabel="Product image error"></app-icon>
             <strong>Images unavailable</strong>
             <span>{{ mediaErrorMessage() }}</span>
           </div>
@@ -43,6 +47,7 @@
           </div>
           } @else {
           <div class="gallery-stage gallery-empty-state">
+            <app-icon name="image-off" [size]="30"></app-icon>
             <strong>No images yet</strong>
             <span>This product has no uploaded media.</span>
           </div>
@@ -120,7 +125,7 @@
             </div>
 
             <div class="stock-pill">
-              <i class="bi bi-check-circle-fill"></i>
+              <app-icon name="circle-check" [size]="16"></app-icon>
               {{ productDetails()?.quantity }} units left
             </div>
           </div>
@@ -140,18 +145,18 @@
             </div>
 
             <div class="shipping-note">
-              <i class="bi bi-lightning-charge-fill"></i>
+              <app-icon name="bolt" [size]="16"></app-icon>
               Ships today if ordered before 4:00 PM.
             </div>
           </div>
           @if(productDetails()?.owner) {
           <div class="action-row">
             <button class="btn-primary" type="button" (click)="delete()" [disabled]="isDeleting()">
-              <i class="bi bi-bag-plus"></i>
+              <app-icon [name]="isDeleting() ? 'spinner' : 'trash'" [class.spin]="isDeleting()" [size]="17"></app-icon>
               {{ isDeleting() ? 'Deleting...' : 'Delete' }}
             </button>
             <button class="btn-light" type="button" (click)="updateProduct()">
-              <i class="bi bi-heart"></i>
+              <app-icon name="edit" [size]="17"></app-icon>
               Update
             </button>
           </div>
@@ -159,9 +164,9 @@
 
 
           <div class="trust-row">
-            <span><i class="bi bi-lock"></i> Secure checkout</span>
-            <span><i class="bi bi-box-seam"></i> Protected packaging</span>
-            <span><i class="bi bi-patch-check"></i> Verified seller</span>
+            <span><app-icon name="lock" [size]="15"></app-icon> Secure checkout</span>
+            <span><app-icon name="package" [size]="15"></app-icon> Protected packaging</span>
+            <span><app-icon name="shield-check" [size]="15"></app-icon> Verified seller</span>
           </div>
         </div>
 
@@ -182,7 +187,7 @@
 
           <div class="seller-actions">
             <button class="ghost-btn" type="button">
-              <i class="bi bi-shop-window"></i>
+              <app-icon name="store" [size]="16"></app-icon>
               View store
             </button>
           </div>

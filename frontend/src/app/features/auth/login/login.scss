@@ -368,6 +368,10 @@
 /* submit button */
 .btn-signin {
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
   padding: .85rem;
   background: var(--ink);
   color: var(--gold);

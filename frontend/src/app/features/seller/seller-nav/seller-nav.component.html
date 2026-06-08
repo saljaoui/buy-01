@@ -1,12 +1,12 @@
 <nav class="seller-nav">
   <div class="seller-nav-label">Overview</div>
   <a class="seller-nav-link" routerLink="/seller" [class.active]="activeItem === 'dashboard'">
-    <i class="bi bi-grid-1x2"></i>
+    <app-icon name="dashboard" [size]="18"></app-icon>
     Dashboard
   </a>
   <div class="seller-nav-label">Catalog</div>
-  <a class="seller-nav-link" routerLink="/seller">
-    <i class="bi bi-box-seam"></i>
+  <a class="seller-nav-link" routerLink="/products">
+    <app-icon name="package" [size]="18"></app-icon>
     Products
     <span class="seller-nav-badge">{{ visibleProductCount }}</span>
   </a>
@@ -15,17 +15,17 @@
     routerLink="/seller/products/new"
     [class.active]="activeItem === 'create-product'"
   >
-    <i class="bi bi-plus-square"></i>
+    <app-icon name="plus" [size]="18"></app-icon>
     Create product
   </a>
   <a class="seller-nav-link" routerLink="/seller/media" [class.active]="activeItem === 'media'">
-    <i class="bi bi-images"></i>
+    <app-icon name="media" [size]="18"></app-icon>
     Media library
   </a>
 
   <div class="seller-nav-label">Account</div>
   <a class="seller-nav-link" routerLink="/seller/profile" [class.active]="activeItem === 'profile'">
-    <i class="bi bi-person-circle"></i>
+    <app-icon name="profile" [size]="18"></app-icon>
     Profile
   </a>
 </nav>

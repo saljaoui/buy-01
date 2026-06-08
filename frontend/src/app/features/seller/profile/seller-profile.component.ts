@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../auth/auth.service';
 import { UserService } from '../../../core/services/user.service';
 import { User } from '../../../core/models/user.model';
+import { IconComponent } from '../../../shared/icon/icon.component';
 import { SellerSidebarComponent } from '../seller-sidebar/seller-sidebar.component';
 
 @Component({
   selector: 'app-seller-profile',
-  imports: [CommonModule, SellerSidebarComponent, FormsModule],
+  imports: [CommonModule, SellerSidebarComponent, FormsModule, IconComponent],
   templateUrl: './seller-profile.component.html',
   styleUrl: './seller-profile.component.scss',
 })

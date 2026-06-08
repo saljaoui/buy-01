@@ -4,12 +4,13 @@ import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { AuthService } from '../auth.service';
+import { IconComponent } from '../../../shared/icon/icon.component';
 
 type ToastKind = 'error' | 'success';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, IconComponent],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })

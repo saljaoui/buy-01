@@ -61,11 +61,11 @@
           <div class="hero-actions">
             <a (click)="scrollCatalog()" class="btn-primary">
               Explore catalog
-              <i class="bi bi-arrow-down"></i>
+              <app-icon name="arrow-down" [size]="16"></app-icon>
             </a>
             <a routerLink="/register" class="btn-secondary">
               Sell on Buy01
-              <i class="bi bi-arrow-right"></i>
+              <app-icon name="arrow-right" [size]="16"></app-icon>
             </a>
           </div>
         </div>
@@ -78,7 +78,7 @@
                 <strong>Most popular this week</strong>
               </div>
               <div class="hero-chip">
-                <i class="bi bi-star-fill" style="font-size:0.6rem;"></i>
+                <app-icon name="star" [size]="13"></app-icon>
                 Top Rated
               </div>
             </div>
@@ -207,22 +207,29 @@
             <div class="kicker">{{ productCount() }} products available</div>
           </div>
           <div class="view-switch">
-            <button class="view-btn active" type="button"><i class="bi bi-grid-3x3-gap"></i></button>
-            <button class="view-btn" type="button"><i class="bi bi-list-task"></i></button>
+            <button class="view-btn active" type="button" aria-label="Show grid view">
+              <app-icon name="grid" [size]="17"></app-icon>
+            </button>
+            <button class="view-btn" type="button" aria-label="Show list view">
+              <app-icon name="list" [size]="17"></app-icon>
+            </button>
           </div>
         </div>
         @if (isLoading()) {
         <div class="catalog-state surface-card">
+          <app-icon class="spin" name="spinner" [size]="24"></app-icon>
           <strong>Loading products...</strong>
           <span>Fetching the latest catalog from Buy01.</span>
         </div>
         } @else if (errorMessage()) {
         <div class="catalog-state surface-card error-state">
+          <app-icon name="alert" [size]="24" [decorative]="false" ariaLabel="Catalog error"></app-icon>
           <strong>Products could not load</strong>
           <span>{{ errorMessage() }}</span>
         </div>
         } @else if (productList().length === 0) {
         <div class="catalog-state surface-card">
+          <app-icon name="package-open" [size]="28"></app-icon>
           <strong>No products yet</strong>
           <span>Seller listings will appear here as soon as they are published.</span>
         </div>
@@ -232,7 +239,9 @@
             <article class="product-card">
               <div class="product-media media-ceramic">
                 <div class="media-badges"><span class="media-badge new">New</span></div>
-                <button class="wish-btn" type="button"><i class="bi bi-heart"></i></button>
+                <button class="wish-btn" type="button" aria-label="Save product">
+                  <app-icon name="heart" [size]="17"></app-icon>
+                </button>
                 <img [src]="getProductImageUrl(product.id)" [alt]="product.name">
               </div>
               <div class="product-body">
@@ -244,7 +253,10 @@
                 <p>{{ product.description }}</p>
                 <div class="product-footer">
                   <strong>${{product.price}}</strong>
-                  <a class="mini-btn" [routerLink]="['/products', product.id]">View item</a>
+                  <a class="mini-btn" [routerLink]="['/products', product.id]">
+                    View item
+                    <app-icon name="arrow-right" [size]="14"></app-icon>
+                  </a>
                 </div>
               </div>
           </article>

@@ -8,6 +8,7 @@ import { AuthUser } from '../../auth/auth.models';
 import { AuthService } from '../../auth/auth.service';
 import { Media, MediaService } from '../../../shared/services/media-service';
 import { ProductResponse, ProductService } from '../../../shared/services/product-service';
+import { IconComponent } from '../../../shared/icon/icon.component';
 import { SellerSidebarComponent } from '../seller-sidebar/seller-sidebar.component';
 import { ToastService } from '../../../shared/services/toast-service';
 
@@ -31,7 +32,7 @@ interface MediaAsset {
 
 @Component({
   selector: 'app-media-manager',
-  imports: [SellerSidebarComponent, FormsModule, RouterLink],
+  imports: [SellerSidebarComponent, FormsModule, RouterLink, IconComponent],
   templateUrl: './media-manager.component.html',
   styleUrl: './media-manager.component.scss',
 })

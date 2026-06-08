@@ -2,6 +2,12 @@
   align-items: center;
 }
 
+.seller-body > .panel .panel-body {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .profile-banner-head {
   display: flex;
   align-items: center;

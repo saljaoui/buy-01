@@ -62,12 +62,12 @@
         } @else {
         <a routerLink="/login" class="nav-btn hide-mobile">Sign In</a>
         <a routerLink="/register" class="nav-btn primary hide-mobile">
-          <i class="bi bi-person-plus"></i>
+          <app-icon name="user-plus" [size]="16"></app-icon>
           Register
         </a>
         }
 
-        <button class="cart-btn" type="button">
+        <button class="cart-btn" type="button" aria-label="Open cart">
           <i class="bi bi-bag">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
               <g fill="none" stroke="currentColor" stroke-width="1.5">

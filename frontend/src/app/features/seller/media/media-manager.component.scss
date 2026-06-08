@@ -102,6 +102,10 @@
 }
 
 .upload-error {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
   color: #b84949;
   font-size: 0.82rem;
   font-weight: 700;
@@ -125,7 +129,8 @@
   min-width: 250px;
 }
 
-.media-search i {
+.media-search i,
+.media-search app-icon {
   position: absolute;
   left: 14px;
   top: 50%;

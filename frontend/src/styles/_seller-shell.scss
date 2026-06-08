@@ -66,6 +66,11 @@
   flex-shrink: 0;
 }
 
+.seller-brand-icon app-icon {
+  width: 18px;
+  height: 18px;
+}
+
 .seller-brand-copy strong {
   display: block;
   font-family: 'Playfair Display', serif;
@@ -109,8 +114,10 @@
   transition: all 0.18s;
 }
 
+.seller-nav-link app-icon,
 .seller-nav-link i {
   width: 18px;
+  height: 18px;
   text-align: center;
   flex-shrink: 0;
 }
@@ -240,6 +247,14 @@
   text-decoration: none;
   cursor: pointer;
   transition: all 0.18s;
+}
+
+.icon-btn app-icon,
+.ghost-btn app-icon,
+.primary-btn app-icon,
+.secondary-btn app-icon {
+  width: 16px;
+  height: 16px;
 }
 
 .icon-btn {
@@ -683,6 +698,11 @@
   cursor: pointer;
   text-decoration: none;
   transition: all 0.18s;
+}
+
+.row-btn app-icon {
+  width: 16px;
+  height: 16px;
 }
 
 .row-btn:hover {

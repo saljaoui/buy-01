@@ -30,7 +30,7 @@
           (click)="loadMedia()"
           [disabled]="isLoadingProducts() || isLoadingMedia() || products().length === 0"
         >
-          <i class="bi bi-arrow-clockwise"></i>
+          <app-icon name="refresh" [size]="16"></app-icon>
           Refresh
         </button>
         <button
@@ -39,7 +39,7 @@
           (click)="fileInput.click()"
           [disabled]="isLoadingProducts() || products().length === 0 || isUploading()"
         >
-          <i class="bi bi-cloud-upload"></i>
+          <app-icon name="upload-cloud" [size]="16"></app-icon>
           Upload files
         </button>
       </div>
@@ -58,11 +58,11 @@
 
         <div class="seller-banner-actions">
           <button class="secondary-btn" type="button" (click)="showAllAssets()">
-            <i class="bi bi-grid"></i>
+            <app-icon name="grid" [size]="16"></app-icon>
             Gallery view
           </button>
           <a class="primary-btn" routerLink="/seller/products/new">
-            <i class="bi bi-plus-lg"></i>
+            <app-icon name="plus" [size]="16"></app-icon>
             New product
           </a>
         </div>
@@ -71,6 +71,7 @@
       @if (errorMessage()) {
       <section class="panel media-error-panel">
         <div class="panel-body">
+          <app-icon name="alert" [size]="24" [decorative]="false" ariaLabel="Media error"></app-icon>
           <strong>Media page could not load</strong>
           <span>{{ errorMessage() }}</span>
         </div>
@@ -88,13 +89,15 @@
         <div class="panel-body">
           @if (isLoadingProducts()) {
           <div class="media-state">
+            <app-icon class="spin" name="spinner" [size]="24"></app-icon>
             <strong>Loading products...</strong>
           </div>
           } @else if (products().length === 0) {
           <div class="media-state">
+            <app-icon name="package-open" [size]="28"></app-icon>
             <strong>Create a product first before uploading media</strong>
             <a class="primary-btn" routerLink="/seller/products/new">
-              <i class="bi bi-plus-lg"></i>
+              <app-icon name="plus" [size]="16"></app-icon>
               Create product
             </a>
           </div>
@@ -114,12 +117,13 @@
           </div>
 
           <div class="upload-dropzone media-upload-zone">
-            <div class="zone-icon"><i class="bi bi-cloud-arrow-up"></i></div>
+            <div class="zone-icon"><app-icon name="upload-cloud" [size]="30"></app-icon></div>
             <strong>{{ selectedFileSummary() }}</strong>
             <span>Allowed types: JPG, PNG, WEBP, AVIF. Maximum size: 2 MB per image.</span>
 
             <div class="upload-actions">
               <button class="primary-btn" type="button" (click)="fileInput.click()" [disabled]="isUploading()">
+                <app-icon name="upload-cloud" [size]="16"></app-icon>
                 Choose files
               </button>
               <button
@@ -128,10 +132,12 @@
                 (click)="uploadSelectedFiles()"
                 [disabled]="isUploading() || selectedFiles().length === 0"
               >
+                <app-icon [name]="isUploading() ? 'spinner' : 'upload-cloud'" [class.spin]="isUploading()" [size]="16"></app-icon>
                 {{ isUploading() ? 'Uploading...' : 'Upload selected' }}
               </button>
               @if (selectedFiles().length > 0) {
               <button class="ghost-btn" type="button" (click)="clearSelectedFiles()" [disabled]="isUploading()">
+                <app-icon name="x" [size]="16"></app-icon>
                 Clear
               </button>
               }
@@ -146,7 +152,7 @@
             }
 
             @if (uploadError()) {
-            <div class="upload-error">{{ uploadError() }}</div>
+            <div class="upload-error"><app-icon name="alert" [size]="16"></app-icon>{{ uploadError() }}</div>
             }
           </div>
           }
@@ -156,7 +162,7 @@
       <section class="panel media-toolbar">
         <div class="panel-body media-toolbar-body">
           <div class="media-search">
-            <i class="bi bi-search"></i>
+            <app-icon name="search" [size]="17"></app-icon>
             <input
               type="text"
               placeholder="Search by file name or product"
@@ -177,7 +183,10 @@
               <option [value]="product.id">{{ product.name }}</option>
               }
             </select>
-            <button class="ghost-btn" type="button" (click)="showAllAssets()">All assets</button>
+            <button class="ghost-btn" type="button" (click)="showAllAssets()">
+              <app-icon name="grid" [size]="16"></app-icon>
+              All assets
+            </button>
           </div>
         </div>
       </section>
@@ -194,19 +203,23 @@
           <div class="panel-body">
             @if (isLoadingMedia()) {
             <div class="media-state">
+              <app-icon class="spin" name="spinner" [size]="24"></app-icon>
               <strong>Loading media...</strong>
             </div>
             } @else if (!isLoadingProducts() && products().length === 0) {
             <div class="media-state">
+              <app-icon name="package-open" [size]="28"></app-icon>
               <strong>Create a product first before uploading media</strong>
             </div>
             } @else if (mediaAssets().length === 0) {
             <div class="media-state">
+              <app-icon name="image-off" [size]="30"></app-icon>
               <strong>No media for selected product</strong>
               <span>Choose image files above to upload through the media service.</span>
             </div>
             } @else if (filteredAssets().length === 0) {
             <div class="media-state">
+              <app-icon name="search" [size]="28"></app-icon>
               <strong>No matching media</strong>
               <span>Try a different product filter or search term.</span>
             </div>
@@ -225,15 +238,16 @@
                   <span class="soft-pill">{{ asset.contentType }}</span>
                 </div>
                 <div class="media-actions">
-                  <button class="row-btn" type="button" (click)="openAsset(asset)" title="View image">
-                    <i class="bi bi-eye"></i>
+                  <button class="row-btn" type="button" (click)="openAsset(asset)" title="View image" aria-label="View image">
+                    <app-icon name="eye" [size]="16"></app-icon>
                   </button>
                   <a
                     class="row-btn"
                     [routerLink]="['/seller/products', asset.productId, 'edit']"
                     title="Edit product"
+                    aria-label="Edit product"
                   >
-                    <i class="bi bi-pencil"></i>
+                    <app-icon name="edit" [size]="16"></app-icon>
                   </a>
                   <button
                     class="row-btn danger"
@@ -241,8 +255,9 @@
                     (click)="deleteAsset(asset)"
                     [disabled]="deletingAssetId() === asset.id"
                     title="Delete media"
+                    aria-label="Delete media"
                   >
-                    <i class="bi" [class.bi-trash]="deletingAssetId() !== asset.id" [class.bi-hourglass-split]="deletingAssetId() === asset.id"></i>
+                    <app-icon [name]="deletingAssetId() === asset.id ? 'spinner' : 'trash'" [class.spin]="deletingAssetId() === asset.id" [size]="16"></app-icon>
                   </button>
                 </div>
               </article>
@@ -301,7 +316,7 @@
               </div>
               <div class="side-actions">
                 <button class="ghost-btn" type="button" (click)="openAsset(asset)">
-                  <i class="bi bi-eye"></i>
+                  <app-icon name="eye" [size]="16"></app-icon>
                   View
                 </button>
                 <button
@@ -310,7 +325,7 @@
                   (click)="deleteAsset(asset)"
                   [disabled]="deletingAssetId() === asset.id"
                 >
-                  <i class="bi bi-trash"></i>
+                  <app-icon [name]="deletingAssetId() === asset.id ? 'spinner' : 'trash'" [class.spin]="deletingAssetId() === asset.id" [size]="16"></app-icon>
                   Delete
                 </button>
               </div>
@@ -338,7 +353,7 @@
                 (click)="clearSelectedProductMedia()"
                 [disabled]="!selectedProduct() || selectedProductMediaCount() === 0 || isClearingProductMedia()"
               >
-                <i class="bi bi-trash"></i>
+                <app-icon [name]="isClearingProductMedia() ? 'spinner' : 'trash'" [class.spin]="isClearingProductMedia()" [size]="16"></app-icon>
                 {{ isClearingProductMedia() ? 'Deleting...' : 'Clear product media' }}
               </button>
             </div>

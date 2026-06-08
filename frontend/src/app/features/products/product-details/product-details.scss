@@ -394,7 +394,8 @@
   font-weight: 500;
 }
 
-.shipping-note i {
+.shipping-note i,
+.shipping-note app-icon {
   color: var(--gold);
 }
 
@@ -423,7 +424,8 @@
   gap: 0.35rem;
 }
 
-.trust-row i {
+.trust-row i,
+.trust-row app-icon {
   color: var(--gold);
 }
 

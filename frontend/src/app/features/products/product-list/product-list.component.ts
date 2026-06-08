@@ -2,12 +2,13 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ApiClient } from '../../../core/api/api-client.service';
 import { FooterComponent } from '../../../shared/footer/footer.component';
+import { IconComponent } from '../../../shared/icon/icon.component';
 import { NavbarComponent } from '../../../shared/navbar/navbar.component';
 import { ProductResponse, ProductService } from '../../../shared/services/product-service';
 
 @Component({
   selector: 'app-product-list',
-  imports: [RouterLink, FooterComponent, NavbarComponent],
+  imports: [RouterLink, FooterComponent, NavbarComponent, IconComponent],
   templateUrl: './product-list.html',
   styleUrl: './product-list.scss',
 })

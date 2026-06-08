@@ -81,16 +81,7 @@
                     </i>
                     <button type="button" class="pw-toggle" id="pwToggle" (click)="togglePasswordVisibility()"
                         aria-label="Toggle password visibility">
-                        <i class="bi" id="pwIcon" [class.bi-eye]="!passwordVisible"
-                            [class.bi-eye-slash]="passwordVisible">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                <g fill="none" stroke="currentColor" stroke-width="1.5">
-                                    <path
-                                        d="M3.275 15.296C2.425 14.192 2 13.639 2 12c0-1.64.425-2.191 1.275-3.296C4.972 6.5 7.818 4 12 4c4.182 0 7.028 2.5 8.725 4.704C21.575 9.81 22 10.361 22 12c0 1.64-.425 2.191-1.275 3.296C19.028 17.5 16.182 20 12 20c-4.182 0-7.028-2.5-8.725-4.704Z" />
-                                    <path d="M15 12a3 3 0 1 1-6 0a3 3 0 0 1 6 0Z" />
-                                </g>
-                            </svg>
-                        </i>
+                        <app-icon [name]="passwordVisible ? 'eye-off' : 'eye'" [size]="18"></app-icon>
                     </button>
                     <div class="err-msg">Password must be at least 8 characters.</div>
                 </div>
@@ -106,7 +97,8 @@
 
                 <!-- Submit -->
                 <button type="submit" class="btn-signin" [disabled]="isSubmitting">
-                    {{ isSubmitting ? 'Signing in...' : 'Sign In' }} &nbsp;<i class="bi bi-arrow-right"></i>
+                    {{ isSubmitting ? 'Signing in...' : 'Sign In' }}
+                    <app-icon [name]="isSubmitting ? 'spinner' : 'arrow-right'" [class.spin]="isSubmitting" [size]="17"></app-icon>
                 </button>
             </form>
 
@@ -132,7 +124,7 @@
                     Google
                 </button>
                 <button class="btn-social">
-                    <i class="bi bi-github" style="font-size:1rem;"></i>
+                    <app-icon name="code" [size]="16"></app-icon>
                     GitHub
                 </button>
             </div>
@@ -145,7 +137,7 @@
 
     <!-- Toast Notification -->
     <div class="toast-alert" id="toast" [class.show]="toastVisible" [class.success]="toastType === 'success'">
-        <i class="bi bi-exclamation-circle-fill"></i>
+        <app-icon [name]="toastType === 'success' ? 'circle-check' : 'alert'" [size]="18"></app-icon>
         <span id="toastMsg">{{ toastMessage }}</span>
     </div>
 

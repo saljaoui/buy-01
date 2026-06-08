@@ -8,11 +8,12 @@ import { UserService } from '../../core/services/user.service';
 import { ProductResponse, ProductService } from '../../shared/services/product-service';
 import { MediaService } from '../../shared/services/media-service';
 import { ToastService } from '../../shared/services/toast-service';
+import { IconComponent } from '../../shared/icon/icon.component';
 import { SellerSidebarComponent } from '../seller/seller-sidebar/seller-sidebar.component';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, SellerSidebarComponent],
+  imports: [RouterLink, SellerSidebarComponent, IconComponent],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })

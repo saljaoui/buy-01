@@ -7,11 +7,12 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ApiClient } from '../../../../core/api/api-client.service';
 import { AuthService } from '../../../auth/auth.service';
+import { IconComponent } from '../../../../shared/icon/icon.component';
 import { SellerSidebarComponent } from '../../seller-sidebar/seller-sidebar.component';
 
 @Component({
   selector: 'app-product-form',
-  imports: [SellerSidebarComponent, FormsModule, RouterLink],
+  imports: [SellerSidebarComponent, FormsModule, RouterLink, IconComponent],
   templateUrl: './product-form.html',
   styleUrl: './product-form.scss',
 })

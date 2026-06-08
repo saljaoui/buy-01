@@ -2,12 +2,13 @@ import { Component, Input, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 import { ProductService } from '../../../shared/services/product-service';
+import { IconComponent } from '../../../shared/icon/icon.component';
 
 export type SellerNavItem = 'dashboard' | 'create-product' | 'media' | 'profile';
 
 @Component({
   selector: 'app-seller-nav',
-  imports: [RouterLink],
+  imports: [RouterLink, IconComponent],
   templateUrl: './seller-nav.component.html',
 })
 export class SellerNavComponent implements OnInit {

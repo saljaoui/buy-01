@@ -7,10 +7,11 @@ import { MediaService, MediaUploadData } from '../../../shared/services/media-se
 import { ToastService } from '../../../shared/services/toast-service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ApiClient } from '../../../core/api/api-client.service';
+import { IconComponent } from '../../../shared/icon/icon.component';
 
 @Component({
   selector: 'app-product-details',
-  imports: [FooterComponent, NavbarComponent, RouterLink],
+  imports: [FooterComponent, NavbarComponent, RouterLink, IconComponent],
   templateUrl: './product-details.html',
   styleUrl: './product-details.scss',
 })

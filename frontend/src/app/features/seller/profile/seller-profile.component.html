@@ -20,7 +20,7 @@
           (click)="saveChanges()"
           [disabled]="isSaving()"
         >
-          <i class="bi" [class.bi-check2]="!isSaving()" [class.bi-arrow-repeat]="isSaving()" [class.bi-spin]="isSaving()"></i>
+          <app-icon [name]="isSaving() ? 'spinner' : 'check'" [class.spin]="isSaving()" [size]="16"></app-icon>
           {{ isSaving() ? 'Saving...' : 'Save changes' }}
         </button>
       </div>
@@ -30,7 +30,8 @@
 
       <div *ngIf="isLoading()" class="panel">
         <div class="panel-body">
-          <i class="bi bi-arrow-repeat bi-spin"></i> Loading profile...
+          <app-icon class="spin" name="spinner" [size]="20"></app-icon>
+          Loading profile...
         </div>
       </div>
 
@@ -38,13 +39,15 @@
 
         <div *ngIf="errorMessage()" class="panel" style="background: #fff0f0; border: 1px solid #e8b4b4; color: #c44;">
           <div class="panel-body">
-            <i class="bi bi-exclamation-triangle-fill"></i> {{ errorMessage() }}
+            <app-icon name="alert" [size]="20" [decorative]="false" ariaLabel="Profile error"></app-icon>
+            {{ errorMessage() }}
           </div>
         </div>
 
         <div *ngIf="successMessage()" class="panel" style="background: #f0fff4; border: 1px solid #b4e8c4; color: #2a6;">
           <div class="panel-body">
-            <i class="bi bi-check-circle-fill"></i> {{ successMessage() }}
+            <app-icon name="circle-check" [size]="20"></app-icon>
+            {{ successMessage() }}
           </div>
         </div>
 
@@ -59,7 +62,7 @@
           </div>
           <div class="seller-banner-actions">
             <button class="secondary-btn" type="button">
-              <i class="bi bi-camera"></i>
+              <app-icon name="camera" [size]="16"></app-icon>
               Change avatar
             </button>
           </div>
@@ -129,7 +132,10 @@
                     <div class="avatar-preview">{{ userInitials() }}</div>
                     <strong>Upload a new profile image</strong>
                     <span>Recommended size: 800 × 800 px, square crop.</span>
-                    <button class="ghost-btn" type="button" [disabled]="isSaving()">Choose image</button>
+                    <button class="ghost-btn" type="button" [disabled]="isSaving()">
+                      <app-icon name="upload-cloud" [size]="16"></app-icon>
+                      Choose image
+                    </button>
                   </div>
                 </div>
               </section>

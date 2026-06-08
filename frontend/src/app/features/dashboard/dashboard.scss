@@ -26,6 +26,138 @@
   align-items: start;
 }
 
+.dashboard-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.dashboard-state .panel-body,
+.dashboard-error .panel-body {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.dashboard-state .panel-body {
+  color: var(--ink);
+}
+
+.dashboard-state strong,
+.dashboard-error strong {
+  display: inline-flex;
+  align-items: center;
+}
+
+.seller-banner-visual {
+  position: relative;
+  z-index: 1;
+  min-width: 220px;
+  display: grid;
+  gap: 0.8rem;
+  justify-items: end;
+}
+
+.banner-illustration-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.8rem 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  backdrop-filter: blur(8px);
+}
+
+.banner-illustration-card.primary {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.banner-illustration-card.primary span {
+  font-size: 0.84rem;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.banner-illustration-card.secondary {
+  background: rgba(200, 169, 110, 0.12);
+  color: var(--gold);
+}
+
+.metric-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.empty-products-state {
+  display: grid;
+  justify-items: start;
+  gap: 0.8rem;
+}
+
+.empty-products-state span {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.empty-products-illustration {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  background: rgba(200, 169, 110, 0.12);
+  color: var(--gold);
+}
+
+.product-thumb {
+  color: var(--gold);
+}
+
+.health-item {
+  position: relative;
+  padding: 0.95rem 1rem 0.95rem 3.4rem;
+  border-radius: 16px;
+  background: #faf8f4;
+  border: 1px solid #eee4d6;
+}
+
+.health-icon {
+  position: absolute;
+  top: 0.9rem;
+  left: 1rem;
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  color: var(--gold);
+  background: rgba(200, 169, 110, 0.14);
+}
+
+.health-icon.success {
+  color: var(--success);
+  background: rgba(39, 174, 96, 0.12);
+}
+
+.health-icon.alert {
+  color: var(--warning);
+  background: rgba(243, 156, 18, 0.14);
+}
+
+.check-item app-icon {
+  color: var(--text-light);
+}
+
+.check-item.done app-icon {
+  color: var(--success);
+}
+
+.row-actions .row-btn app-icon {
+  pointer-events: none;
+}
+
 .dashboard-error {
   border-color: rgba(192, 57, 43, 0.24);
   background: rgba(192, 57, 43, 0.06);
@@ -192,13 +324,6 @@
   gap: 0.8rem;
 }
 
-.health-item {
-  padding: 0.95rem 1rem;
-  border-radius: 16px;
-  background: #faf8f4;
-  border: 1px solid #eee4d6;
-}
-
 .health-item strong {
   display: block;
   color: var(--ink);
@@ -224,22 +349,23 @@
   font-size: 0.82rem;
 }
 
-.check-item i {
-  color: var(--text-light);
-}
-
-.check-item.done i {
-  color: var(--success);
-}
-
 @media (max-width: 1199px) {
   .dashboard-grid,
   .insights-grid {
     grid-template-columns: 1fr;
   }
+
+  .seller-banner-visual {
+    min-width: 0;
+    justify-items: start;
+  }
 }
 
 @media (max-width: 767px) {
+  .seller-banner-visual {
+    display: none;
+  }
+
   .activity-item {
     grid-template-columns: auto 1fr;
   }

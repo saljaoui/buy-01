@@ -656,6 +656,13 @@
        display: none;
    }
 
+   .btn-text {
+       display: inline-flex;
+       align-items: center;
+       justify-content: center;
+       gap: .45rem;
+   }
+
    .btn-register.loading .btn-spinner {
        display: block;
    }
