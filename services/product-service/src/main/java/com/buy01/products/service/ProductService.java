@@ -1,23 +1,25 @@
 package com.buy01.products.service;
 
+import java.time.Instant;
 import java.util.List;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+
+import com.buy01.events.ProductDeletedEvent;
 import com.buy01.products.Exceptions.ForbiddenException;
 import com.buy01.products.Exceptions.ProductNotFoundException;
-import org.springframework.web.multipart.MultipartFile;
-
 import com.buy01.products.dto.ProductDto;
 import com.buy01.products.dto.ProductResponseDto;
 import com.buy01.products.model.Product;
-import com.example.events.ProductEvent;
 import com.buy01.products.repository.ProductRepository;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 
-@AllArgsConstructor
-@Data
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class ProductService {
 
     private final ProductRepository productRepository;
@@ -30,9 +32,7 @@ public class ProductService {
         product.setPrice(productData.getPrice());
         product.setQuantity(productData.getQuantity());
         product.setUserId(userId);
-        Product saved = this.productRepository.save(product);
-        this.eventProducer.sendEvent(new ProductEvent("CREATED", saved.getId(), saved.getUserId()));
-        return saved;
+        return this.productRepository.save(product);
     }
 
     public Product getProduct(String id) {
@@ -70,11 +70,21 @@ public class ProductService {
 
     public void deleteProduct(String productId, Authentication authentication) {
         Product deletedProduct = this.checkOwnership(authentication, productId);
-        if (deletedProduct == null) {
-            return;
-        }
         this.productRepository.delete(deletedProduct);
-        this.eventProducer.sendEvent(new ProductEvent("DELETED", productId, null));
+        try {
+            this.eventProducer.sendProductDeletedEvent(
+                    new ProductDeletedEvent(productId, deletedProduct.getUserId(), Instant.now()))
+                    .join();
+        } catch (RuntimeException ex) {
+            log.error("Kafka publish failed for deleted productId={}, restoring database state", productId, ex);
+            try {
+                this.productRepository.save(deletedProduct);
+            } catch (Exception restoreEx) {
+                log.error("Failed to restore productId={} after Kafka failure", productId, restoreEx);
+                ex.addSuppressed(restoreEx);
+            }
+            throw new IllegalStateException("Failed to publish product delete event", ex.getCause() == null ? ex : ex.getCause());
+        }
     }
     
     public List<Product> getProductsOwnedBy(String OwnerId) {

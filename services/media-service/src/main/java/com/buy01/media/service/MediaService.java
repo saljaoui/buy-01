@@ -1,13 +1,16 @@
 package com.buy01.media.service;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -16,18 +19,22 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-import com.buy01.media.dto.MediaResponse;
+
 import com.buy01.media.client.ProductServiceClient;
+import com.buy01.media.dto.MediaResponse;
 import com.buy01.media.model.Media;
 import com.buy01.media.repository.MediaRepository;
-import jakarta.ws.rs.NotFoundException;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 
-@AllArgsConstructor
-@Data
+import jakarta.ws.rs.NotFoundException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class MediaService {
+    private static final Path UPLOAD_ROOT = Paths.get("uploads").toAbsolutePath().normalize();
+
     private final MediaRepository mediaRepository;
     private final ProductServiceClient productServiceClient;
 
@@ -53,13 +60,19 @@ public class MediaService {
 
     public void replaceMedia(List<MultipartFile> files, String productId, String authorizationHeader) {
         this.assertSellerOwnsProduct(productId, authorizationHeader);
-        this.deleteAllByProductId(productId);
+        MediaCleanupResult cleanupResult = this.deleteAllByProductId(productId);
+        if (cleanupResult.hasFailures()) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, cleanupResult.summary());
+        }
         this.upload(files, productId, authorizationHeader);
     }
 
     public void deleteAllByProductIdForOwner(String productId, String authorizationHeader) {
         this.assertSellerOwnsProduct(productId, authorizationHeader);
-        this.deleteAllByProductId(productId);
+        MediaCleanupResult cleanupResult = this.deleteAllByProductId(productId);
+        if (cleanupResult.hasFailures()) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, cleanupResult.summary());
+        }
     }
 
     private void assertSellerOwnsProduct(String productId, String authorizationHeader) {
@@ -96,35 +109,29 @@ public class MediaService {
     }
 
     private String save(MultipartFile file) {
-        // 1. Validate file is not empty
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("File is empty");
         }
         try {
-            // 2. Sanitize filename (prevent path traversal attacks)
-            String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
-            // 3. Generate unique filename to avoid overwriting
+            String originalFilename = sanitizeFilename(file.getOriginalFilename());
             String uniqueFilename = UUID.randomUUID() + "_" + originalFilename;
-            // 4. Create upload directory if missing
-            Path uploadPath = Paths.get("uploads/");
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
+            if (!Files.exists(UPLOAD_ROOT)) {
+                Files.createDirectories(UPLOAD_ROOT);
             }
-            // 5. Write file to disk
-            Path targetPath = uploadPath.resolve(uniqueFilename);
+            Path targetPath = UPLOAD_ROOT.resolve(uniqueFilename).normalize();
+            validateInsideUploadRoot(targetPath);
             Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-            return uniqueFilename; // return saved filename to store in DB
-        } catch (Exception e) {
-            throw new IllegalAccessError(e.getMessage());
+            return uniqueFilename;
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to store media file", e);
         }
     }
 
-    
     public Resource find(String imageId) {
         Media media = this.mediaRepository.findById(imageId)
                 .orElseThrow(() -> new NotFoundException("media not found"));
-        String imagetPath = media.getImagePath();
-        Resource image = new FileSystemResource("uploads/" + imagetPath);
+        Path imagePath = resolveMediaPath(media);
+        Resource image = new FileSystemResource(imagePath.toFile());
         if (!image.exists()) {
             throw new NotFoundException("image not found");
         }
@@ -147,11 +154,11 @@ public class MediaService {
     }
 
     public List<MediaResponse> findAllMediaByProductId(String productId) {
-
         List<Media> mediaList = mediaRepository.findAllByProductId(productId);
         return mediaList.stream().map(media -> {
             try {
-                Resource image = new FileSystemResource("uploads/" + media.getImagePath());
+                Path imagePath = resolveMediaPath(media);
+                Resource image = new FileSystemResource(imagePath.toFile());
                 byte[] imageBytes = Files.readAllBytes(image.getFile().toPath());
                 String base64 = Base64.getEncoder().encodeToString(imageBytes);
                 String contentType = Files.probeContentType(image.getFile().toPath());
@@ -166,32 +173,53 @@ public class MediaService {
         return this.mediaRepository.findAll();
     }
 
-    private void deleteMediaFile(Media media) {
-        if (media == null || media.getImagePath() == null || media.getImagePath().isBlank()) {
-            throw new IllegalArgumentException("Invalid media or image path");
-        }
+    private boolean deleteMediaFile(Media media) {
         try {
-            // 1. Sanitize filename to prevent path traversal
-            String filename = StringUtils.cleanPath(media.getImagePath());
-            // 2. Build path inside uploads directory
-            Path uploadPath = Paths.get("uploads/");
-            Path filePath = uploadPath.resolve(filename).normalize();
-            // 3. Extra safety: ensure file is still inside uploads folder
-            if (!filePath.startsWith(uploadPath.toAbsolutePath().normalize())) {
-                //throw new SecurityException("Invalid file path detected");
-            }
-            // 4. Delete file if it exists
-            Files.deleteIfExists(filePath);
+            Path filePath = resolveMediaPath(media);
+            return Files.deleteIfExists(filePath);
         } catch (Exception e) {
-            //throw new IllegalStateException("Failed to delete file: " + e.getMessage(), e);
+            throw new IllegalStateException("Failed to delete media file for productId="
+                    + (media == null ? "unknown" : media.getProductId()), e);
         }
     }
 
-    public void deleteAllByProductId(String productId) {
+    public MediaCleanupResult deleteAllByProductId(String productId) {
         List<Media> mediaList = this.getAllMedia(productId);
-        mediaList.forEach(this::deleteMediaFile);
-        this.mediaRepository.deleteAllByProductId(productId);
+        List<String> failedFiles = new ArrayList<>();
+        int deletedCount = 0;
+        int missingCount = 0;
 
+        for (Media media : mediaList) {
+            try {
+                boolean deleted = this.deleteMediaFile(media);
+                if (deleted) {
+                    deletedCount++;
+                } else {
+                    missingCount++;
+                }
+            } catch (Exception ex) {
+                String failedFile = media == null
+                        ? "unknown"
+                        : (media.getImagePath() == null || media.getImagePath().isBlank()
+                                ? media.getId()
+                                : media.getImagePath());
+                failedFiles.add(failedFile);
+                log.error("Failed to remove media file for productId={} mediaId={}",
+                        productId,
+                        media == null ? "unknown" : media.getId(),
+                        ex);
+            }
+        }
+
+        if (failedFiles.isEmpty()) {
+            this.mediaRepository.deleteAllByProductId(productId);
+            log.info("Media cleanup completed for productId={} deleted={} missing={}",
+                    productId, deletedCount, missingCount);
+        } else {
+            log.error("Media cleanup partially failed for productId={} failedFiles={}", productId, failedFiles);
+        }
+
+        return new MediaCleanupResult(productId, deletedCount, missingCount, List.copyOf(failedFiles));
     }
 
     public void delete(Media media) {
@@ -200,5 +228,34 @@ public class MediaService {
 
     public List<Media> getAllMedia(String productId) {
         return this.mediaRepository.findAllByProductId(productId);
+    }
+
+    private static String sanitizeFilename(String originalFilename) {
+        if (originalFilename == null || originalFilename.isBlank()) {
+            throw new IllegalArgumentException("Original filename is missing");
+        }
+
+        String cleaned = StringUtils.cleanPath(originalFilename);
+        String filename = Paths.get(cleaned).getFileName().toString();
+        if (filename.isBlank() || filename.equals(".") || filename.equals("..")) {
+            throw new IllegalArgumentException("Invalid filename");
+        }
+        return filename;
+    }
+
+    private static Path resolveMediaPath(Media media) {
+        if (media == null || media.getImagePath() == null || media.getImagePath().isBlank()) {
+            throw new IllegalArgumentException("Invalid media or image path");
+        }
+
+        Path filePath = UPLOAD_ROOT.resolve(sanitizeFilename(media.getImagePath())).normalize();
+        validateInsideUploadRoot(filePath);
+        return filePath;
+    }
+
+    private static void validateInsideUploadRoot(Path filePath) {
+        if (!filePath.startsWith(UPLOAD_ROOT)) {
+            throw new SecurityException("Invalid file path outside upload directory");
+        }
     }
 }

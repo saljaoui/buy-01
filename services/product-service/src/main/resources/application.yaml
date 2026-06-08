@@ -7,13 +7,20 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-    properties:
-      spring.json.add.type.headers: true
+      properties:
+        spring.json.add.type.headers: true
+        acks: all
+        enable.idempotence: true
+        retries: 10
+        retry.backoff.ms: 1000
+        delivery.timeout.ms: 120000
+        request.timeout.ms: 30000
   application:
     name: product-service
   data:
     mongodb:
       uri: ${MONGODB_URI:mongodb://localhost:27017/buy01_products}
+      auto-index-creation: true
 
 jwt:
   secret: ${JWT_SECRET:4fd8a6c3b92f4a8c9c6b8a1f2e3d4c5f6a7b8c9d}

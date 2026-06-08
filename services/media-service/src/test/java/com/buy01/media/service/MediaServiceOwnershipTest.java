@@ -41,6 +41,7 @@ class MediaServiceOwnershipTest {
     void ownerCanDeleteMedia() {
         MediaService mediaService = new MediaService(mediaRepository, productServiceClient);
         when(productServiceClient.isCurrentUserOwner("product-1", "Bearer token")).thenReturn(true);
+        when(mediaRepository.findAllByProductId("product-1")).thenReturn(List.of());
 
         mediaService.deleteAllByProductIdForOwner("product-1", "Bearer token");
 

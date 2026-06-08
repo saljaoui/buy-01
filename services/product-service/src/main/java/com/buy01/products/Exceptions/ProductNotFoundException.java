@@ -7,6 +7,5 @@ import org.springframework.http.HttpStatus;
 public class ProductNotFoundException extends RuntimeException  {
     public ProductNotFoundException(String msg) {
         super(msg);
-        System.out.println(">>> INSIDE PRODUCT SERVICE: " + msg);
     }
 }

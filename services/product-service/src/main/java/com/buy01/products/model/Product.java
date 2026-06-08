@@ -1,6 +1,7 @@
 package com.buy01.products.model;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,5 +20,6 @@ public class Product {
     private String description;
     private Double price;
     private int quantity;
+    @Indexed
     private String userId;
 }

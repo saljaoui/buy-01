@@ -4,13 +4,18 @@ server:
 spring:
   kafka:
     bootstrap-servers: kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring.json.add.type.headers: true
     consumer:
       group-id: media-service-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
-        spring.json.trusted.packages: com.example.events
+        spring.json.trusted.packages: com.buy01.events
   application:
     name: media-service
   servlet:
@@ -20,6 +25,7 @@ spring:
   data:
     mongodb:
       uri: ${MONGODB_URI:mongodb://localhost:27017/buy01_media}
+      auto-index-creation: true
 
 jwt:
   secret: ${JWT_SECRET:4fd8a6c3b92f4a8c9c6b8a1f2e3d4c5f6a7b8c9d}
