@@ -243,7 +243,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
           const file = this.rawBase64ToFile(
             media.base64Image,
             `image-${media.id}`,
-            media.contentType
+            media.contentType || 'image/jpeg'
           );
           this.selectedImages.push({
             id: media.id,

@@ -5,7 +5,7 @@ import { ApiClient } from '../../core/api/api-client.service';
 export interface Media {
   id: string;
   base64Image: string;
-  contentType: string;
+  contentType: string | null;
 }
 
 export type MediaUploadData = Media;
@@ -33,7 +33,7 @@ export class MediaService {
     formData.append('productId', productId);
     files.forEach((file) => {
       formData.append('images', file, file.name);
-    })
+    });
     return this.api.post<MediaMessageResponse>('/media/upload', formData);
   }
 
@@ -46,7 +46,7 @@ export class MediaService {
     formData.append('productId', productId);
     files.forEach((file) => {
       formData.append('images', file, file.name);
-    })
+    });
     return this.api.put<MediaMessageResponse>('/media/product', formData);
   }
 
@@ -55,7 +55,8 @@ export class MediaService {
   }
 
   toDataUrl(media: Media): string {
-    return `data:${media.contentType};base64,${media.base64Image}`;
+    const contentType = media.contentType || 'image/jpeg';
+    return `data:${contentType};base64,${media.base64Image}`;
   }
 
 }
