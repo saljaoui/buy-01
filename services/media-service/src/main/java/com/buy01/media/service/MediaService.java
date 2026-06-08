@@ -10,10 +10,14 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import com.buy01.media.dto.MediaResponse;
+import com.buy01.media.client.ProductServiceClient;
 import com.buy01.media.model.Media;
 import com.buy01.media.repository.MediaRepository;
 import jakarta.ws.rs.NotFoundException;
@@ -25,10 +29,9 @@ import lombok.Data;
 @Service
 public class MediaService {
     private final MediaRepository mediaRepository;
+    private final ProductServiceClient productServiceClient;
 
     public void upload(MultipartFile file, String productId) {
-        System.out.println("image: " + file);
-        
         String filePath = this.save(file);
         Media media = Media.builder()
                 .productId(productId)
@@ -37,7 +40,8 @@ public class MediaService {
         this.mediaRepository.save(media);
     }
 
-    public void upload(List<MultipartFile> files, String productId) {
+    public void upload(List<MultipartFile> files, String productId, String authorizationHeader) {
+        this.assertSellerOwnsProduct(productId, authorizationHeader);
         if (files == null || files.isEmpty()) {
             return;
         }
@@ -47,12 +51,34 @@ public class MediaService {
         }
     }
 
+    public void replaceMedia(List<MultipartFile> files, String productId, String authorizationHeader) {
+        this.assertSellerOwnsProduct(productId, authorizationHeader);
+        this.deleteAllByProductId(productId);
+        this.upload(files, productId, authorizationHeader);
+    }
+
+    public void deleteAllByProductIdForOwner(String productId, String authorizationHeader) {
+        this.assertSellerOwnsProduct(productId, authorizationHeader);
+        this.deleteAllByProductId(productId);
+    }
+
+    private void assertSellerOwnsProduct(String productId, String authorizationHeader) {
+        try {
+            boolean owner = productServiceClient.isCurrentUserOwner(productId, authorizationHeader);
+            if (!owner) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                        "You are not allowed to modify this product");
+            }
+        } catch (HttpClientErrorException.NotFound ex) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product Not Found", ex);
+        }
+    }
+
     private void validateImage(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("File is empty");
         }
         String contentType = file.getContentType();
-        System.out.println("contentType = " + contentType);
         if (contentType == null ||
             !(contentType.equals("image/jpeg") ||
               contentType.equals("image/png") ||
@@ -60,8 +86,6 @@ public class MediaService {
                 contentType.equals("image/avif"))) {
             throw new IllegalArgumentException("Only JPG, PNG, WEBP, AVIF images are allowed");
         }
-        String filename = file.getOriginalFilename();
-        System.out.println("filename = " + filename);
 
         // 3. Optional: check file size (e.g. max 5MB)
         long maxSize = 2 * 1024 * 1024;
@@ -89,7 +113,6 @@ public class MediaService {
             // 5. Write file to disk
             Path targetPath = uploadPath.resolve(uniqueFilename);
             Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("Saving to: " + uploadPath.toAbsolutePath());
             return uniqueFilename; // return saved filename to store in DB
         } catch (Exception e) {
             throw new IllegalAccessError(e.getMessage());
@@ -101,7 +124,6 @@ public class MediaService {
         Media media = this.mediaRepository.findById(imageId)
                 .orElseThrow(() -> new NotFoundException("media not found"));
         String imagetPath = media.getImagePath();
-        System.out.println("path = " + imagetPath);
         Resource image = new FileSystemResource("uploads/" + imagetPath);
         if (!image.exists()) {
             throw new NotFoundException("image not found");
@@ -159,12 +181,7 @@ public class MediaService {
                 //throw new SecurityException("Invalid file path detected");
             }
             // 4. Delete file if it exists
-            boolean deleted = Files.deleteIfExists(filePath);
-            if (!deleted) {
-                System.out.println("File not found: " + filePath);
-            } else {
-                System.out.println("Deleted file: " + filePath);
-            }
+            Files.deleteIfExists(filePath);
         } catch (Exception e) {
             //throw new IllegalStateException("Failed to delete file: " + e.getMessage(), e);
         }

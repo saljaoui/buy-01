@@ -57,8 +57,12 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
         ServerHttpRequest mutatedRequest = exchange.getRequest()
             .mutate()
-            .header("X-User-Id",   userId)
-            .header("X-User-Role", role)
+            .headers(headers -> {
+                headers.remove("X-User-Id");
+                headers.remove("X-User-Role");
+                headers.add("X-User-Id", userId);
+                headers.add("X-User-Role", role);
+            })
             .build();
 
         log.debug("Forwarding request — userId: {}, role: {}, path: {}",

@@ -42,8 +42,7 @@ public class ProductService {
     public ProductResponseDto getProductDetails(String productId, Authentication authentication) {
         Product product = this.getProduct(productId);
         ProductResponseDto productResponseDto = ProductResponseDto.toDto(product);
-        String userId = authentication.getName();
-        boolean isOwner = (product.getUserId().equals(userId)) ? true:false;
+        boolean isOwner = authentication != null && product.getUserId().equals(authentication.getName());
         productResponseDto.setOwner(isOwner);
         return productResponseDto;
     }
@@ -83,6 +82,9 @@ public class ProductService {
     }
     
     public Product checkOwnership(Authentication authentication, String productId) {
+        if (authentication == null || authentication.getName() == null) {
+            throw new ForbiddenException("You are not allowed to access this product");
+        }
         String userId = authentication.getName();
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Product Not Found"));

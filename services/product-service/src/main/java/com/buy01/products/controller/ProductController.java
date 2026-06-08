@@ -3,6 +3,7 @@ import lombok.AllArgsConstructor;
 import java.util.HashMap;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,9 +13,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import com.buy01.products.dto.ProductDto;
 import com.buy01.products.dto.ProductResponseDto;
 
@@ -29,23 +30,25 @@ import jakarta.validation.Valid;
 public class ProductController {
     private final ProductService productService;
     @PostMapping
-    @PreAuthorize("hasRole('ROLE_SELLER')")
+    @PreAuthorize("hasAuthority('ROLE_SELLER')")
     public ResponseEntity<?> create(@Valid @RequestPart("product") ProductDto product, Authentication authentication) {
+        requireSeller(authentication);
         String userID = authentication.getName();
         Product product2 = this.productService.createProduct(product, userID);
         return ResponseEntity.ok(Map.of("id", product2.getId()));
     }
 
-    @PreAuthorize("hasRole('ROLE_SELLER')")
+    @PreAuthorize("hasAuthority('ROLE_SELLER')")
     @PutMapping("/{id}")
     public ResponseEntity<Product> update(@PathVariable("id") String id, @Valid @RequestBody ProductDto product, Authentication authentication) {
-        
+        requireSeller(authentication);
         return ResponseEntity.ok(this.productService.updateProduct(id, product, authentication));
     }
 
-    @PreAuthorize("hasRole('ROLE_SELLER')")
+    @PreAuthorize("hasAuthority('ROLE_SELLER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable String id, Authentication authentication) {
+        requireSeller(authentication);
         this.productService.deleteProduct(id, authentication);
         HashMap<String, Object> response = new HashMap<>();
         response.put("success", true);
@@ -66,5 +69,13 @@ public class ProductController {
     @GetMapping("/ownedBy/{id}")
     public ResponseEntity<List<Product>> findAllBy(@PathVariable String id) {
         return ResponseEntity.ok(this.productService.getProductsOwnedBy(id));
+    }
+
+    private void requireSeller(Authentication authentication) {
+        boolean seller = authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(authority -> "ROLE_SELLER".equals(authority.getAuthority()));
+        if (!seller) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Seller role required");
+        }
     }
 }

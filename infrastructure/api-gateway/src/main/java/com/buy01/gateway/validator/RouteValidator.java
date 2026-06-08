@@ -1,29 +1,34 @@
 package com.buy01.gateway.validator;
 
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 public class RouteValidator {
 
-    private static final List<String> PUBLIC_ENDPOINTS = List.of(
-            "/api/auth/register",
-            "/api/auth/login",
-            "/api/auth/ping",
-            "/api/media/primary/product",
-            "/products",
-            "/actuator"
-    );
-
     public boolean isSecured(ServerHttpRequest request) {
         String path = request.getURI().getPath();
+        HttpMethod method = request.getMethod();
 
-        for (String endpoint : PUBLIC_ENDPOINTS) {
-            if (path.startsWith(endpoint)) {
-                return false;
-            }
+        if (path.startsWith("/api/auth/")) {
+            return false;
+        }
+
+        if (method == HttpMethod.GET && path.startsWith("/api/products")) {
+            return false;
+        }
+
+        if (method == HttpMethod.GET && path.startsWith("/api/media/primary/")) {
+            return false;
+        }
+
+        if (method == HttpMethod.GET && path.startsWith("/api/media/product/")) {
+            return false;
+        }
+
+        if (path.startsWith("/actuator")) {
+            return false;
         }
 
         return true;

@@ -2,6 +2,7 @@ package com.buy01.media.config;
 
 import com.buy01.media.security.JwtFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpMethod;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -28,7 +29,8 @@ public class SecurityConfig {
             .sessionManagement(s -> s
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/media/primary/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/media/primary/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/media/product/**").permitAll()
                 .anyRequest().authenticated())
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
