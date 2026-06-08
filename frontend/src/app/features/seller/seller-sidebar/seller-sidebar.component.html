@@ -1,0 +1,21 @@
+<aside class="seller-sidebar">
+  <div class="seller-sidebar-inner">
+    <a class="seller-brand" routerLink="/seller">
+      <div class="seller-brand-icon"><i class="bi bi-bag-heart-fill"></i></div>
+      <div class="seller-brand-copy">
+        <strong>Buy01</strong>
+        <span>Seller panel</span>
+      </div>
+    </a>
+
+    <app-seller-nav [activeItem]="activeItem" [productCount]="productCount"></app-seller-nav>
+
+    <div class="seller-account">
+      <div class="seller-account-avatar">{{ initials }}</div>
+      <div class="seller-account-copy">
+        <strong>{{ name }}</strong>
+        <span>{{ subtitle }}</span>
+      </div>
+    </div>
+  </div>
+</aside>

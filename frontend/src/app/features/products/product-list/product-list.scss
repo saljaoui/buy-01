@@ -790,6 +790,22 @@
   gap: 1rem;
 }
 
+.catalog-state {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1.25rem;
+  color: var(--text);
+}
+
+.catalog-state span {
+  color: var(--text-muted);
+}
+
+.catalog-state.error-state {
+  border-color: rgba(192, 57, 43, 0.24);
+  background: rgba(192, 57, 43, 0.06);
+}
+
 .product-card {
   background: var(--card-bg);
   border: 1.5px solid var(--border);

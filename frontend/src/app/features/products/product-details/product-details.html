@@ -3,23 +3,48 @@
 
   <main class="container detail-page">
     <div class="breadcrumb-row">
-      <a href="/products">Products</a>
+      <a routerLink="/products">Products</a>
       <i class="bi bi-chevron-right"></i>
-      <span>Electronics</span>
+      <span>Catalog</span>
       <i class="bi bi-chevron-right"></i>
-      <strong>Noise-Cancelling Pro Headphones</strong>
+      <strong>{{ productDetails()?.name || 'Product details' }}</strong>
     </div>
 
+    @if (isLoading()) {
+    <div class="surface-card detail-state">
+      <strong>Loading product...</strong>
+      <span>Fetching product details from Buy01.</span>
+    </div>
+    } @else if (errorMessage()) {
+    <div class="surface-card detail-state error-state">
+      <strong>Product could not load</strong>
+      <span>{{ errorMessage() }}</span>
+    </div>
+    } @else {
     <div class="detail-layout">
       <section class="gallery-column">
         <div class="surface-card gallery-card">
-          @if (selectedImage() ; as media) {
+          @if (isMediaLoading()) {
+          <div class="gallery-stage gallery-empty-state">
+            <strong>Loading images...</strong>
+          </div>
+          } @else if (mediaErrorMessage()) {
+          <div class="gallery-stage gallery-empty-state">
+            <strong>Images unavailable</strong>
+            <span>{{ mediaErrorMessage() }}</span>
+          </div>
+          } @else if (selectedImage() ; as media) {
           <div class="gallery-stage">
             <div class="gallery-badges">
               <span class="gallery-badge featured">Best seller</span>
               <span class="gallery-badge stock">In stock</span>
             </div>
-            <img [src]="'data:' + media.contentType + ';base64,' + media.base64Image" alt="Product Image">
+            <img [src]="imageDataUrl(media)" alt="Product Image">
+          </div>
+          } @else {
+          <div class="gallery-stage gallery-empty-state">
+            <strong>No images yet</strong>
+            <span>This product has no uploaded media.</span>
           </div>
           }
 
@@ -27,7 +52,7 @@
             @for (mediaData of MediaDetails(); track mediaData.id) {
             <button [class]="(selectedImage()?.id==mediaData.id)? 'thumb-btn active':'thumb-btn'" type="button"
               (click)="selectImage(mediaData.id)">
-              <img [src]="'data:' + mediaData.contentType + ';base64,' + mediaData.base64Image" alt="Product Image">
+              <img [src]="imageDataUrl(mediaData)" alt="Product Image">
             </button>
             }
           </div>
@@ -121,9 +146,9 @@
           </div>
           @if(productDetails()?.owner) {
           <div class="action-row">
-            <button class="btn-primary" type="button" (click)="delete()">
+            <button class="btn-primary" type="button" (click)="delete()" [disabled]="isDeleting()">
               <i class="bi bi-bag-plus"></i>
-              Delete
+              {{ isDeleting() ? 'Deleting...' : 'Delete' }}
             </button>
             <button class="btn-light" type="button" (click)="updateProduct()">
               <i class="bi bi-heart"></i>
@@ -164,6 +189,7 @@
         </div>
       </section>
     </div>
+    }
   </main>
   <app-footer />
 </div>

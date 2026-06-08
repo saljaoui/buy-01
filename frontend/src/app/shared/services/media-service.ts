@@ -1,73 +1,61 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { LocalStorageService } from '../global/local-storage-service';
-import { Router } from '@angular/router';
-import { GlobalService } from '../global/global-service';
-import { EMPTY, Observable } from 'rxjs';
-import { ProductImage } from './product-service';
+import { Observable } from 'rxjs';
+import { ApiClient } from '../../core/api/api-client.service';
 
-
-export interface MediaUploadData {
+export interface Media {
   id: string;
   base64Image: string;
   contentType: string;
 }
+
+export type MediaUploadData = Media;
+
+export interface ProductImage {
+  id: string;
+  isNew: boolean;
+  deleted: boolean;
+  file: File;
+  preview: string;
+}
+
+export interface MediaMessageResponse {
+  message: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
-
 export class MediaService {
-  private readonly http = inject(HttpClient);
-  private readonly router = inject(Router);
-  private readonly storage = inject(LocalStorageService);
-  private readonly API = GlobalService.clientIP;
+  private readonly api = inject(ApiClient);
 
-  publishMedia(productId: string, files: File[]): Observable<any> {
-    const token = this.storage.get('buy01.auth.token');
-    if (!token) {
-      this.router.navigate(['/login']);
-      return EMPTY;
-    }
+  publishMedia(productId: string, files: File[]): Observable<MediaMessageResponse> {
     const formData = new FormData();
     formData.append('productId', productId);
     files.forEach((file) => {
       formData.append('images', file, file.name);
     })
-    const headers = new HttpHeaders({
-      'Authorization': 'Bearer ' + token
-    })
-    return this.http.post<any>(`${this.API}/media/upload`, formData, { headers });
+    return this.api.post<MediaMessageResponse>('/media/upload', formData);
   }
 
-  getMediaByPost(productId: string): Observable<MediaUploadData[]> {
-    const token = this.storage.get('buy01.auth.token');
-    if (!token) {
-      this.router.navigate(['/login']);
-      return EMPTY;
-    }
-    const headers = new HttpHeaders({
-      'Authorization': 'Bearer ' + token,
-      'Content-Type': 'application/json'
-    })
-    return this.http.get<MediaUploadData[]>(`${this.API}/media/product/${productId}`, { headers });
+  getMediaByProduct(productId: string): Observable<Media[]> {
+    return this.api.get<Media[]>(`/media/product/${productId}`);
   }
 
-  updateMedia(productId: string, data: ProductImage[]): Observable<any> {
-    const token = this.storage.get('buy01.auth.token');
-    if (!token) {
-      this.router.navigate(['/login']);
-      return EMPTY;
-    }
+  replaceProductMedia(productId: string, files: File[]): Observable<MediaMessageResponse> {
     const formData = new FormData();
     formData.append('productId', productId);
-    data.forEach((d) => {
-      
-      formData.append('images', d.file, d.file.name);
+    files.forEach((file) => {
+      formData.append('images', file, file.name);
     })
-    const headers = new HttpHeaders({
-      'Authorization': 'Bearer ' + token
-    })
-    return this.http.put<any>(`${this.API}/media/product`, formData, { headers });
+    return this.api.put<MediaMessageResponse>('/media/product', formData);
+  }
+
+  deleteProductMedia(productId: string): Observable<MediaMessageResponse> {
+    return this.api.delete<MediaMessageResponse>(`/media/product/${productId}`);
+  }
+
+  toDataUrl(media: Media): string {
+    return `data:${media.contentType};base64,${media.base64Image}`;
   }
 
 }

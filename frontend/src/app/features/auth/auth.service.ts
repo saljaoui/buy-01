@@ -1,55 +1,42 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable, switchMap } from 'rxjs';
+import { map, Observable, of, switchMap, throwError } from 'rxjs';
 
+import { ApiClient } from '../../core/api/api-client.service';
 import {
   AuthResponse,
   AuthSession,
   AuthUser,
   LoginRequest,
   RegisterRequest,
-  RegisterResponse,
 } from './auth.models';
 
 const AUTH_TOKEN_KEY = 'buy01.auth.token';
 const AUTH_USER_KEY = 'buy01.auth.user';
 
-function resolveApiBaseUrl(): string {
-  const location = globalThis.location;
-
-  if (!location) {
-    return 'http://localhost:8080';
-  }
-
-  if (location.port === '4200' && ['localhost', '127.0.0.1'].includes(location.hostname)) {
-    return 'http://localhost:8080';
-  }
-
-  return location.origin;
-}
-
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${resolveApiBaseUrl()}/api/auth`;
-  private readonly usersUrl = `${resolveApiBaseUrl()}/api/users`;
+  private readonly api = inject(ApiClient);
 
   login(payload: LoginRequest): Observable<AuthSession> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, payload).pipe(
-      switchMap(({ token }) =>
-        this.http
-          .get<AuthUser>(`${this.usersUrl}/me`, {
-            headers: new HttpHeaders({
-              Authorization: `Bearer ${token}`,
-            }),
-          })
-          .pipe(map((user) => ({ token, user }))),
-      ),
-    );
+    return this.api
+      .post<AuthResponse>('/auth/login', payload)
+      .pipe(switchMap((response) => this.toSession(response)));
   }
 
-  register(payload: RegisterRequest): Observable<RegisterResponse> {
-    return this.http.post<RegisterResponse>(`${this.apiUrl}/register`, payload);
+  register(payload: RegisterRequest): Observable<AuthSession> {
+    return this.api
+      .post<AuthResponse>('/auth/register', payload)
+      .pipe(switchMap((response) => this.toSession(response)));
+  }
+
+  refreshCurrentUser(): Observable<AuthUser> {
+    return this.api.get<AuthUser>('/users/me').pipe(
+      map((user) => {
+        this.updateStoredUser(user);
+        return user;
+      }),
+    );
   }
 
   storeSession(session: AuthSession, persistent = true): void {
@@ -101,30 +88,24 @@ export class AuthService {
   }
 
   getErrorMessage(error: unknown, fallback = 'Something went wrong.'): string {
-    if (error instanceof HttpErrorResponse) {
-      if (typeof error.error === 'string' && error.error.trim()) {
-        return error.error;
-      }
-
-      if (this.hasMessage(error.error)) {
-        return error.error.message;
-      }
-
-      if (error.status === 0) {
-        return 'Unable to reach the authentication server.';
-      }
-    }
-
-    return fallback;
+    return this.api.getErrorMessage(error, fallback);
   }
 
-  private hasMessage(value: unknown): value is { message: string } {
-    return (
-      typeof value === 'object' &&
-      value !== null &&
-      'message' in value &&
-      typeof value.message === 'string' &&
-      value.message.trim().length > 0
-    );
+  private toSession(response: AuthResponse): Observable<AuthSession> {
+    if (!response.token) {
+      return throwError(() => new Error('Authentication response did not include an access token.'));
+    }
+
+    if (response.user) {
+      return of({ token: response.token, user: response.user });
+    }
+
+    return this.api
+      .get<AuthUser>('/users/me', {
+        headers: new HttpHeaders({
+          Authorization: `Bearer ${response.token}`,
+        }),
+      })
+      .pipe(map((user) => ({ token: response.token, user })));
   }
 }

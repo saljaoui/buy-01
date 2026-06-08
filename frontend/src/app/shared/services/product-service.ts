@@ -1,10 +1,6 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { EMPTY, Observable } from 'rxjs';
-import { GlobalService } from '../global/global-service';
-import { LocalStorageService } from '../global/local-storage-service';
-import { Router } from '@angular/router';
-
+import { Observable } from 'rxjs';
+import { ApiClient } from '../../core/api/api-client.service';
 
 export interface ProductRequest {
   name: string;
@@ -19,61 +15,38 @@ export interface ProductResponse {
   description: string;
   price: number;
   quantity: number;
-  owner: boolean;
+  owner?: boolean;
+  userId?: string;
 }
 
-
-export interface ProductImage {
+export interface CreateProductResponse {
   id: string;
-  isNew: boolean;
-  deleted: boolean;
-  file: File;
-  preview: string;
 }
+
+export interface DeleteProductResponse {
+  success?: boolean;
+  message: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
-
-
-
 export class ProductService {
-  private readonly http = inject(HttpClient);
-  private readonly router = inject(Router);
-  private readonly storage = inject(LocalStorageService);
-  private readonly API = GlobalService.clientIP;
+  private readonly api = inject(ApiClient);
 
   getProducts(): Observable<ProductResponse[]> {
-    const token = this.storage.get('buy01.auth.token');
-    if (!token) {
-      this.router.navigate(['/login']);
-      return EMPTY;
-    }
-    const headers = new HttpHeaders({
-      'Authorization': 'Bearer ' + token,
-      'Content-Type': 'application/json'
-    })
-    return this.http.get<ProductResponse[]>(`${this.API}/products`, { headers });
+    return this.api.get<ProductResponse[]>('/products');
   }
 
   getProduct(productId: string): Observable<ProductResponse> {
-    const token = this.storage.get('buy01.auth.token');
-    if (!token) {
-      this.router.navigate(['/login']);
-      return EMPTY;
-    }
-    const headers = new HttpHeaders({
-      'Authorization': 'Bearer ' + token,
-      'Content-Type': 'application/json'
-    })
-    return this.http.get<ProductResponse>(`${this.API}/products/${productId}`, { headers });
+    return this.api.get<ProductResponse>(`/products/${productId}`);
   }
 
-  publishProduct(product: ProductRequest): Observable<any> {
-    const token = this.storage.get('buy01.auth.token');
-    if (!token) {
-      this.router.navigate(['/login']);
-      return EMPTY;
-    }
+  getProductsOwnedBy(userId: string): Observable<ProductResponse[]> {
+    return this.api.get<ProductResponse[]>(`/products/ownedBy/${userId}`);
+  }
+
+  publishProduct(product: ProductRequest): Observable<CreateProductResponse> {
     const formData = new FormData();
     formData.append(
       'product',
@@ -81,36 +54,19 @@ export class ProductService {
         type: 'application/json'
       })
     );
-    const headers = new HttpHeaders({
-      'Authorization': 'Bearer ' + token
-    })
-    return this.http.post<any>(`${this.API}/products`, formData, { headers });
+    return this.api.post<CreateProductResponse>('/products', formData);
   }
 
-  deleteProduct(productId: string): Observable<any> {
-    const token = this.storage.get('buy01.auth.token');
-    if (!token) {
-      this.router.navigate(['/login']);
-      return EMPTY;
-    }
-    const headers = new HttpHeaders({
-      'Authorization': 'Bearer ' + token,
-      'Content-Type': 'application/json'
-    })
-    return this.http.delete<string>(`${this.API}/products/${productId}`, { headers });
+  deleteProduct(productId: string): Observable<DeleteProductResponse> {
+    return this.api.delete<DeleteProductResponse>(`/products/${productId}`);
   }
 
-  updateProduct(productId: string, product: ProductRequest): Observable<any> {
-    const token = this.storage.get('buy01.auth.token');
-    if (!token) {
-      this.router.navigate(['/login']);
-      return EMPTY;
-    }
-    const headers = new HttpHeaders({
-      'Authorization': 'Bearer ' + token,
-      'Content-Type': 'application/json'
-    })
-    return this.http.put<string>(`${this.API}/products/${productId}`, product , { headers });
+  updateProduct(productId: string, product: ProductRequest): Observable<ProductResponse> {
+    return this.api.put<ProductResponse>(`/products/${productId}`, product);
+  }
+
+  getPrimaryImageUrl(productId: string): string {
+    return this.api.url(`/media/primary/product/${productId}`);
   }
 
 }

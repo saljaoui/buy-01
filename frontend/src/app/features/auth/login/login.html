@@ -106,7 +106,7 @@
 
                 <!-- Submit -->
                 <button type="submit" class="btn-signin" [disabled]="isSubmitting">
-                    Sign In &nbsp;<i class="bi bi-arrow-right"></i>
+                    {{ isSubmitting ? 'Signing in...' : 'Sign In' }} &nbsp;<i class="bi bi-arrow-right"></i>
                 </button>
             </form>
 

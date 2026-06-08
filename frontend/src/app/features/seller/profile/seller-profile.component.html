@@ -1,25 +1,10 @@
 <div class="seller-shell">
-  <aside class="seller-sidebar">
-    <div class="seller-sidebar-inner">
-      <a class="seller-brand" href="/seller">
-        <div class="seller-brand-icon"><i class="bi bi-bag-heart-fill"></i></div>
-        <div class="seller-brand-copy">
-          <strong>Buy01</strong>
-          <span>Seller panel</span>
-        </div>
-      </a>
-
-      <app-seller-nav activeItem="profile"></app-seller-nav>
-
-      <div class="seller-account">
-        <div class="seller-account-avatar">{{ userInitials() }}</div>
-        <div class="seller-account-copy">
-          <strong>{{ displayName() }}</strong>
-          <span>Seller</span>
-        </div>
-      </div>
-    </div>
-  </aside>
+  <app-seller-sidebar
+    activeItem="profile"
+    [initials]="userInitials()"
+    [name]="displayName()"
+    subtitle="Seller"
+  ></app-seller-sidebar>
 
   <div class="seller-main">
     <header class="seller-topbar">

@@ -1,14 +1,14 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SellerNavComponent } from '../seller-nav/seller-nav.component';
 import { AuthService } from '../../auth/auth.service';
 import { UserService } from '../../../core/services/user.service';
 import { User } from '../../../core/models/user.model';
+import { SellerSidebarComponent } from '../seller-sidebar/seller-sidebar.component';
 
 @Component({
   selector: 'app-seller-profile',
-  imports: [CommonModule, SellerNavComponent, FormsModule],
+  imports: [CommonModule, SellerSidebarComponent, FormsModule],
   templateUrl: './seller-profile.component.html',
   styleUrl: './seller-profile.component.scss',
 })

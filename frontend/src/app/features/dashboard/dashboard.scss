@@ -26,6 +26,17 @@
   align-items: start;
 }
 
+.dashboard-error {
+  border-color: rgba(192, 57, 43, 0.24);
+  background: rgba(192, 57, 43, 0.06);
+  color: #9f2f23;
+}
+
+.dashboard-error span {
+  display: block;
+  margin-top: 0.35rem;
+}
+
 .aside-stack {
   display: grid;
   gap: 1rem;

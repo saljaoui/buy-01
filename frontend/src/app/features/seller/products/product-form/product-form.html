@@ -1,42 +1,27 @@
 <div class="seller-shell">
-  <aside class="seller-sidebar">
-    <div class="seller-sidebar-inner">
-      <a class="seller-brand" href="/seller">
-        <div class="seller-brand-icon"><i class="bi bi-bag-heart-fill"></i></div>
-        <div class="seller-brand-copy">
-          <strong>Buy01</strong>
-          <span>Seller panel</span>
-        </div>
-      </a>
-
-      <app-seller-nav activeItem="create-product"></app-seller-nav>
-
-      <div class="seller-account">
-        <div class="seller-account-avatar">A</div>
-        <div class="seller-account-copy">
-          <strong>Ada Lovelace</strong>
-          <span>Northline Studio</span>
-        </div>
-      </div>
-    </div>
-  </aside>
+  <app-seller-sidebar
+    activeItem="create-product"
+    [initials]="sellerInitials()"
+    [name]="currentUser?.name || 'Seller'"
+    [subtitle]="currentUser?.email || 'Seller account'"
+  ></app-seller-sidebar>
 
   <div class="seller-main">
     <header class="seller-topbar">
       <div class="seller-topbar-copy">
         <strong>Create / edit product</strong>
-        <span>Static seller form UI</span>
+        <span>{{ mode === 'edit' ? 'Editing existing backend product' : 'Creating a backend product listing' }}</span>
       </div>
 
       <div class="seller-topbar-actions">
-        <a class="ghost-btn" href="/products">
+        <a class="ghost-btn" routerLink="/products">
           <i class="bi bi-eye"></i>
           Preview
         </a>
-        <a class="secondary-btn" href="/seller">Cancel</a>
-        <button class="primary-btn" type="button" (click)="saveProduct()">
+        <a class="secondary-btn" routerLink="/seller">Cancel</a>
+        <button class="primary-btn" type="button" (click)="saveProduct()" [disabled]="isSaving() || isLoading()">
           <i class="bi bi-check2"></i>
-          Save product
+          {{ isSaving() ? 'Saving...' : 'Save product' }}
         </button>
       </div>
     </header>
@@ -48,10 +33,28 @@
           <h1>Build a polished <em>listing</em> quickly.</h1>
           <p>
             This form keeps the same soft cards, dark accents, and structured spacing used across
-            the rest of the app while remaining UI-only.
+            the rest of the app while publishing directly to the backend.
           </p>
         </div>
       </section>
+
+      @if (isLoading()) {
+      <section class="panel">
+        <div class="panel-body">
+          <strong>Loading product...</strong>
+        </div>
+      </section>
+      }
+
+      @if (formErrors().length > 0) {
+      <section class="panel form-error-panel">
+        <div class="panel-body">
+          @for (error of formErrors(); track error) {
+          <div>{{ error }}</div>
+          }
+        </div>
+      </section>
+      }
 
       <div class="form-layout">
         <section class="panel">
@@ -60,7 +63,7 @@
               <h3>Product information</h3>
               <p>Core details buyers will see in the storefront.</p>
             </div>
-            <span class="pill">Draft</span>
+            <span class="pill">Backend</span>
           </div>
 
           <div class="panel-body form-stack">
@@ -71,10 +74,10 @@
               </div>
 
               <div class="field-grid">
-                <div class="field full invalid">
+                <div class="field full" [class.invalid]="formSubmitted() && productInfo.name.trim().length < 2">
                   <label for="title">Product title</label>
                   <input id="title" type="text" placeholder="Noise-Cancelling Pro Headphones" name="name"
-                    [(ngModel)]="productInfo.name" />
+                    [(ngModel)]="productInfo.name" [class.is-invalid]="formSubmitted() && productInfo.name.trim().length < 2" />
                   <div class="message">Title is required before publishing.</div>
                 </div>
 
@@ -92,13 +95,13 @@
             <section class="form-section">
               <div class="section-intro">
                 <h3>Pricing and inventory</h3>
-                <p>Static placeholders for merchant-friendly selling controls.</p>
+                <p>Price and stock fields are validated before publishing to the product service.</p>
               </div>
 
               <div class="field-grid">
-                <div class="field invalid">
+                <div class="field" [class.invalid]="formSubmitted() && productInfo.price <= 0">
                   <label for="price">Price</label>
-                  <input id="price" type="text" placeholder="$149.00" name="price" [(ngModel)]="productInfo.price" />
+                  <input id="price" type="number" min="0" step="0.01" placeholder="149.00" name="price" [(ngModel)]="productInfo.price" />
                   <div class="message">Enter a valid sale price.</div>
                 </div>
 
@@ -115,64 +118,35 @@
                 <p>Dropzone and file cards stay visually aligned with the dashboard and media library.</p>
               </div>
 
-              <!--<div class="upload-dropzone media-dropzone">
-              <div class="drop-icon"><i class="bi bi-cloud-arrow-up"></i></div>
-                <strong>Upload product imagery</strong>
-                <span>Drag and drop hero shots, detail crops, or packaging images here.</span>
-                <div class="drop-actions">
-                  <button class="primary-btn" type="button">Choose files</button>
-                  <a class="ghost-btn" href="/seller/media">Open library</a>
-                </div>
-                <small>Allowed: JPG, PNG, WEBP up to 5 MB each.</small>
-              </div>-->
-
               <div class="upload-dropzone media-dropzone">
                 <div class="drop-icon"><i class="bi bi-cloud-arrow-up"></i></div>
                 <strong>Upload product imagery</strong>
                 <span>Drag and drop hero shots, detail crops, or packaging images here.</span>
 
                 <div class="drop-actions">
-                  <!-- Hidden file input -->
                   <input #imageInput type="file" id="imageInput" accept="image/*" multiple
                     (change)="onFilesSelected($event)" style="display: none;">
 
-                  <!-- Button triggers file picker -->
                   <button class="primary-btn" type="button" (click)="imageInput.click()">
                     Choose images
                   </button>
 
-                  <a class="ghost-btn" href="/seller/media">Open library</a>
+                  <a class="ghost-btn" routerLink="/seller/media">Open library</a>
                 </div>
 
-                <small>Allowed: JPG, PNG, WEBP up to 5 MB each.</small>
+                <small>Allowed: JPG, PNG, WEBP, AVIF up to 2 MB each.</small>
               </div>
 
               <div class="upload-preview-grid">
 
 
-                <!--<article *ngFor="let item of selectedImages; let i = index" class="upload-card">
-
-                    <div class="preview-art">
-                      <img [src]="item.preview" [alt]="item.file.name">
-                    </div>
-
-                    <strong>{{ item.file.name }}</strong>
-
-                    <span>1600 x 1200 px</span>
-
-                    <button (click)="deleteImage(i)">
-                      delete
-                    </button>
-
-                  </article>-->
-
-                @for(item of selectedImages; track item.file.lastModified) {
+                @for(item of selectedImages; track item.preview) {
                 <article  class="upload-card">
                   <div class="preview-art">
-                    <img [src]="getPreview(item.file)" [alt]="item.file.name">
+                    <img [src]="item.preview" [alt]="item.file.name">
                   </div>
                   <strong>{{ item.file.name }}</strong>
-                  <span>1600 x 1200 px</span>
+                  <span>{{ (item.file.size / 1024 / 1024).toFixed(2) }} MB</span>
                   <button (click)="deleteImage(item)">delete</button>
                 </article>
                 }
@@ -195,7 +169,7 @@
               <div class="panel-body summary-stack">
                 <div class="summary-row">
                   <span>Visibility</span>
-                  <strong>Draft only</strong>
+                  <strong>Backend listing</strong>
                 </div>
                 <div class="summary-row">
                   <span>Sales channel</span>
@@ -203,12 +177,14 @@
                 </div>
                 <div class="summary-row">
                   <span>Images attached</span>
-                  <strong>2 / 5</strong>
+                  <strong>{{ selectedImages.length }} / {{ maxImages }}</strong>
                 </div>
+                @if (formErrors().length > 0) {
                 <div class="summary-alert">
                   <i class="bi bi-exclamation-triangle"></i>
-                  Three required fields still show placeholder validation.
+                  {{ formErrors()[0] }}
                 </div>
+                }
               </div>
             </section>
 
@@ -227,7 +203,7 @@
                 </div>
                 <div class="note-item">
                   <i class="bi bi-circle"></i>
-                  Upload at least 3 images
+                  Upload product images
                 </div>
                 <div class="note-item">
                   <i class="bi bi-circle"></i>

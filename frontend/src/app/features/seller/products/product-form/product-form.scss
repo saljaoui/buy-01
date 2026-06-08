@@ -169,6 +169,13 @@
   line-height: 1.55;
 }
 
+.form-error-panel {
+  margin-bottom: 1rem;
+  border-color: rgba(192, 57, 43, 0.24);
+  background: rgba(192, 57, 43, 0.06);
+  color: #9f2f23;
+}
+
 .note-list,
 .action-stack {
   display: grid;

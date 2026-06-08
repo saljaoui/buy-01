@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GlobalService {
-
-  static readonly clientIP = "http://localhost:8080/api";
+  static readonly clientIP = environment.apiBaseUrl;
 }

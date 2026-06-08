@@ -92,13 +92,6 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'media',
-        loadComponent: () =>
-          import('./features/seller/media/media-manager.component').then(
-            (m) => m.MediaManagerComponent
-          ),
-      },
-      {
         path: 'profile',
         loadComponent: () =>
           import('./features/seller/profile/seller-profile.component').then(

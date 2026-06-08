@@ -204,20 +204,36 @@
       <section class="catalog-content">
         <div class="section-heading">
           <div>
-            <div class="kicker">48 products available</div>
+            <div class="kicker">{{ productCount() }} products available</div>
           </div>
           <div class="view-switch">
             <button class="view-btn active" type="button"><i class="bi bi-grid-3x3-gap"></i></button>
             <button class="view-btn" type="button"><i class="bi bi-list-task"></i></button>
           </div>
         </div>
+        @if (isLoading()) {
+        <div class="catalog-state surface-card">
+          <strong>Loading products...</strong>
+          <span>Fetching the latest catalog from Buy01.</span>
+        </div>
+        } @else if (errorMessage()) {
+        <div class="catalog-state surface-card error-state">
+          <strong>Products could not load</strong>
+          <span>{{ errorMessage() }}</span>
+        </div>
+        } @else if (productList().length === 0) {
+        <div class="catalog-state surface-card">
+          <strong>No products yet</strong>
+          <span>Seller listings will appear here as soon as they are published.</span>
+        </div>
+        } @else {
         <div class="product-grid">
           @for (product of productList(); track product.id) {
             <article class="product-card">
               <div class="product-media media-ceramic">
                 <div class="media-badges"><span class="media-badge new">New</span></div>
                 <button class="wish-btn" type="button"><i class="bi bi-heart"></i></button>
-                <img [src]="'http://localhost:8080/api/media/primary/product/' + product.id" [alt]="product.name">
+                <img [src]="getProductImageUrl(product.id)" [alt]="product.name">
               </div>
               <div class="product-body">
                 <div class="product-meta">
@@ -234,6 +250,7 @@
           </article>
           }
         </div>
+        }
       </section>
     </div>
   </main>

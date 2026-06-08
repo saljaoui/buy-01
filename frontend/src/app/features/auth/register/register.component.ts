@@ -103,15 +103,17 @@ export class RegisterComponent implements OnDestroy {
       })
       .pipe(finalize(() => (this.isSubmitting = false)))
       .subscribe({
-        next: () => {
-          this.showToast('Account created successfully. Redirecting to sign in.', 'success');
+        next: (session) => {
+          this.authService.storeSession(session, true);
+          this.showToast('Account created successfully. Redirecting to your workspace.', 'success');
 
           if (this.redirectTimer) {
             clearTimeout(this.redirectTimer);
           }
 
           this.redirectTimer = setTimeout(() => {
-            void this.router.navigate(['/login']);
+            const target = session.user.role === 'SELLER' ? '/seller' : '/products';
+            void this.router.navigate([target]);
           }, 1200);
         },
         error: (error) => {

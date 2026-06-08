@@ -4,19 +4,19 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class LocalStorageService {
-  get(key: string) : any {
+  get<T = unknown>(key: string): T | string | null {
     const value = localStorage.getItem(key);
 
     if (!value) return null;
 
     try {
-      return JSON.parse(value);
+      return JSON.parse(value) as T;
     } catch {
       return value; // return raw string (like JWT)
     }
   }
 
-  set(key : string, value : any) {
+  set<T>(key: string, value: T): void {
     if (localStorage) {
       localStorage.setItem(key, JSON.stringify(value));
     }

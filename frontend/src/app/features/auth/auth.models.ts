@@ -15,17 +15,11 @@ export interface RegisterRequest {
 
 export interface AuthResponse {
   token: string;
+  type?: string;
+  user?: AuthUser;
 }
 
 export interface AuthUser {
-  id: string;
-  name: string;
-  email: string;
-  role: UserRole;
-  avatar?: string | null;
-}
-
-export interface RegisterResponse {
   id: string;
   name: string;
   email: string;

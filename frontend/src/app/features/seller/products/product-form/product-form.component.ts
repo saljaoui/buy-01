@@ -1,15 +1,17 @@
 import { ChangeDetectorRef, Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
-import { SellerNavComponent } from '../../seller-nav/seller-nav.component';
-import { ProductImage, ProductRequest, ProductResponse, ProductService } from '../../../../shared/services/product-service';
+import { ProductRequest, ProductResponse, ProductService } from '../../../../shared/services/product-service';
 import { FormsModule } from '@angular/forms';
-import { MediaService, MediaUploadData } from '../../../../shared/services/media-service';
+import { Media, MediaService, ProductImage } from '../../../../shared/services/media-service';
 import { ToastService } from '../../../../shared/services/toast-service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
+import { ApiClient } from '../../../../core/api/api-client.service';
+import { AuthService } from '../../../auth/auth.service';
+import { SellerSidebarComponent } from '../../seller-sidebar/seller-sidebar.component';
 
 @Component({
   selector: 'app-product-form',
-  imports: [SellerNavComponent, FormsModule],
+  imports: [SellerSidebarComponent, FormsModule, RouterLink],
   templateUrl: './product-form.html',
   styleUrl: './product-form.scss',
 })
@@ -20,21 +22,24 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly api = inject(ApiClient);
+  private readonly authService = inject(AuthService);
 
 
   mode: 'create' | 'edit' = 'create';
   productDetailsSignal = signal<ProductResponse | undefined>(undefined);
   productDetails = computed(() => this.productDetailsSignal());
 
-  MediasDetailsSignal = signal<MediaUploadData[] | undefined>(undefined);
-  MediaDetails = computed(() => this.MediasDetailsSignal());
-  selectedFilesArray: File[] = [];
-
-
-
   productId = signal<string>('');
 
   selectedImages: ProductImage[] = [];
+  maxImages = 5;
+  isLoading = signal(false);
+  isSaving = signal(false);
+  formSubmitted = signal(false);
+  formErrors = signal<string[]>([]);
+  currentUser = this.authService.getStoredUser();
+  sellerInitials = computed(() => this.getInitials(this.currentUser?.name ?? ''));
 
   productInfo: ProductRequest = {
     name: '',
@@ -46,9 +51,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
       const productId = params.get('id');
-      console.log('before ... is');
       if (productId) {
-        console.log('yeah...');
         this.productId.set(productId);
         this.mode = 'edit';
         this.loadProductData();
@@ -59,85 +62,124 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   }
 
   saveProduct() {
-    if (this.selectedImages.length == 0) {
-      this.toastService.error("product most have at least one Image");
+    this.formSubmitted.set(true);
+    const validationErrors = this.validateProduct();
+    this.formErrors.set(validationErrors);
+
+    if (this.currentUser?.role !== 'SELLER') {
+      const message = 'Only seller accounts can save products.';
+      this.formErrors.set([message]);
+      this.toastService.error(message);
+      this.router.navigate(['/products']);
       return;
     }
+
+    if (validationErrors.length > 0) {
+      this.toastService.error(validationErrors[0]);
+      return;
+    }
+
+    if (this.isSaving()) {
+      return;
+    }
+
+    this.isSaving.set(true);
+    this.formErrors.set([]);
+
     if (this.mode === 'edit') {
-      this.productService.updateProduct(this.productId(), this.productInfo).subscribe({
-        next: (response) => {
-          this.mediaService.updateMedia(this.productId(), this.selectedImages).subscribe({
-            next: (response) => {
-              this.toastService.success("product updated succesfully");
-              this.router.navigate(['/products']);
-            },
-            error: (err: HttpErrorResponse) => {
-              switch (err.status) {
-                case 400:
-                  this.toastService.error(err.error.message);
-                  this.router.navigate(['/products']);
-
-                  break;
-                default:
-                  break;
-              }
-            }
-          });
-        },
-        error: (err: HttpErrorResponse) => {
-          switch (err.status) {
-            case 400:
-              this.toastService.error(err.error.message);
-              break;
-
-            default:
-              break;
-          }
-        }
-      });
+      this.saveExistingProduct();
     } else {
-      this.productService.publishProduct(this.productInfo).subscribe({
-        next: (product: any) => {
-          console.log("product created with id = ", product.id);
-          this.selectedFilesArray = this.selectedImages.map((m) => m.file);
-          this.mediaService.publishMedia(product.id, this.selectedFilesArray).subscribe({
-            next: (response: any) => {
-              console.log('response: ', response);
-              this.toastService.success("product created succesfully");
-              this.router.navigate(['/products']);
-            },
-            error: (err: HttpErrorResponse) => {
-              switch (err.status) {
-                case 400:
-                  this.toastService.error(err.error.message);
-                  this.router.navigate(['/products']);
-                  break;
-                default:
-                  break;
-              }
-            }
-          });
-        },
-        error: (err: HttpErrorResponse) => {
-          switch (err.status) {
-            case 400:
-              this.toastService.error(err.error.message);
-              break;
-
-            default:
-              break;
-          }
-        }
-      });
+      this.createProduct();
     }
   }
 
-  onFilesSelected(event: any): void {
-    if (this.selectedImages.length == 3) {
+  private saveExistingProduct(): void {
+    this.productService.updateProduct(this.productId(), this.productPayload()).subscribe({
+      next: () => {
+        this.syncExistingProductMedia();
+      },
+      error: (err: HttpErrorResponse) => {
+        this.handleSaveError(err, 'Product could not be updated.');
+      }
+    });
+  }
+
+  private syncExistingProductMedia(): void {
+    const files = this.selectedImageFiles();
+    const request = files.length > 0
+      ? this.mediaService.replaceProductMedia(this.productId(), files)
+      : this.mediaService.deleteProductMedia(this.productId());
+
+    request.subscribe({
+      next: () => {
+        this.finishSave('Product updated successfully.');
+      },
+      error: (err: HttpErrorResponse) => {
+        this.handleSaveError(err, 'Product media could not be updated.');
+      }
+    });
+  }
+
+  private createProduct(): void {
+    this.productService.publishProduct(this.productPayload()).subscribe({
+      next: (product) => {
+        const files = this.selectedImageFiles();
+
+        if (files.length === 0) {
+          this.finishSave('Product created successfully.');
+          return;
+        }
+
+        this.mediaService.publishMedia(product.id, files).subscribe({
+          next: () => {
+            this.finishSave('Product created successfully.');
+          },
+          error: (err: HttpErrorResponse) => {
+            this.handleSaveError(err, 'Product was created, but media upload failed.');
+            this.router.navigate(['/seller/products', product.id, 'edit']);
+          }
+        });
+      },
+      error: (err: HttpErrorResponse) => {
+        this.handleSaveError(err, 'Product could not be created.');
+      }
+    });
+  }
+
+  private finishSave(message: string): void {
+    this.toastService.success(message);
+    this.isSaving.set(false);
+    this.router.navigate(['/seller']);
+  }
+
+  private handleSaveError(error: unknown, fallback: string): void {
+    const message = this.api.getErrorMessage(error, fallback);
+    this.formErrors.set([message]);
+    this.toastService.error(message);
+    this.isSaving.set(false);
+  }
+
+  onFilesSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) {
       return;
     }
-    const files: File[] = Array.from(event.target.files);
-    const mappedFiles: ProductImage[] = files.map(file => ({
+
+    const remainingSlots = Math.max(0, this.maxImages - this.selectedImages.length);
+    if (remainingSlots === 0) {
+      this.toastService.error(`You can attach up to ${this.maxImages} images.`);
+      input.value = '';
+      return;
+    }
+
+    const files = Array.from(input.files).slice(0, remainingSlots);
+    const validFiles = files.filter((file) => this.isValidImage(file));
+
+    if (validFiles.length !== files.length) {
+      this.toastService.error('Only JPG, PNG, WEBP, or AVIF images up to 2 MB are allowed.');
+    }
+
+    const mappedFiles: ProductImage[] = validFiles.map(file => ({
       id: '',
       isNew: true,
       deleted: false,
@@ -146,8 +188,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     }));
 
     this.selectedImages = [...this.selectedImages, ...mappedFiles];
-    event.target.value = '';
-    console.log('images: ', this.selectedImages);
+    input.value = '';
   }
 
   deleteImage(fileToDelete: ProductImage): void {
@@ -168,44 +209,36 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       URL.revokeObjectURL(item.preview);
     });
   }
-  printProductInfo() {
-    if (this.productInfo) {
-      console.log('name : ', this.productInfo.name);
-      console.log('description : ', this.productInfo.description);
-      console.log('price : ', this.productInfo.price);
-      console.log('quantity : ', this.productInfo.quantity);
-      return;
-    }
-    console.log('product is null');
-  }
-
-
-  getPreview(file: File): string {
-    return URL.createObjectURL(file);
-  }
-
-
   loadProductData() {
+    this.isLoading.set(true);
     this.productService.getProduct(this.productId()).subscribe({
       next: (response: ProductResponse) => {
+        if (!response.owner) {
+          this.toastService.error('You can only edit products you own.');
+          this.isLoading.set(false);
+          this.router.navigate(['/products']);
+          return;
+        }
+
         this.productDetailsSignal.set(response);
         this.productInfo.name = response.name;
         this.productInfo.description = response.description;
         this.productInfo.price = response.price;
         this.productInfo.quantity = response.quantity;
+        this.isLoading.set(false);
         this.cdr.detectChanges();
-        console.log('productInfo : ', this.productInfo);
       },
-      error: (err: ProductResponse) => {
-        console.error('error: ', err);
+      error: (err) => {
+        this.toastService.error(this.api.getErrorMessage(err, 'Unable to load product.'));
+        this.isLoading.set(false);
       }
     })
   }
 
   loadMediaData() {
-    this.mediaService.getMediaByPost(this.productId()).subscribe({
-      next: (response: MediaUploadData[]) => {
-        console.log('response: ', response);
+    this.mediaService.getMediaByProduct(this.productId()).subscribe({
+      next: (response: Media[]) => {
+        this.selectedImages = [];
         response.forEach((media) => {
           const file = this.rawBase64ToFile(
             media.base64Image,
@@ -220,11 +253,10 @@ export class ProductFormComponent implements OnInit, OnDestroy {
             deleted: false
           });
         })
-        this.MediasDetailsSignal.set(response);
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('error: ', err);
+        this.toastService.error(this.api.getErrorMessage(err, 'Unable to load product media.'));
       }
     })
   }
@@ -243,5 +275,61 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     }
 
     return new File([intArray], filename, { type: mimeType });
+  }
+
+  private selectedImageFiles(): File[] {
+    return this.selectedImages.filter((image) => !image.deleted).map((image) => image.file);
+  }
+
+  private productPayload(): ProductRequest {
+    return {
+      name: this.productInfo.name.trim(),
+      description: this.productInfo.description.trim(),
+      price: Number(this.productInfo.price),
+      quantity: Number(this.productInfo.quantity),
+    };
+  }
+
+  private validateProduct(): string[] {
+    const errors: string[] = [];
+    const name = this.productInfo.name.trim();
+    const description = this.productInfo.description.trim();
+    const price = Number(this.productInfo.price);
+    const quantity = Number(this.productInfo.quantity);
+
+    if (name.length < 2) {
+      errors.push('Product title must be at least 2 characters.');
+    }
+
+    if (description.length < 10) {
+      errors.push('Description must be at least 10 characters.');
+    }
+
+    if (!Number.isFinite(price) || price <= 0) {
+      errors.push('Enter a valid price greater than 0.');
+    }
+
+    if (!Number.isInteger(quantity) || quantity < 0) {
+      errors.push('Stock quantity must be 0 or greater.');
+    }
+
+    return errors;
+  }
+
+  private isValidImage(file: File): boolean {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
+    return allowedTypes.includes(file.type) && file.size <= 2 * 1024 * 1024;
+  }
+
+  private getInitials(name: string): string {
+    return (
+      name
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0]?.toUpperCase() ?? '')
+        .join('') || 'U'
+    );
   }
 }
