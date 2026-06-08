@@ -1,9 +1,10 @@
 package com.buy01.products.controller;
-import lombok.AllArgsConstructor;
-import java.util.HashMap;
+
 import java.util.List;
-import org.springframework.http.ResponseEntity;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,17 +13,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
+
 import com.buy01.products.dto.ProductDto;
 import com.buy01.products.dto.ProductResponseDto;
-
 import com.buy01.products.model.Product;
-import java.util.Map;
 import com.buy01.products.service.ProductService;
+
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/api/products")
@@ -33,9 +35,9 @@ public class ProductController {
     @PreAuthorize("hasAuthority('ROLE_SELLER')")
     public ResponseEntity<?> create(@Valid @RequestPart("product") ProductDto product, Authentication authentication) {
         requireSeller(authentication);
-        String userID = authentication.getName();
-        Product product2 = this.productService.createProduct(product, userID);
-        return ResponseEntity.ok(Map.of("id", product2.getId()));
+        String userId = authentication.getName();
+        Product createdProduct = this.productService.createProduct(product, userId);
+        return ResponseEntity.ok(Map.of("id", createdProduct.getId()));
     }
 
     @PreAuthorize("hasAuthority('ROLE_SELLER')")
@@ -50,10 +52,9 @@ public class ProductController {
     public ResponseEntity<?> delete(@PathVariable String id, Authentication authentication) {
         requireSeller(authentication);
         this.productService.deleteProduct(id, authentication);
-        HashMap<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("message", String.format("Product \"%s\" is deleted succesfully", id));
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", String.format("Product \"%s\" is deleted successfully", id)));
     }
 
     @GetMapping

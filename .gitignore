@@ -2,3 +2,7 @@
 target*.tar.gz
 app.jar
 .tools
+target/
+**/target/
+hs_err_pid*.log
+services/media-service/uploads/*

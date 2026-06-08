@@ -50,10 +50,9 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             return onError(exchange, HttpStatus.UNAUTHORIZED);
         }
 
-        // Extract claims and forward them as headers to downstream services
         Claims claims = jwtUtil.extractAllClaims(token);
         String userId = claims.getSubject();
-        String role   = (String) claims.get("role");
+        String role = (String) claims.get("role");
 
         ServerHttpRequest mutatedRequest = exchange.getRequest()
             .mutate()
@@ -65,7 +64,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             })
             .build();
 
-        log.debug("Forwarding request — userId: {}, role: {}, path: {}",
+        log.debug("Forwarding request - userId: {}, role: {}, path: {}",
             userId, role, request.getURI().getPath());
 
         return chain.filter(exchange.mutate().request(mutatedRequest).build());

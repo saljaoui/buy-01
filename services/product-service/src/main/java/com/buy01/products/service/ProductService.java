@@ -7,8 +7,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.buy01.events.ProductDeletedEvent;
-import com.buy01.products.Exceptions.ForbiddenException;
-import com.buy01.products.Exceptions.ProductNotFoundException;
+import com.buy01.products.exception.ForbiddenException;
+import com.buy01.products.exception.ProductNotFoundException;
 import com.buy01.products.dto.ProductDto;
 import com.buy01.products.dto.ProductResponseDto;
 import com.buy01.products.model.Product;
@@ -87,8 +87,8 @@ public class ProductService {
         }
     }
     
-    public List<Product> getProductsOwnedBy(String OwnerId) {
-        return this.productRepository.findAllByUserId(OwnerId);
+    public List<Product> getProductsOwnedBy(String ownerId) {
+        return this.productRepository.findAllByUserId(ownerId);
     }
     
     public Product checkOwnership(Authentication authentication, String productId) {

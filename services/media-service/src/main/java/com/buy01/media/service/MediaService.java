@@ -100,7 +100,6 @@ public class MediaService {
             throw new IllegalArgumentException("Only JPG, PNG, WEBP, AVIF images are allowed");
         }
 
-        // 3. Optional: check file size (e.g. max 5MB)
         long maxSize = 2 * 1024 * 1024;
 
         if (file.getSize() > maxSize) {
@@ -140,10 +139,9 @@ public class MediaService {
 
     public Resource findPrimaryImage(String productId) {
 
-        List<Media> arrayOfMedia =
-            this.mediaRepository.findAllByProductId(productId);
-        if (!arrayOfMedia.isEmpty()) {
-            return this.find(arrayOfMedia.get(0).getId());
+        List<Media> mediaList = this.mediaRepository.findAllByProductId(productId);
+        if (!mediaList.isEmpty()) {
+            return this.find(mediaList.get(0).getId());
         }
         return null;
     }

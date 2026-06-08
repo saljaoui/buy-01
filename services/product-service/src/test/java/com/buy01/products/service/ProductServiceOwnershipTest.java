@@ -15,7 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import com.buy01.products.Exceptions.ForbiddenException;
+import com.buy01.products.exception.ForbiddenException;
 import com.buy01.products.model.Product;
 import com.buy01.products.repository.ProductRepository;
 

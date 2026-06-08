@@ -14,7 +14,4 @@
     <artifactId>shared-events</artifactId>
     <name>Shared Events</name>
 
-    <dependencies>
-    </dependencies>
-
 </project>
