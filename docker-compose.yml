@@ -6,29 +6,56 @@ services:
       - mongodb_data:/data/db
     networks:
       - buy01-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.4.0
-    restart: unless-stopped
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    networks:
-      - buy01-network
-
+  # Single-node Kafka in KRaft mode (no Zookeeper): one process is both broker and controller.
   kafka:
-    image: confluentinc/cp-kafka:7.4.0
+    image: apache/kafka:4.0.0
     restart: unless-stopped
-    depends_on:
-      - zookeeper
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
     networks:
       - buy01-network
+    healthcheck:
+      test: ["CMD", "/opt/kafka/bin/kafka-broker-api-versions.sh", "--bootstrap-server", "kafka:9092"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 20s
+
+  # Optional Kafka web UI: docker compose --profile tools up -d kafka-ui  ->  http://localhost:8085
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    profiles: ["tools"]
+    restart: unless-stopped
+    environment:
+      KAFKA_CLUSTERS_0_NAME: buy01
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    ports:
+      - "8085:8080"
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+      - buy01-network
+
   discovery-service:
     build:
       context: ./infrastructure/discovery-service
@@ -36,13 +63,16 @@ services:
     environment:
       SERVER_PORT: 8761
       EUREKA_HOSTNAME: discovery-service
+    ports:
+      - "${EUREKA_PORT:-8761}:8761"
     networks:
       - buy01-network
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8761/actuator/health"]
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:8761/actuator/health"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 12
+      start_period: 30s
 
   api-gateway:
     build:
@@ -55,13 +85,26 @@ services:
     ports:
       - "${GATEWAY_PORT:-8080}:8080"
     depends_on:
-      - discovery-service
+      user-service:
+        condition: service_healthy
+      product-service:
+        condition: service_healthy
+      media-service:
+        condition: service_healthy
     networks:
       - buy01-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
 
+  # The three business services build from services/ so shared-events is in the build context
   user-service:
     build:
-      context: ./services/user-service
+      context: ./services
+      dockerfile: user-service/Dockerfile
     restart: unless-stopped
     environment:
       SERVER_PORT: 8081
@@ -70,38 +113,72 @@ services:
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is not set - copy .env.example to .env and fill it in}
       JWT_EXPIRATION: ${JWT_EXPIRATION:-24h}
     depends_on:
-      - discovery-service
-      - mongodb
+      discovery-service:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
     networks:
       - buy01-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:8081/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
 
   product-service:
     build:
-      context: ./services/product-service
+      context: ./services
+      dockerfile: product-service/Dockerfile
     restart: unless-stopped
     environment:
       SERVER_PORT: 8082
       EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
       MONGODB_URI: mongodb://mongodb:27017/buy01_products
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
-      - discovery-service
-      - mongodb
+      discovery-service:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
     networks:
       - buy01-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:8082/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
 
   media-service:
     build:
-      context: ./services/media-service
+      context: ./services
+      dockerfile: media-service/Dockerfile
     restart: unless-stopped
     environment:
       SERVER_PORT: 8083
       EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
       MONGODB_URI: mongodb://mongodb:27017/buy01_media
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    volumes:
+      - media_uploads:/app/uploads
     depends_on:
-      - discovery-service
-      - mongodb
+      discovery-service:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
     networks:
       - buy01-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:8083/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
 
   frontend:
     build:
@@ -110,12 +187,14 @@ services:
     ports:
       - "${FRONTEND_PORT:-4200}:80"
     depends_on:
-      - api-gateway
+      api-gateway:
+        condition: service_healthy
     networks:
       - buy01-network
 
 volumes:
   mongodb_data:
+  media_uploads:
 
 networks:
   buy01-network:

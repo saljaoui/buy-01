@@ -32,6 +32,7 @@ public class SecurityConfig {
                 .formLogin(formLogin -> formLogin.disable())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/actuator/health", "/actuator/info", "/error").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                         .requestMatchers("/internal/**").permitAll()
                         .anyRequest().authenticated())

@@ -1,0 +1,7 @@
+# Build context for user-, product- and media-service images
+**/target
+**/uploads
+**/.idea
+**/.vscode
+**/Dockerfile
+**/.git*
