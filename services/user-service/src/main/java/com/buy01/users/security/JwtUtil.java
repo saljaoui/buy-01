@@ -18,14 +18,21 @@ import javax.crypto.SecretKey;
 @Component
 public class JwtUtil {
 
-    @Value("${jwt.secret}")
-    private String secret;
+    private static final int MIN_SECRET_BYTES = 32; // HS256 needs a 256-bit key
 
-    @Value("${jwt.expiration}")
-    private Duration expiration;
+    private final SecretKey signingKey;
+    private final Duration expiration;
 
-    private SecretKey key() {
-        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    // jwt.secret has no default: startup fails if JWT_SECRET is missing or too short
+    public JwtUtil(@Value("${jwt.secret}") String secret,
+            @Value("${jwt.expiration}") Duration expiration) {
+        byte[] secretBytes = secret.getBytes(StandardCharsets.UTF_8);
+        if (secretBytes.length < MIN_SECRET_BYTES) {
+            throw new IllegalStateException(
+                    "JWT_SECRET must be set and at least " + MIN_SECRET_BYTES + " bytes long");
+        }
+        this.signingKey = Keys.hmacShaKeyFor(secretBytes);
+        this.expiration = expiration;
     }
 
     public String generateToken(String userId, Role role) {
@@ -38,13 +45,13 @@ public class JwtUtil {
                 .claim("role", role)
                 .issuedAt(now)
                 .expiration(expiryDate)
-                .signWith(key())
+                .signWith(signingKey)
                 .compact();
     }
 
     public Claims extractClaims(String token) {
         return Jwts.parser()
-                .verifyWith(key())
+                .verifyWith(signingKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();

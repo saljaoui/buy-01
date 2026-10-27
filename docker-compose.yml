@@ -51,7 +51,7 @@ services:
     environment:
       SERVER_PORT: 8080
       EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
-      JWT_SECRET: ${JWT_SECRET:-4fd8a6c3b92f4a8c9c6b8a1f2e3d4c5f6a7b8c9d}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is not set - copy .env.example to .env and fill it in}
     ports:
       - "${GATEWAY_PORT:-8080}:8080"
     depends_on:
@@ -67,7 +67,7 @@ services:
       SERVER_PORT: 8081
       EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
       MONGODB_URI: mongodb://mongodb:27017/buy01_users
-      JWT_SECRET: ${JWT_SECRET:-4fd8a6c3b92f4a8c9c6b8a1f2e3d4c5f6a7b8c9d}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is not set - copy .env.example to .env and fill it in}
       JWT_EXPIRATION: ${JWT_EXPIRATION:-24h}
     depends_on:
       - discovery-service
@@ -83,7 +83,6 @@ services:
       SERVER_PORT: 8082
       EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
       MONGODB_URI: mongodb://mongodb:27017/buy01_products
-      JWT_SECRET: ${JWT_SECRET:-4fd8a6c3b92f4a8c9c6b8a1f2e3d4c5f6a7b8c9d}
     depends_on:
       - discovery-service
       - mongodb
@@ -98,7 +97,6 @@ services:
       SERVER_PORT: 8083
       EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
       MONGODB_URI: mongodb://mongodb:27017/buy01_media
-      JWT_SECRET: ${JWT_SECRET:-4fd8a6c3b92f4a8c9c6b8a1f2e3d4c5f6a7b8c9d}
     depends_on:
       - discovery-service
       - mongodb

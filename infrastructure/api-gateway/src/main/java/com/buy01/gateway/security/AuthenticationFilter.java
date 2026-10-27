@@ -21,12 +21,23 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class AuthenticationFilter implements GlobalFilter, Ordered {
 
+    private static final String USER_ID_HEADER = "X-User-Id";
+    private static final String USER_ROLE_HEADER = "X-User-Role";
+
     private final RouteValidator routeValidator;
     private final JwtUtil jwtUtil;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        ServerHttpRequest request = exchange.getRequest();
+        // Identity headers are only ever set by the gateway; drop any the client sent
+        ServerHttpRequest request = exchange.getRequest().mutate()
+                .headers(headers -> {
+                    headers.remove(USER_ID_HEADER);
+                    headers.remove(USER_ROLE_HEADER);
+                })
+                .build();
+        exchange = exchange.mutate().request(request).build();
+
         boolean isSecuredRoute = routeValidator.isSecured(request);
 
         String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
@@ -58,10 +69,8 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
         ServerHttpRequest mutatedRequest = request.mutate()
                 .headers(headers -> {
-                    headers.remove("X-User-Id");
-                    headers.remove("X-User-Role");
-                    headers.add("X-User-Id", userId);
-                    headers.add("X-User-Role", role);
+                    headers.set(USER_ID_HEADER, userId);
+                    headers.set(USER_ROLE_HEADER, role);
                 })
                 .build();
 

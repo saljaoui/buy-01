@@ -1,11 +1,9 @@
 package com.buy01.gateway.util;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -15,16 +13,23 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class JwtUtil {
 
-    @Value("${jwt.secret}")
-    private String secret;
+    private static final int MIN_SECRET_BYTES = 32; // HS256 needs a 256-bit key
 
-    private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    private final SecretKey signingKey;
+
+    // jwt.secret has no default: startup fails if JWT_SECRET is missing or too short
+    public JwtUtil(@Value("${jwt.secret}") String secret) {
+        byte[] secretBytes = secret.getBytes(StandardCharsets.UTF_8);
+        if (secretBytes.length < MIN_SECRET_BYTES) {
+            throw new IllegalStateException(
+                    "JWT_SECRET must be set and at least " + MIN_SECRET_BYTES + " bytes long");
+        }
+        this.signingKey = Keys.hmacShaKeyFor(secretBytes);
     }
 
     public Claims extractAllClaims(String token) {
         return Jwts.parser()
-            .verifyWith(getSigningKey())
+            .verifyWith(signingKey)
             .build()
             .parseSignedClaims(token)
             .getPayload();
@@ -34,8 +39,7 @@ public class JwtUtil {
         try {
             extractAllClaims(token);
             return true;
-        } catch (ExpiredJwtException | MalformedJwtException |
-                 SignatureException | IllegalArgumentException e) {
+        } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
