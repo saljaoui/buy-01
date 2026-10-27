@@ -38,7 +38,6 @@ export class DashboardComponent implements OnInit {
   }).format(new Date());
 
   totalProducts = computed(() => this.products().length);
-  // TODO: Use a backend listing status when product-service exposes one.
   activeListings = computed(() => this.products().filter((product) => product.quantity > 0).length);
   mediaTotal = computed(() =>
     Object.values(this.mediaCounts()).reduce((total, count) => total + count, 0),
@@ -49,7 +48,6 @@ export class DashboardComponent implements OnInit {
   draftTasks = computed(() =>
     this.products().filter((product) => this.needsWork(product)).length,
   );
-  // TODO: Sort by backend createdAt when product-service exposes timestamps.
   recentProducts = computed(() => this.products().slice(0, 5));
   userInitials = computed(() => this.getInitials(this.user()?.name ?? ''));
 

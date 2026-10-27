@@ -12,7 +12,13 @@
 
     @if (isLoading()) {
     <div class="surface-card detail-state">
-      <app-icon class="spin" name="spinner" [size]="24"></app-icon>
+      <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24">
+        <g fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10" />
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="m15.977 8.715l-.441-.453a4.918 4.918 0 0 0-7.072 0c-1.952 1.999-1.952 5.24 0 7.239a4.919 4.919 0 0 0 7.072 0a5.184 5.184 0 0 0 1.425-4.259m-.983-2.527h-2.652m2.651 0V6" />
+        </g>
+      </svg>
       <strong>Loading product...</strong>
       <span>Fetching product details from Buy01.</span>
     </div>
@@ -43,7 +49,7 @@
               <span class="gallery-badge featured">Best seller</span>
               <span class="gallery-badge stock">In stock</span>
             </div>
-            <img [src]="imageDataUrl(media)" alt="Product Image">
+            <img [src]="imageUrl(media)" alt="Product Image">
           </div>
           } @else {
           <div class="gallery-stage gallery-empty-state">
@@ -54,10 +60,10 @@
           }
 
           <div class="thumb-grid">
-            @for (mediaData of MediaDetails(); track mediaData.id) {
+            @for (mediaData of medias(); track mediaData.id) {
             <button [class]="(selectedImage()?.id==mediaData.id)? 'thumb-btn active':'thumb-btn'" type="button"
               (click)="selectImage(mediaData.id)">
-              <img [src]="imageDataUrl(mediaData)" alt="Product Image">
+              <img [src]="imageUrl(mediaData)" alt="Product Image">
             </button>
             }
           </div>
@@ -181,13 +187,19 @@
           </div>
 
           <p>
-            SoundWave Studio focuses on premium listening gear with a clean industrial look,
-            detailed setup guides, and fast customer support for creators and remote teams.
+            Discover quality products at great prices. Shop with confidence and enjoy a simple, secure, and reliable
+            shopping experience.
           </p>
 
           <div class="seller-actions">
             <button class="ghost-btn" type="button">
-              <app-icon name="store" [size]="16"></app-icon>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                <g fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" d="M21 22H3m16 0v-7M5 22v-7" />
+                  <path stroke-linejoin="round"
+                    d="M16.528 2H7.472c-1.203 0-1.804 0-2.287.299c-.484.298-.753.836-1.29 1.912L2.49 7.76c-.324.82-.608 1.786-.062 2.479A2 2 0 0 0 6 9a2 2 0 1 0 4 0a2 2 0 1 0 4 0a2 2 0 1 0 4 0a2 2 0 0 0 3.571 1.238c.546-.693.262-1.659-.062-2.479l-1.404-3.548c-.537-1.076-.806-1.614-1.29-1.912C18.332 2 17.731 2 16.528 2Z" />
+                </g>
+              </svg>
               View store
             </button>
           </div>

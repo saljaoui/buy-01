@@ -27,6 +27,12 @@
   gap: 1.5rem;
 }
 
+.b01-mini-footer__brand-icon {
+  width: 40px; /* Scaled down */
+  height: 40px;
+  object-fit: contain;
+}
+
 /* Brand Group */
 .b01-mini-footer__brand-group {
   display: flex;

@@ -1,14 +1,18 @@
 import { ChangeDetectorRef, Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
-import { ProductRequest, ProductResponse, ProductService } from '../../../../shared/services/product-service';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+
+import { ProductRequest, ProductResponse, ProductService } from '../../../../shared/services/product-service';
 import { Media, MediaService, ProductImage } from '../../../../shared/services/media-service';
 import { ToastService } from '../../../../shared/services/toast-service';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { HttpErrorResponse } from '@angular/common/http';
 import { ApiClient } from '../../../../core/api/api-client.service';
 import { AuthService } from '../../../auth/auth.service';
 import { IconComponent } from '../../../../shared/icon/icon.component';
 import { SellerSidebarComponent } from '../../seller-sidebar/seller-sidebar.component';
+
+const MAX_IMAGES = 3;
+const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
 
 @Component({
   selector: 'app-product-form',
@@ -26,124 +30,210 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   private readonly api = inject(ApiClient);
   private readonly authService = inject(AuthService);
 
-
   mode: 'create' | 'edit' = 'create';
-  productDetailsSignal = signal<ProductResponse | undefined>(undefined);
-  productDetails = computed(() => this.productDetailsSignal());
-
   productId = signal<string>('');
-
-  selectedImages: ProductImage[] = [];
-  maxImages = 5;
+  productDetails = signal<ProductResponse | undefined>(undefined);
   isLoading = signal(false);
   isSaving = signal(false);
   formSubmitted = signal(false);
   formErrors = signal<string[]>([]);
+
+  productInfo: ProductRequest = { name: '', description: '', price: 0, quantity: 100 };
+  selectedImages: ProductImage[] = [];
+  maxImages = MAX_IMAGES;
   currentUser = this.authService.getStoredUser();
   sellerInitials = computed(() => this.getInitials(this.currentUser?.name ?? ''));
 
-  productInfo: ProductRequest = {
-    name: '',
-    description: '',
-    price: 0,
-    quantity: 100
-  };
-
-  ngOnInit() {
-    this.route.paramMap.subscribe(params => {
-      const productId = params.get('id');
-      if (productId) {
-        this.productId.set(productId);
-        this.mode = 'edit';
-        this.loadProductData();
-        this.loadMediaData();
-
-      }
+  ngOnInit(): void {
+    this.route.paramMap.subscribe((params) => {
+      const id = params.get('id');
+      if (!id) return;
+      this.mode = 'edit';
+      this.productId.set(id);
+      this.loadProductData();
+      this.loadMediaData();
     });
   }
 
-  saveProduct() {
-    this.formSubmitted.set(true);
-    const validationErrors = this.validateProduct();
-    this.formErrors.set(validationErrors);
+  ngOnDestroy(): void {
+    this.selectedImages.forEach((image) => {
+      if (image.isNew) URL.revokeObjectURL(image.preview);
+    });
+  }
 
+  private loadProductData(): void {
+    this.isLoading.set(true);
+    this.productService.getProduct(this.productId()).subscribe({
+      next: (product) => {
+        if (!product.owner) {
+          this.toastService.error('You can only edit products you own.');
+          this.router.navigate(['/products']);
+          return;
+        }
+        this.productDetails.set(product);
+        this.productInfo = {
+          name: product.name,
+          description: product.description,
+          price: product.price,
+          quantity: product.quantity,
+        };
+        this.isLoading.set(false);
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.toastService.error(this.api.getErrorMessage(err, 'Unable to load product.'));
+        this.isLoading.set(false);
+      },
+    });
+  }
+
+  private loadMediaData(): void {
+    this.mediaService.getMediaByProduct(this.productId()).subscribe({
+      next: (mediaList) => {
+        this.selectedImages = mediaList.map((media) => this.toProductImage(media));
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.toastService.error(this.api.getErrorMessage(err, 'Unable to load product media.'));
+      },
+    });
+  }
+
+  private toProductImage(media: Media): ProductImage {
+    return {
+      id: media.id,
+      file: new File([], media.id),
+      preview: this.mediaService.imageUrl(media),
+      isNew: false,
+      deleted: false,
+    };
+  }
+
+  onFilesSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    const remainingSlots = this.maxImages - this.selectedImages.length;
+    if (remainingSlots <= 0) {
+      this.toastService.error(`You can attach up to ${this.maxImages} images.`);
+      input.value = '';
+      return;
+    }
+    const files = Array.from(input.files).slice(0, remainingSlots);
+    const validFiles = files.filter((file) => this.isValidImage(file));
+    if (validFiles.length !== files.length) {
+      this.toastService.error('Only JPG, PNG, WEBP, or AVIF images up to 2 MB are allowed.');
+    }
+    const images: ProductImage[] = validFiles.map((file) => ({
+      id: '',
+      file,
+      preview: URL.createObjectURL(file),
+      isNew: true,
+      deleted: false,
+    }));
+    this.selectedImages = [...this.selectedImages, ...images];
+    input.value = '';
+  }
+
+  deleteImage(image: ProductImage): void {
+    if (image.isNew) {
+      URL.revokeObjectURL(image.preview);
+      this.selectedImages = this.selectedImages.filter((item) => item !== image);
+      return;
+    }
+    image.deleted = true;
+    this.selectedImages = this.selectedImages.filter((item) => item !== image);
+  }
+
+  private isValidImage(file: File): boolean {
+    return ALLOWED_IMAGE_TYPES.includes(file.type) && file.size <= MAX_IMAGE_SIZE;
+  }
+
+  saveProduct(): void {
+    this.formSubmitted.set(true);
     if (this.currentUser?.role !== 'SELLER') {
-      const message = 'Only seller accounts can save products.';
-      this.formErrors.set([message]);
-      this.toastService.error(message);
+      this.rejectSave('Only seller accounts can save products.');
       this.router.navigate(['/products']);
       return;
     }
-
-    if (validationErrors.length > 0) {
-      this.toastService.error(validationErrors[0]);
+    const errors = this.validateProduct();
+    if (errors.length > 0) {
+      this.formErrors.set(errors);
+      this.toastService.error(errors[0]);
       return;
     }
-
-    if (this.isSaving()) {
-      return;
-    }
-
+    if (this.isSaving()) return;
     this.isSaving.set(true);
     this.formErrors.set([]);
-
     if (this.mode === 'edit') {
-      this.saveExistingProduct();
+      this.updateProduct();
     } else {
       this.createProduct();
     }
   }
 
-  private saveExistingProduct(): void {
-    this.productService.updateProduct(this.productId(), this.productPayload()).subscribe({
-      next: () => {
-        this.syncExistingProductMedia();
-      },
-      error: (err: HttpErrorResponse) => {
-        this.handleSaveError(err, 'Product could not be updated.');
-      }
-    });
-  }
-
-  private syncExistingProductMedia(): void {
-    const files = this.selectedImageFiles();
-    const request = files.length > 0
-      ? this.mediaService.replaceProductMedia(this.productId(), files)
-      : this.mediaService.deleteProductMedia(this.productId());
-
-    request.subscribe({
-      next: () => {
-        this.finishSave('Product updated successfully.');
-      },
-      error: (err: HttpErrorResponse) => {
-        this.handleSaveError(err, 'Product media could not be updated.');
-      }
-    });
-  }
-
   private createProduct(): void {
     this.productService.publishProduct(this.productPayload()).subscribe({
       next: (product) => {
-        const files = this.selectedImageFiles();
-
-        if (files.length === 0) {
-          this.finishSave('Product created successfully.');
-          return;
-        }
-
-        this.mediaService.publishMedia(product.id, files).subscribe({
-          next: () => {
-            this.finishSave('Product created successfully.');
-          },
-          error: (err: HttpErrorResponse) => {
-            this.handleSaveError(err, 'Product was created, but media upload failed.');
-            this.router.navigate(['/seller/products', product.id, 'edit']);
-          }
-        });
+        this.uploadImagesFor(product.id, 'Product created successfully.');
       },
-      error: (err: HttpErrorResponse) => {
-        this.handleSaveError(err, 'Product could not be created.');
-      }
+      error: (err) => {
+        this.rejectSave(this.api.getErrorMessage(err, 'Product could not be created.'));
+      },
+    });
+  }
+
+  private updateProduct(): void {
+    this.productService.updateProduct(this.productId(), this.productPayload()).subscribe({
+      next: () => {
+        this.syncImagesFor(this.productId(), 'Product updated successfully.');
+      },
+      error: (err) => {
+        this.rejectSave(this.api.getErrorMessage(err, 'Product could not be updated.'));
+      },
+    });
+  }
+
+  private uploadImagesFor(productId: string, successMessage: string): void {
+    const files = this.activeImageFiles();
+    if (files.length === 0) {
+      this.finishSave(successMessage);
+      return;
+    }
+    let uploaded = 0;
+    files.forEach((file) => {
+      this.mediaService.upload(productId, file).subscribe({
+        next: () => {
+          uploaded++;
+          if (uploaded === files.length) this.finishSave(successMessage);
+        },
+        error: (err) => {
+          this.rejectSave(this.api.getErrorMessage(err, 'Product created but image upload failed.'));
+        },
+      });
+    });
+  }
+
+  private syncImagesFor(productId: string, successMessage: string): void {
+    const newFiles = this.activeImageFiles();
+    const deletedImages = this.selectedImages.filter((image) => image.deleted);
+    deletedImages.forEach((image) => {
+      this.mediaService.deleteMedia(image.id).subscribe();
+    });
+    if (newFiles.length === 0) {
+      this.finishSave(successMessage);
+      return;
+    }
+    let uploaded = 0;
+    newFiles.forEach((file) => {
+      this.mediaService.upload(productId, file).subscribe({
+        next: () => {
+          uploaded++;
+          if (uploaded === newFiles.length) this.finishSave(successMessage);
+        },
+        error: (err) => {
+          this.rejectSave(this.api.getErrorMessage(err, 'Product media update failed.'));
+        },
+      });
     });
   }
 
@@ -153,133 +243,16 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     this.router.navigate(['/seller']);
   }
 
-  private handleSaveError(error: unknown, fallback: string): void {
-    const message = this.api.getErrorMessage(error, fallback);
+  private rejectSave(message: string): void {
     this.formErrors.set([message]);
     this.toastService.error(message);
     this.isSaving.set(false);
   }
 
-  onFilesSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (!input.files?.length) {
-      return;
-    }
-
-    const remainingSlots = Math.max(0, this.maxImages - this.selectedImages.length);
-    if (remainingSlots === 0) {
-      this.toastService.error(`You can attach up to ${this.maxImages} images.`);
-      input.value = '';
-      return;
-    }
-
-    const files = Array.from(input.files).slice(0, remainingSlots);
-    const validFiles = files.filter((file) => this.isValidImage(file));
-
-    if (validFiles.length !== files.length) {
-      this.toastService.error('Only JPG, PNG, WEBP, or AVIF images up to 2 MB are allowed.');
-    }
-
-    const mappedFiles: ProductImage[] = validFiles.map(file => ({
-      id: '',
-      isNew: true,
-      deleted: false,
-      file,
-      preview: URL.createObjectURL(file)
-    }));
-
-    this.selectedImages = [...this.selectedImages, ...mappedFiles];
-    input.value = '';
-  }
-
-  deleteImage(fileToDelete: ProductImage): void {
-    const item = this.selectedImages.find(
-      item => item === fileToDelete
-    );
-    if (item) {
-      URL.revokeObjectURL(item.preview);
-    }
-    this.selectedImages = this.selectedImages.filter(
-      item => item !== fileToDelete
-    );
-
-  }
-
-  ngOnDestroy(): void {
-    this.selectedImages.forEach(item => {
-      URL.revokeObjectURL(item.preview);
-    });
-  }
-  loadProductData() {
-    this.isLoading.set(true);
-    this.productService.getProduct(this.productId()).subscribe({
-      next: (response: ProductResponse) => {
-        if (!response.owner) {
-          this.toastService.error('You can only edit products you own.');
-          this.isLoading.set(false);
-          this.router.navigate(['/products']);
-          return;
-        }
-
-        this.productDetailsSignal.set(response);
-        this.productInfo.name = response.name;
-        this.productInfo.description = response.description;
-        this.productInfo.price = response.price;
-        this.productInfo.quantity = response.quantity;
-        this.isLoading.set(false);
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        this.toastService.error(this.api.getErrorMessage(err, 'Unable to load product.'));
-        this.isLoading.set(false);
-      }
-    })
-  }
-
-  loadMediaData() {
-    this.mediaService.getMediaByProduct(this.productId()).subscribe({
-      next: (response: Media[]) => {
-        this.selectedImages = [];
-        response.forEach((media) => {
-          const file = this.rawBase64ToFile(
-            media.base64Image,
-            `image-${media.id}`,
-            media.contentType || 'image/jpeg'
-          );
-          this.selectedImages.push({
-            id: media.id,
-            file: file,
-            preview: URL.createObjectURL(file),
-            isNew: false,
-            deleted: false
-          });
-        })
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        this.toastService.error(this.api.getErrorMessage(err, 'Unable to load product media.'));
-      }
-    })
-  }
-
-  rawBase64ToFile(
-    base64: string,
-    filename: string,
-    mimeType: string
-  ): File {
-    const byteString = atob(base64);
-    const arrayBuffer = new ArrayBuffer(byteString.length);
-    const intArray = new Uint8Array(arrayBuffer);
-
-    for (let i = 0; i < byteString.length; i++) {
-      intArray[i] = byteString.charCodeAt(i);
-    }
-
-    return new File([intArray], filename, { type: mimeType });
-  }
-
-  private selectedImageFiles(): File[] {
-    return this.selectedImages.filter((image) => !image.deleted).map((image) => image.file);
+  private activeImageFiles(): File[] {
+    return this.selectedImages
+      .filter((image) => image.isNew && !image.deleted)
+      .map((image) => image.file);
   }
 
   private productPayload(): ProductRequest {
@@ -293,33 +266,14 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
   private validateProduct(): string[] {
     const errors: string[] = [];
-    const name = this.productInfo.name.trim();
-    const description = this.productInfo.description.trim();
-    const price = Number(this.productInfo.price);
-    const quantity = Number(this.productInfo.quantity);
-
-    if (name.length < 2) {
-      errors.push('Product title must be at least 2 characters.');
-    }
-
-    if (description.length < 10) {
-      errors.push('Description must be at least 10 characters.');
-    }
-
-    if (!Number.isFinite(price) || price <= 0) {
+    const { name, description, price, quantity } = this.productInfo;
+    if (name.trim().length < 2) errors.push('Product title must be at least 2 characters.');
+    if (description.trim().length < 10) errors.push('Description must be at least 10 characters.');
+    if (!Number.isFinite(Number(price)) || Number(price) <= 0)
       errors.push('Enter a valid price greater than 0.');
-    }
-
-    if (!Number.isInteger(quantity) || quantity < 0) {
+    if (!Number.isInteger(Number(quantity)) || Number(quantity) < 0)
       errors.push('Stock quantity must be 0 or greater.');
-    }
-
     return errors;
-  }
-
-  private isValidImage(file: File): boolean {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
-    return allowedTypes.includes(file.type) && file.size <= 2 * 1024 * 1024;
   }
 
   private getInitials(name: string): string {

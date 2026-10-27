@@ -1,14 +1,13 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiClient } from '../../core/api/api-client.service';
+import { environment } from '../../../environments/environment';
 
 export interface Media {
   id: string;
-  base64Image: string;
-  contentType: string | null;
+  productId: string;
+  imageUrl: string;
 }
-
-export type MediaUploadData = Media;
 
 export interface ProductImage {
   id: string;
@@ -18,45 +17,31 @@ export interface ProductImage {
   preview: string;
 }
 
-export interface MediaMessageResponse {
-  message: string;
-}
-
 @Injectable({
   providedIn: 'root',
 })
 export class MediaService {
   private readonly api = inject(ApiClient);
 
-  publishMedia(productId: string, files: File[]): Observable<MediaMessageResponse> {
+  upload(productId: string, file: File): Observable<Media> {
     const formData = new FormData();
+
+    formData.append('file', file);
     formData.append('productId', productId);
-    files.forEach((file) => {
-      formData.append('images', file, file.name);
-    });
-    return this.api.post<MediaMessageResponse>('/media/upload', formData);
+
+    return this.api.post<Media>('/media', formData);
   }
 
   getMediaByProduct(productId: string): Observable<Media[]> {
     return this.api.get<Media[]>(`/media/product/${productId}`);
   }
 
-  replaceProductMedia(productId: string, files: File[]): Observable<MediaMessageResponse> {
-    const formData = new FormData();
-    formData.append('productId', productId);
-    files.forEach((file) => {
-      formData.append('images', file, file.name);
-    });
-    return this.api.put<MediaMessageResponse>('/media/product', formData);
+  deleteMedia(mediaId: string): Observable<void> {
+    return this.api.delete<void>(`/media/${mediaId}`);
   }
 
-  deleteProductMedia(productId: string): Observable<MediaMessageResponse> {
-    return this.api.delete<MediaMessageResponse>(`/media/product/${productId}`);
+  imageUrl(media: Media): string {
+    console.log('MediaService.imageUrl called with media:', media);
+    return `${environment.apiBaseUrl}${media.imageUrl}`;
   }
-
-  toDataUrl(media: Media): string {
-    const contentType = media.contentType || 'image/jpeg';
-    return `data:${contentType};base64,${media.base64Image}`;
-  }
-
 }

@@ -1,14 +1,16 @@
 package com.buy01.products.dto;
 
-import java.time.LocalDateTime;
-
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.Instant;
+
 @Data
 @Builder
+@AllArgsConstructor
 public class ErrorResponse {
-    private LocalDateTime timestamp;
+    private Instant timestamp;
     private int status;
     private String error;
     private String message;

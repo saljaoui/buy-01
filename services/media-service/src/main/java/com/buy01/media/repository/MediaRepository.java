@@ -7,6 +7,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import com.buy01.media.model.Media;
 
 public interface MediaRepository extends MongoRepository<Media, String> {
-    List<Media> findAllByProductId(String productId);
-    void deleteAllByProductId(String productId);
+    List<Media> findByProductId(String productId);
+    void deleteByProductId(String productId);
 }

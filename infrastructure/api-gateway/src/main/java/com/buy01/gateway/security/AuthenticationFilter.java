@@ -27,45 +27,46 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
-
-        if (!routeValidator.isSecured(request)) {
-            return chain.filter(exchange);
-        }
-
-        if (!request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
-            log.warn("Missing Authorization header for: {}", request.getURI().getPath());
-            return onError(exchange, HttpStatus.UNAUTHORIZED);
-        }
+        boolean isSecuredRoute = routeValidator.isSecured(request);
 
         String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        boolean hasToken = authHeader != null && authHeader.startsWith("Bearer ");
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (isSecuredRoute && !hasToken) {
+            log.warn("Missing Authorization header for secured route: {}", request.getURI().getPath());
             return onError(exchange, HttpStatus.UNAUTHORIZED);
+        }
+
+        if (!isSecuredRoute && !hasToken) {
+            return chain.filter(exchange);
         }
 
         String token = authHeader.substring(7);
 
         if (!jwtUtil.isTokenValid(token)) {
-            log.warn("Invalid or expired JWT for: {}", request.getURI().getPath());
-            return onError(exchange, HttpStatus.UNAUTHORIZED);
+            if (isSecuredRoute) {
+                log.warn("Invalid or expired JWT for secured route: {}", request.getURI().getPath());
+                return onError(exchange, HttpStatus.UNAUTHORIZED);
+            }
+            log.debug("Invalid token on public route {}, continuing as anonymous", request.getURI().getPath());
+            return chain.filter(exchange);
         }
 
         Claims claims = jwtUtil.extractAllClaims(token);
         String userId = claims.getSubject();
         String role = (String) claims.get("role");
 
-        ServerHttpRequest mutatedRequest = exchange.getRequest()
-            .mutate()
-            .headers(headers -> {
-                headers.remove("X-User-Id");
-                headers.remove("X-User-Role");
-                headers.add("X-User-Id", userId);
-                headers.add("X-User-Role", role);
-            })
-            .build();
+        ServerHttpRequest mutatedRequest = request.mutate()
+                .headers(headers -> {
+                    headers.remove("X-User-Id");
+                    headers.remove("X-User-Role");
+                    headers.add("X-User-Id", userId);
+                    headers.add("X-User-Role", role);
+                })
+                .build();
 
         log.debug("Forwarding request - userId: {}, role: {}, path: {}",
-            userId, role, request.getURI().getPath());
+                userId, role, request.getURI().getPath());
 
         return chain.filter(exchange.mutate().request(mutatedRequest).build());
     }

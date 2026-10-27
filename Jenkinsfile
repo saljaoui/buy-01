@@ -1,47 +1,46 @@
 pipeline {
     agent any
 
-    tools {
-        jdk 'jdk21'
-    }
-
     stages {
-        stage('Git Test') {
-            steps {
-                bat 'git --version'
-            }
-        }
         stage('Build') {
             steps {
-                dir('infrastructure/api-gateway') {
-                    bat 'mvn clean package'
-                }
-                dir('infrastructure/discovery-service') {
-                    bat 'mvn clean package'
-                }
+                echo 'Building all services...'
                 dir('services') {
-                    bat 'mvn clean package' 
+                    sh 'chmod +x mvnw'
+                    sh './mvnw clean install -DskipTests'
                 }
             }
         }
+        
         stage('Test') {
             steps {
-                dir('infrastructure/api-gateway') {
-                    bat 'mvn test'
-                }
-                dir('infrastructure/discovery-service') {
-                    bat 'mvn test'
-                }
-
+                echo 'Testing all services...'
                 dir('services') {
-                    bat 'mvn test'
+                    sh './mvnw test'
                 }
             }
         }
-        stage('Run Docker Build') {
+
+        stage('Deploy') {
             steps {
-                bat 'docker compose up -d --build'
+                echo 'Deploying with Docker Compose...'
+                sh 'docker compose -f docker-compose.yml down || true'
+                sh 'docker compose -f docker-compose.yml up -d'
             }
+        }
+    }
+
+    post {
+        always {
+            echo '🏁 Pipeline finished'
+        }
+
+        success {
+            echo '✅ Build, Test, and Deploy succeeded'
+        }
+
+        failure {
+            echo '❌ Pipeline failed'
         }
     }
 }

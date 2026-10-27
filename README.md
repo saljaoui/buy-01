@@ -117,6 +117,9 @@ docker compose up mongodb zookeeper kafka discovery-service
 Then run the services from their module directories:
 
 ```bash
+docker compose -f docker-compose.kafka.yml up -d
+docker compose -f docker-compose.jenkins.yml up -d
+cd services ./mvnw clean install
 cd services/user-service && ./mvnw spring-boot:run
 cd services/product-service && ./mvnw spring-boot:run
 cd services/media-service && ./mvnw spring-boot:run

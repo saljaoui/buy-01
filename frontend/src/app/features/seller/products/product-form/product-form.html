@@ -1,10 +1,6 @@
 <div class="seller-shell">
-  <app-seller-sidebar
-    activeItem="create-product"
-    [initials]="sellerInitials()"
-    [name]="currentUser?.name || 'Seller'"
-    [subtitle]="currentUser?.email || 'Seller account'"
-  ></app-seller-sidebar>
+  <app-seller-sidebar activeItem="create-product" [initials]="sellerInitials()" [name]="currentUser?.name || 'Seller'"
+    [subtitle]="currentUser?.email || 'Seller account'"></app-seller-sidebar>
 
   <div class="seller-main">
     <header class="seller-topbar">
@@ -81,15 +77,15 @@
                 <div class="field full" [class.invalid]="formSubmitted() && productInfo.name.trim().length < 2">
                   <label for="title">Product title</label>
                   <input id="title" type="text" placeholder="Noise-Cancelling Pro Headphones" name="name"
-                    [(ngModel)]="productInfo.name" [class.is-invalid]="formSubmitted() && productInfo.name.trim().length < 2" />
+                    [(ngModel)]="productInfo.name"
+                    [class.is-invalid]="formSubmitted() && productInfo.name.trim().length < 2" />
                   <div class="message">Title is required before publishing.</div>
                 </div>
 
                 <div class="field full">
                   <label for="shortDescription">description</label>
                   <textarea id="shortDescription"
-                    placeholder="Write a concise summary that will appear in cards and previews."
-                    name="description"
+                    placeholder="Write a concise summary that will appear in cards and previews." name="description"
                     [(ngModel)]="productInfo.description"></textarea>
                   <div class="helper">Keep it focused on materials, benefits, and visual style.</div>
                 </div>
@@ -105,7 +101,8 @@
               <div class="field-grid">
                 <div class="field" [class.invalid]="formSubmitted() && productInfo.price <= 0">
                   <label for="price">Price</label>
-                  <input id="price" type="number" min="0" step="0.01" placeholder="149.00" name="price" [(ngModel)]="productInfo.price" />
+                  <input id="price" type="number" min="0" step="0.01" placeholder="149.00" name="price"
+                    [(ngModel)]="productInfo.price" />
                   <div class="message">Enter a valid sale price.</div>
                 </div>
 
@@ -132,36 +129,51 @@
                     (change)="onFilesSelected($event)" style="display: none;">
 
                   <button class="primary-btn" type="button" (click)="imageInput.click()">
-                    <app-icon name="upload-cloud" [size]="16"></app-icon>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                      <g fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path
+                          d="M2 14c0-3.771 0-5.657 1.172-6.828C4.343 6 6.229 6 10 6h4c3.771 0 5.657 0 6.828 1.172C22 8.343 22 10.229 22 14c0 3.771 0 5.657-1.172 6.828C19.657 22 17.771 22 14 22h-4c-3.771 0-5.657 0-6.828-1.172C2 19.657 2 17.771 2 14Z" />
+                        <path
+                          d="m4 7l-.012-1c.112-.931.347-1.574.837-2.063C5.765 3 7.279 3 10.307 3h3.211c3.028 0 4.541 0 5.482.937c.49.489.725 1.132.837 2.063v1" />
+                        <circle cx="17.5" cy="10.5" r="1.5" />
+                        <path stroke-linecap="round"
+                          d="m2 14.5l1.752-1.533a2.3 2.3 0 0 1 3.14.105l4.29 4.29a2 2 0 0 0 2.564.222l.299-.21a3 3 0 0 1 3.731.225L21 20.5" />
+                      </g>
+                    </svg>
                     Choose images
                   </button>
-
-                  <a class="ghost-btn" routerLink="/seller/media">
-                    <app-icon name="media" [size]="16"></app-icon>
-                    Open library
-                  </a>
                 </div>
 
                 <small>Allowed: JPG, PNG, WEBP, AVIF up to 2 MB each.</small>
               </div>
 
               <div class="upload-preview-grid">
+                <div class="image-grid" role="list" aria-label="Selected images">
+                  @for (item of selectedImages; track item.preview) {
+                  <article class="image-card" role="listitem">
+                    <div class="preview-art">
+                      <img [src]="item.preview" alt="" loading="lazy" />
 
+                      <button class="delete-button" type="button" (click)="deleteImage(item)"
+                        [attr.aria-label]="'Delete ' + item.file.name" [title]="'Delete ' + item.file.name">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                          <g fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path
+                              d="M11.142 20c-2.227 0-3.341 0-4.27-.501c-.93-.502-1.52-1.42-2.701-3.259l-.681-1.06C2.497 13.634 2 12.86 2 12c0-.86.497-1.634 1.49-3.18l.68-1.06c1.181-1.838 1.771-2.757 2.701-3.259C7.801 4 8.915 4 11.142 4h2.637c3.875 0 5.813 0 7.017 1.172C22 6.343 22 8.229 22 12c0 3.771 0 5.657-1.204 6.828C19.592 20 17.654 20 13.78 20h-2.637Z" />
+                            <path stroke-linecap="round" d="m15.5 9.5l-5 5m0-5l5 5" />
+                          </g>
+                        </svg>
+                        <span class="sr-only">Delete</span>
+                      </button>
+                    </div>
 
-                @for(item of selectedImages; track item.preview) {
-                <article  class="upload-card">
-                  <div class="preview-art">
-                    <img [src]="item.preview" [alt]="item.file.name">
-                  </div>
-                  <strong>{{ item.file.name }}</strong>
-                  <span>{{ (item.file.size / 1024 / 1024).toFixed(2) }} MB</span>
-                  <button type="button" (click)="deleteImage(item)">
-                    <app-icon name="trash" [size]="15"></app-icon>
-                    Delete
-                  </button>
-                </article>
-                }
-
+                    <div class="file-details">
+                      <strong [title]="item.file.name">{{ item.file.name }}</strong>
+                      <span class="file-size">{{ (item.file.size / 1024 / 1024).toFixed(2) }} MB</span>
+                    </div>
+                  </article>
+                  }
+                </div>
               </div>
             </section>
           </div>
@@ -202,24 +214,33 @@
             <section class="panel">
               <div class="panel-head">
                 <div>
-                  <h3>Checklist</h3>
-                  <p>Typical seller workflow</p>
+                  <h3>Product Checklist</h3>
+                  <p>Complete these steps before publishing</p>
                 </div>
               </div>
 
               <div class="panel-body note-list">
+
                 <div class="note-item">
                   <app-icon name="circle" [size]="16"></app-icon>
-                  Add a valid price
+                  Add product title
                 </div>
+
+                <div class="note-item">
+                  <app-icon name="circle" [size]="16"></app-icon>
+                  Write product description
+                </div>
+
+                <div class="note-item">
+                  <app-icon name="circle" [size]="16"></app-icon>
+                  Add a valid product price
+                </div>
+
                 <div class="note-item">
                   <app-icon name="circle" [size]="16"></app-icon>
                   Upload product images
                 </div>
-                <div class="note-item">
-                  <app-icon name="circle" [size]="16"></app-icon>
-                  Review final storefront preview
-                </div>
+
               </div>
             </section>
           </div>

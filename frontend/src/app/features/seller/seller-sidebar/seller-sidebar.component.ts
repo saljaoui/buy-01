@@ -1,12 +1,11 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { IconComponent } from '../../../shared/icon/icon.component';
 import { SellerNavComponent, SellerNavItem } from '../seller-nav/seller-nav.component';
 
 @Component({
   selector: 'app-seller-sidebar',
-  imports: [RouterLink, SellerNavComponent, IconComponent],
+  imports: [RouterLink, SellerNavComponent],
   templateUrl: './seller-sidebar.component.html',
 })
 export class SellerSidebarComponent {

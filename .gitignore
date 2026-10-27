@@ -6,3 +6,6 @@ target/
 **/target/
 hs_err_pid*.log
 services/media-service/uploads/*
+# Uploaded images
+/uploads/
+uploads/
