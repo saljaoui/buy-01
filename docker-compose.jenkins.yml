@@ -1,7 +1,8 @@
 services:
   jenkins:
-    image: jenkins/jenkins:lts
+    build: ./jenkins
     container_name: jenkins
+    user: root
     ports:
       - "8000:8080"
       - "50000:50000"

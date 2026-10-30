@@ -11,7 +11,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Test') {
             steps {
                 echo 'Testing all services...'
@@ -23,9 +23,14 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                echo 'Deploying with Docker Compose...'
-                sh 'docker compose -f docker-compose.yml down || true'
-                sh 'docker compose -f docker-compose.yml up -d'
+                withCredentials([file(credentialsId: 'buy01-env', variable: 'ENV_FILE')]) {
+                    sh '''
+                    cp "$ENV_FILE" .env
+                    docker compose -f docker-compose.yml down || true
+                    docker compose -f docker-compose.yml up -d --build
+                    rm -f .env
+                  '''
+                }
             }
         }
     }
