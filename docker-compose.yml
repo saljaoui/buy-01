@@ -1,3 +1,5 @@
+name: buy-01
+
 services:
   mongodb:
     image: mongo:7.0

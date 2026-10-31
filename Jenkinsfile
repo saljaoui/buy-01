@@ -71,7 +71,7 @@ pipeline {
                 }
             }
             post {
-                failure {
+                unsuccessful {
                     echo 'Deploy failed, rolling back to previous version'
                     withCredentials([file(credentialsId: 'buy01-env', variable: 'ENV_FILE')]) {
                         sh '''
@@ -79,7 +79,7 @@ pipeline {
                             for img in $(docker images --format '{{.Repository}}:{{.Tag}}' | grep '^buy-01-.*:previous$' | cut -d: -f1); do
                                 docker tag "$img:previous" "$img:latest"
                             done
-                            docker compose up -d --no-build
+                            docker compose up -d --no-build --wait --wait-timeout 300
                         '''
                     }
                 }
