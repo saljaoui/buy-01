@@ -46,7 +46,7 @@ pipeline {
             steps {
                 dir('frontend') {
                     sh 'npm ci'
-                    sh 'npx ng test --watch=false --reporters=default --reporters=junit --output-file=test-results/junit.xml'
+                    sh 'npx ng test --watch=false --coverage --coverage-reporters=lcov --reporters=default --reporters=junit --output-file=test-results/junit.xml'
                 }
             }
             post {
