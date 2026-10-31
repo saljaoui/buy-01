@@ -9,6 +9,12 @@ services:
     volumes:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - ci-network
 
 volumes:
   jenkins_home:
+
+networks:
+  ci-network:
+    external: true
