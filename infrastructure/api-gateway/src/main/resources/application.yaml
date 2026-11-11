@@ -24,6 +24,10 @@ spring:
               uri: lb://media-service
               predicates:
                 - Path=/api/media/**
+            - id: order-service
+              uri: lb://order-service
+              predicates:
+                - Path=/api/order/**
 
 jwt:
   secret: ${JWT_SECRET}
