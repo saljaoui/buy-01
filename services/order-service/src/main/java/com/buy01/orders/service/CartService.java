@@ -11,6 +11,7 @@ import lombok.Data;
 import com.buy01.orders.model.dto.CartItemDTO;
 import com.buy01.orders.exception.ProductExistsInCartException;
 import com.buy01.orders.model.entity.Cart;
+import com.buy01.orders.common.Product;
 @AllArgsConstructor
 @Data
 @Service 
@@ -25,7 +26,12 @@ public class CartService {
         ProductResponse product = productClient.getProduct(productId);
         Cart cart = cartRepository.findById(userId).orElse(new Cart());
         cart.setUserId(userId);
-        cart.getItems().add(product);
+        Product cartItem = new Product();
+        cartItem.setId(product.getId());
+        cartItem.setName(product.getName());
+        cartItem.setPrice(product.getPrice());
+        cartItem.setQuantity(1);
+        cart.getItems().add(cartItem);
         cartRepository.save(cart);
     }
 
