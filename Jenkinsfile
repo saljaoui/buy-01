@@ -39,14 +39,24 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying with Docker Compose...'
-
-                script {
-                    if (isUnix()) {
-                        sh 'docker compose -f docker-compose.yml down || true'
-                        sh 'docker compose -f docker-compose.yml up -d'
-                    } else {
-                        bat 'docker compose -f docker-compose.yml down'
-                        bat 'docker compose -f docker-compose.yml up -d'
+                withCredentials([
+                    string(credentialsId: 'jwt-secret',
+                        variable: 'JWT_SECRET'),
+                    string(credentialsId: 'jwt-expiration',
+                        variable: 'JWT_EXPIRATION'),
+                    string(credentialsId: 'gateway-port',
+                        variable: 'GATEWAY_PORT'),
+                    string(credentialsId: 'frontend-port',
+                        variable: 'FRONTEND_PORT')
+                ]) {
+                    script {
+                        if (isUnix()) {
+                            sh 'docker compose -f docker-compose.yml down || true'
+                            sh 'docker compose -f docker-compose.yml up -d'
+                        } else {
+                            bat 'docker compose -f docker-compose.yml down'
+                            bat 'docker compose -f docker-compose.yml up -d'
+                        }
                     }
                 }
             }
