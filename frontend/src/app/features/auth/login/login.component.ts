@@ -1,4 +1,4 @@
-import { Component, OnDestroy, inject } from '@angular/core';
+import { Component, OnDestroy, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
@@ -31,11 +31,18 @@ export class LoginComponent implements OnDestroy {
     return controlError(this.form.get(name), this.labels[name] ?? name);
   }
 
+  /** The message to show under a field, or '' when nothing should render (untouched, valid, or no text). */
+  protected fieldError(name: string): string {
+    return showError(this.form, name) ? this.err(name) : '';
+  }
+
   protected passwordVisible = false;
-  protected isSubmitting = false;
-  protected toastVisible = false;
-  protected toastMessage = 'Invalid credentials.';
-  protected toastType: ToastKind = 'error';
+  // Signals, not plain fields: the app is zoneless, so state changed inside an HTTP
+  // callback (spinner, toast) only re-renders when it lives in a signal.
+  protected readonly isSubmitting = signal(false);
+  protected readonly toastVisible = signal(false);
+  protected readonly toastMessage = signal('Invalid credentials.');
+  protected readonly toastType = signal<ToastKind>('error');
 
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
@@ -50,21 +57,21 @@ export class LoginComponent implements OnDestroy {
     // Mark every field as touched so all inline errors appear at once.
     this.form.markAllAsTouched();
 
-    if (this.isSubmitting || this.form.invalid) {
+    if (this.isSubmitting() || this.form.invalid) {
       return;
     }
 
     const { email, password, rememberMe } = this.form.getRawValue();
 
     this.hideToast();
-    this.isSubmitting = true;
+    this.isSubmitting.set(true);
 
     this.authService
       .login({
         email: email.trim(),
         password,
       })
-      .pipe(finalize(() => (this.isSubmitting = false)))
+      .pipe(finalize(() => this.isSubmitting.set(false)))
       .subscribe({
         next: (session) => {
           this.authService.storeSession(session, rememberMe);
@@ -88,21 +95,21 @@ export class LoginComponent implements OnDestroy {
   }
 
   private showToast(message: string, type: ToastKind = 'error'): void {
-    this.toastMessage = message;
-    this.toastType = type;
-    this.toastVisible = true;
+    this.toastMessage.set(message);
+    this.toastType.set(type);
+    this.toastVisible.set(true);
 
     if (this.toastTimer) {
       clearTimeout(this.toastTimer);
     }
 
     this.toastTimer = setTimeout(() => {
-      this.toastVisible = false;
+      this.toastVisible.set(false);
     }, 3500);
   }
 
   private hideToast(): void {
-    this.toastVisible = false;
+    this.toastVisible.set(false);
 
     if (this.toastTimer) {
       clearTimeout(this.toastTimer);

@@ -1,0 +1,42 @@
+@if (product(); as p) {
+  <a class="product-media" [routerLink]="['/products', p.id]" tabindex="-1" aria-hidden="true">
+    @if (image(); as src) {
+      @if (isLocal(src)) {
+        <!-- blob:/data: previews (e.g. the seller's live preview) can't go through NgOptimizedImage -->
+        <img class="local-img" [src]="src" [alt]="p.name" />
+      } @else {
+        <img [ngSrc]="src" fill [sizes]="sizes()" [priority]="priority()" [alt]="p.name" />
+      }
+    } @else {
+      <span class="media-placeholder"><span class="letter-mark">{{ initial() }}</span></span>
+    }
+  </a>
+
+  <div class="product-body">
+    <h3><a [routerLink]="['/products', p.id]">{{ p.name }}</a></h3>
+    @if (badge() || p.owner) {
+      <div class="card-badges">
+        @if (badge(); as b) {
+          <span class="stock-badge" [class]="'is-' + b.tone">{{ b.label }}</span>
+        }
+        @if (p.owner) {
+          <span class="stock-badge is-owner">Your listing</span>
+        }
+      </div>
+    }
+    <p>{{ p.description }}</p>
+    <div class="product-footer">
+      <strong class="product-price">{{ p.price | currency: 'USD' }}</strong>
+      <span class="mini-btn" aria-hidden="true">
+        View
+        <app-icon name="arrow-right" [size]="14"></app-icon>
+      </span>
+    </div>
+  </div>
+} @else {
+  <span class="product-media skeleton"></span>
+  <span class="product-body">
+    <span class="skeleton skeleton-line w-70"></span>
+    <span class="skeleton skeleton-line w-40"></span>
+  </span>
+}

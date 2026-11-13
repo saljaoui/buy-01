@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
+import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 import { LoginComponent } from './login.component';
 import { AuthService } from '../auth.service';
@@ -34,9 +34,31 @@ describe('LoginComponent (reactive form)', () => {
     fixture.detectChanges();
   });
 
-  it('shows no errors before the user interacts', () => {
-    expect(el.querySelector('#email-error')!.textContent!.trim()).toBe('');
+  it('renders no error elements before the user interacts', () => {
+    expect(el.querySelector('.err-msg')).toBeNull();
     expect(el.querySelector('#email')!.classList).not.toContain('is-invalid');
+    expect(el.querySelector('#email')!.getAttribute('aria-describedby')).toBeNull();
+  });
+
+  it('removes the error element once the field becomes valid', () => {
+    type('#email', 'bad');
+    fixture.detectChanges();
+    expect(el.querySelector('#email-error')).not.toBeNull();
+
+    type('#email', 'a@b.com');
+    fixture.detectChanges();
+    expect(el.querySelector('#email-error')).toBeNull();
+  });
+
+  it('keeps each field icon inside the input wrapper, with errors outside it', () => {
+    submit();
+    for (const id of ['email', 'password']) {
+      const wrap = el.querySelector(`#${id}`)!.closest('.input-wrap')!;
+      expect(wrap.querySelector('.input-icon')).not.toBeNull();
+      expect(wrap.querySelector('.err-msg')).toBeNull();
+      expect(wrap.parentElement!.querySelector(`#${id}-error`)).not.toBeNull();
+    }
+    expect(el.querySelector('#pwToggle')!.closest('.input-wrap')).not.toBeNull();
   });
 
   it('shows inline errors on submit and does not call the API', () => {
@@ -67,5 +89,27 @@ describe('LoginComponent (reactive form)', () => {
     submit();
 
     expect(login).toHaveBeenCalledWith({ email: 'a@b.com', password: 'password123' });
+  });
+
+  it('stops the spinner and shows the server message on a failed login (401)', () => {
+    vi.spyOn(auth, 'login').mockReturnValue(
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            status: 401,
+            url: 'http://localhost:8080/api/auth/login',
+            error: { status: 401, message: 'Invalid credentials' },
+          }),
+      ),
+    );
+    type('#email', 'a@b.com');
+    type('#password', 'wrongpassword');
+    submit();
+
+    const button = el.querySelector<HTMLButtonElement>('.btn-signin')!;
+    expect(button.disabled).toBe(false);
+    expect(button.textContent).toContain('Sign in');
+    expect(el.querySelector('#toast')!.classList).toContain('show');
+    expect(el.querySelector('#toastMsg')!.textContent).toContain('Invalid credentials');
   });
 });

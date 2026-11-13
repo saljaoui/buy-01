@@ -164,25 +164,50 @@
     border-color: var(--success);
   }
 
-  .field-wrap .input-icon {
-    left: 0.9rem;
-    bottom: 14px;
-    display: grid;
-    color: var(--faint);
+  /*
+   * Only the input and its icons live in .input-wrap, so the icons are centred on the
+   * input itself. Hints, the strength meter and errors sit below it, outside the wrapper,
+   * and can grow without moving the icons.
+   */
+  .field-wrap .input-wrap {
+    position: relative;
   }
 
-  .field-wrap .input-icon svg {
+  /* Block, so no inline baseline gap makes the wrapper taller than the input. */
+  .field-wrap .input-wrap input {
+    display: block;
+  }
+
+  .field-wrap .input-icon,
+  .field-wrap .f-icon {
+    position: absolute;
+    left: 0.9rem;
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+    display: grid;
+    line-height: 0;
+    color: var(--faint);
+    pointer-events: none;
+  }
+
+  .field-wrap .input-icon svg,
+  .field-wrap .f-icon svg {
     width: 18px;
     height: 18px;
   }
 
-  .field-wrap input:focus ~ .input-icon {
+  .field-wrap input:focus ~ .input-icon,
+  .field-wrap input:focus ~ .f-icon {
     color: var(--copper);
   }
 
   .field-wrap .pw-toggle {
+    position: absolute;
     right: 0.6rem;
-    bottom: 7px;
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
     width: 32px;
     height: 32px;
     display: grid;
@@ -196,14 +221,48 @@
     color: var(--ink);
   }
 
-  .field-wrap .err-msg {
+  /* Rendered only when there is something to say (see @if in the templates). */
+  .field-wrap .err-msg,
+  .field-wrap .ok-msg {
+    position: static;
     display: flex;
     align-items: center;
     gap: 0.3rem;
     margin-top: 0.35rem;
     font-size: var(--text-xs);
     font-weight: 500;
+  }
+
+  .field-wrap .err-msg {
     color: var(--error);
+  }
+
+  .field-wrap .ok-msg {
+    color: var(--success);
+  }
+
+  /*
+   * Browser autofill: Chrome forces a light-blue background that can't be overridden
+   * directly, so paint over it with a large inset shadow and keep the normal text colour.
+   * The outer shadows repeat the focus / invalid rings so those still show.
+   */
+  .field-wrap input:-webkit-autofill,
+  .field-wrap input:-webkit-autofill:hover {
+    -webkit-text-fill-color: var(--ink);
+    caret-color: var(--ink);
+    -webkit-box-shadow: 0 0 0 1000px var(--surface) inset;
+    box-shadow: 0 0 0 1000px var(--surface) inset;
+    transition: background-color 9999s ease-out 0s;
+  }
+
+  .field-wrap input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px var(--surface) inset, var(--focus-ring);
+    box-shadow: 0 0 0 1000px var(--surface) inset, var(--focus-ring);
+  }
+
+  .field-wrap input.is-invalid:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px var(--surface) inset, 0 0 0 3px rgba(178, 58, 42, 0.18);
+    box-shadow: 0 0 0 1000px var(--surface) inset, 0 0 0 3px rgba(178, 58, 42, 0.18);
   }
 
   /* ---------- Primary button ---------- */

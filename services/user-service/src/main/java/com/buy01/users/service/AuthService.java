@@ -9,6 +9,8 @@ import com.buy01.users.exception.InvalidCredentialsException;
 import com.buy01.users.model.User;
 import com.buy01.users.repository.UserRepository;
 import com.buy01.users.security.JwtUtil;
+import java.util.Locale;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,13 +24,14 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
+        String email = normalizeEmail(request.getEmail());
+        if (userRepository.existsByEmailIgnoreCase(email)) {
             throw new DuplicateEmailException("Email is already in use");
         }
 
         User user = User.builder()
                 .name(request.getName().trim())
-                .email(request.getEmail().trim())
+                .email(email)
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
                 .avatar(request.getAvatar() != null ? request.getAvatar().trim() : null)
@@ -46,7 +49,7 @@ public class AuthService {
 
     public AuthResponse login(LoginRequest request) {
         User user = userRepository
-                .findByEmail(request.getEmail())
+                .findByEmailIgnoreCase(normalizeEmail(request.getEmail()))
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid credentials"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
@@ -60,6 +63,11 @@ public class AuthService {
                 .type("Bearer")
                 .user(toUserResponse(user))
                 .build();
+    }
+
+    /** Emails are compared and stored trimmed and lower-cased: "Bob@X.com " == "bob@x.com". */
+    private static String normalizeEmail(String email) {
+        return email == null ? null : email.trim().toLowerCase(Locale.ROOT);
     }
 
     private UserResponse toUserResponse(User user) {

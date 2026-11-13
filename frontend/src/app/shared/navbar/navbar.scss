@@ -24,3 +24,16 @@
 .nav-search .s-icon {
   font-style: normal;
 }
+
+@media (prefers-reduced-motion: no-preference) {
+  .cart-badge.bump {
+    animation: cart-bump 0.45s var(--ease);
+  }
+}
+
+@keyframes cart-bump {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.35); }
+  65% { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}

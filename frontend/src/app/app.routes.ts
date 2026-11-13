@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { clientGuard, guestGuard, sellerGuard } from './core/guards/auth.guards';
+import { unsavedChangesGuard } from './core/guards/unsaved-changes.guard';
 
 export const routes: Routes = [
   {
@@ -67,6 +68,9 @@ export const routes: Routes = [
     path: 'seller',
     canActivate: [sellerGuard],
     canActivateChild: [sellerGuard],
+    // One shell (sidebar + content container) for every seller page.
+    loadComponent: () =>
+      import('./features/seller/seller-layout/seller-layout.component').then((m) => m.SellerLayoutComponent),
     children: [
       {
         path: '',
@@ -77,6 +81,7 @@ export const routes: Routes = [
       },
       {
         path: 'products/new',
+        canDeactivate: [unsavedChangesGuard],
         loadComponent: () =>
           import('./features/seller/products/product-form/product-form.component').then(
             (m) => m.ProductFormComponent
@@ -84,6 +89,7 @@ export const routes: Routes = [
       },
       {
         path: 'products/:id/edit',
+        canDeactivate: [unsavedChangesGuard],
         loadComponent: () =>
           import('./features/seller/products/product-form/product-form.component').then(
             (m) => m.ProductFormComponent

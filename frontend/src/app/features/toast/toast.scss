@@ -59,6 +59,29 @@
   flex: 1;
 }
 
+.toast-action {
+  flex-shrink: 0;
+  align-self: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  color: var(--copper-bright);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.16s var(--ease);
+}
+
+.toast-action:hover {
+  background: rgba(255, 255, 255, 0.08);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.toast-action:focus-visible {
+  outline: 2px solid var(--copper-bright);
+  outline-offset: 1px;
+}
+
 .toast button {
   flex-shrink: 0;
   width: 26px;

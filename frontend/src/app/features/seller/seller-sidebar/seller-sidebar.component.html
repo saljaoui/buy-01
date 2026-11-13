@@ -1,22 +1,66 @@
-<aside class="seller-sidebar">
+<aside class="seller-sidebar" aria-label="Seller navigation">
   <div class="seller-sidebar-inner">
-    <a class="seller-brand" routerLink="/products">
-      <div class="seller-brand-icon">
-        <img src="/logo.png" alt="Logo">
-      </div>
-      <div class="seller-brand-copy">
-        <span>Seller panel</span>
-      </div>
-    </a>
+    <div class="sidebar-head">
+      <a class="seller-brand" routerLink="/seller" aria-label="Seller dashboard">
+        <span class="seller-brand-icon"><img src="/logo.png" alt="" width="34" height="34" /></span>
+        <span class="seller-brand-copy">Seller <em>studio</em></span>
+      </a>
+      <button type="button" class="rail-toggle" (click)="toggleCollapse.emit()"
+        [attr.aria-label]="collapsed() ? 'Expand sidebar' : 'Collapse sidebar'" [attr.aria-pressed]="collapsed()"
+        [attr.title]="collapsed() ? 'Expand sidebar' : 'Collapse sidebar'" data-testid="rail-toggle">
+        <app-icon [name]="collapsed() ? 'chevron-right' : 'chevron-left'" [size]="16"></app-icon>
+      </button>
+    </div>
 
-    <app-seller-nav [activeItem]="activeItem" [productCount]="productCount"></app-seller-nav>
+    <nav class="seller-nav">
+      @for (group of groups(); track group.label) {
+        <div class="seller-nav-group">
+          <div class="seller-nav-label">{{ group.label }}</div>
+          @for (item of group.links; track item.id) {
+            <a class="seller-nav-link" [routerLink]="item.link" [fragment]="item.fragment"
+              [class.active]="activeItem() === item.id" [attr.aria-current]="activeItem() === item.id ? 'page' : null"
+              [attr.data-label]="item.label" [attr.title]="collapsed() ? item.label : null">
+              <app-icon [name]="item.icon" [size]="18"></app-icon>
+              <span class="nav-text">{{ item.label }}</span>
+              @if (item.count) {
+                <span class="seller-nav-badge" [attr.aria-label]="item.count + ' ' + item.countLabel">{{ item.count > 99 ? '99+' : item.count }}</span>
+              }
+            </a>
+          }
+        </div>
+      }
+    </nav>
 
-    <div class="seller-account">
-      <div class="seller-account-avatar">{{ initials }}</div>
-      <div class="seller-account-copy">
-        <strong>{{ name }}</strong>
-        <span>{{ subtitle }}</span>
-      </div>
+    <div class="seller-account" [class.open]="menuOpen()">
+      @if (menuOpen()) {
+        <div class="account-menu" id="account-menu" data-testid="account-menu">
+          <a routerLink="/seller/profile" (click)="menuOpen.set(false)">
+            <app-icon name="profile" [size]="16"></app-icon> Profile
+          </a>
+          <a routerLink="/products" (click)="menuOpen.set(false)">
+            <app-icon name="store" [size]="16"></app-icon> View store
+          </a>
+          <button type="button" class="danger" (click)="doSignOut()">
+            <app-icon name="log-out" [size]="16"></app-icon> Sign out
+          </button>
+        </div>
+      }
+      <button type="button" class="account-trigger" (click)="toggleMenu($event)" [attr.aria-expanded]="menuOpen()"
+        aria-controls="account-menu" aria-haspopup="true" data-testid="account-trigger"
+        [attr.title]="collapsed() ? name() : null">
+        <span class="seller-account-avatar">
+          @if (avatar(); as src) {
+            <img [src]="src" alt="" />
+          } @else {
+            {{ initials() }}
+          }
+        </span>
+        <span class="seller-account-copy">
+          <strong>{{ name() }}</strong>
+          <span class="seller-role-badge">Seller</span>
+        </span>
+        <app-icon class="account-caret" name="chevron-down" [size]="15"></app-icon>
+      </button>
     </div>
   </div>
 </aside>

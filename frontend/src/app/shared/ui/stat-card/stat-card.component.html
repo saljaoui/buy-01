@@ -1,0 +1,33 @@
+<div class="sc-top">
+  <span class="sc-icon" aria-hidden="true"><app-icon [name]="icon()" [size]="18"></app-icon></span>
+  @if (badge()) {
+    <span class="sc-badge" [class]="'sc-badge tone-' + badgeTone()">{{ badge() }}</span>
+  }
+</div>
+
+<div class="sc-value-row">
+  <span class="sc-value" aria-hidden="true">{{ display() }}</span>
+  <span class="sr-only">{{ finalDisplay() }}</span>
+  @if (trendLabel(); as t) {
+    <span class="sc-trend" [class.up]="trend()! > 0" [class.down]="trend()! < 0"
+      [attr.aria-label]="t + ' versus the previous period'">
+      <app-icon [name]="trend()! < 0 ? 'trending-down' : 'trending-up'" [size]="14"></app-icon>{{ t }}
+    </span>
+  }
+</div>
+<div class="sc-label">{{ label() }}</div>
+
+@if (spark(); as s) {
+  <svg class="sc-spark" viewBox="0 0 120 36" preserveAspectRatio="none" aria-hidden="true">
+    <path class="sc-spark-area" [attr.d]="s.area" />
+    <path class="sc-spark-line" [attr.d]="s.line" vector-effect="non-scaling-stroke" />
+  </svg>
+} @else if (progress() !== null) {
+  <div class="sc-meter" role="presentation" aria-hidden="true">
+    <span [style.width.%]="(progress() ?? 0) * 100"></span>
+  </div>
+}
+
+@if (hint()) {
+  <p class="sc-hint">{{ hint() }}</p>
+}

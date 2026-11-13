@@ -8,8 +8,8 @@
       <form class="nav-search" role="search" (submit)="search($event, searchInput.value)">
         <i class="s-icon"><app-icon name="search" [size]="17"></app-icon></i>
         <label class="sr-only" for="nav-search-input">Search products</label>
-        <input #searchInput id="nav-search-input" type="search" [value]="searchText"
-          placeholder="Search products" maxlength="100" />
+        <input #searchInput id="nav-search-input" type="search" [value]="searchText()"
+          (input)="onSearchInput(searchInput.value)" placeholder="Search products" maxlength="100" />
       </form>
 
       <div class="nav-actions">
@@ -74,7 +74,7 @@
           [attr.aria-label]="'Cart, ' + cart.count() + (cart.count() === 1 ? ' item' : ' items')">
           <app-icon name="shopping-bag" [size]="19"></app-icon>
           @if (cart.count() > 0) {
-          <span class="cart-badge" aria-hidden="true">{{ cart.count() > 99 ? '99+' : cart.count() }}</span>
+          <span class="cart-badge" [class.bump]="cartBump()" aria-hidden="true">{{ cart.count() > 99 ? '99+' : cart.count() }}</span>
           }
         </a>
         }

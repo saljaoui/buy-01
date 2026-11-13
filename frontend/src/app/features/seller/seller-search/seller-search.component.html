@@ -1,0 +1,47 @@
+<div class="seller-search" [class.open]="open()" [class.has-value]="query().length > 0" role="search">
+  <app-icon class="seller-search-icon" name="search" [size]="16"></app-icon>
+  <label class="sr-only" for="seller-search-input">Search your products and orders</label>
+  <input #input id="seller-search-input" type="search" autocomplete="off" placeholder="Search products, orders…"
+    role="combobox" aria-autocomplete="list" aria-controls="seller-search-results" [attr.aria-expanded]="open()"
+    [attr.aria-activedescendant]="open() && results().length ? 'ssr-' + results()[activeIndex()].id : null"
+    (input)="onInput(input.value)" (keydown)="onKeydown($event)" (focus)="open.set(query().trim().length > 0)" />
+  <kbd class="seller-search-kbd" aria-hidden="true">{{ isMac ? '⌘' : 'Ctrl' }} K</kbd>
+
+  @if (open()) {
+    <div class="seller-search-panel" id="seller-search-results" role="listbox" aria-label="Search results">
+      @if (productResults().length) {
+        <div class="ssr-group" role="presentation">Products</div>
+        @for (r of productResults(); track r.id) {
+          <button type="button" class="ssr-item" role="option" [id]="'ssr-' + r.id"
+            [class.active]="indexOf(r) === activeIndex()" [attr.aria-selected]="indexOf(r) === activeIndex()"
+            (mouseenter)="activeIndex.set(indexOf(r))" (click)="go(r)">
+            <span class="ssr-icon"><app-icon name="shopping-bag" [size]="15"></app-icon></span>
+            <span class="ssr-copy"><strong>{{ r.title }}</strong><small>{{ r.meta }}</small></span>
+          </button>
+        }
+      }
+      @if (orderResults().length) {
+        <div class="ssr-group" role="presentation">Orders</div>
+        @for (r of orderResults(); track r.id) {
+          <button type="button" class="ssr-item" role="option" [id]="'ssr-' + r.id"
+            [class.active]="indexOf(r) === activeIndex()" [attr.aria-selected]="indexOf(r) === activeIndex()"
+            (mouseenter)="activeIndex.set(indexOf(r))" (click)="go(r)">
+            <span class="ssr-icon"><app-icon name="package" [size]="15"></app-icon></span>
+            <span class="ssr-copy"><strong>{{ r.title }}</strong><small>{{ r.meta }}</small></span>
+          </button>
+        }
+      }
+      @if (!productResults().length && !orderResults().length) {
+        <p class="ssr-empty">Nothing in your store matches “{{ query().trim() }}”.</p>
+      }
+      @if (storeResult(); as r) {
+        <button type="button" class="ssr-item ssr-store" role="option" [id]="'ssr-' + r.id"
+          [class.active]="indexOf(r) === activeIndex()" [attr.aria-selected]="indexOf(r) === activeIndex()"
+          (mouseenter)="activeIndex.set(indexOf(r))" (click)="go(r)">
+          <span class="ssr-icon"><app-icon name="store" [size]="15"></app-icon></span>
+          <span class="ssr-copy"><strong>{{ r.title }}</strong><small>{{ r.meta }}</small></span>
+        </button>
+      }
+    </div>
+  }
+</div>

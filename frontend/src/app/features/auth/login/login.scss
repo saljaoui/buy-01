@@ -261,7 +261,6 @@
 .field-wrap .input-icon {
   position: absolute;
   left: 14px;
-  bottom: 13px;
   color: var(--muted);
   font-size: 1rem;
   pointer-events: none;
@@ -296,7 +295,6 @@
 .field-wrap .pw-toggle {
   position: absolute;
   right: 14px;
-  bottom: 13px;
   background: none;
   border: none;
   color: var(--muted);
@@ -320,12 +318,6 @@
 .field-wrap .err-msg {
   font-size: .75rem;
   color: var(--error);
-  position: absolute;
-  display: none;
-}
-
-.field-wrap input.is-invalid~.err-msg {
-  display: block;
 }
 
 /* meta row */

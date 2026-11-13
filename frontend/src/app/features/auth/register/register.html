@@ -12,21 +12,21 @@
       <p>Shop from independent sellers, or start selling your own products. It takes three short steps.</p>
       <ul class="step-list" id="leftStepList">
         <li>
-          <div class="step-dot" id="ls1" [class.active]="currentStep === 1" [class.done]="currentStep > 1">1</div>
+          <div class="step-dot" id="ls1" [class.active]="currentStep() === 1" [class.done]="currentStep() > 1">1</div>
           <div class="step-text">
             <strong>Choose your role</strong>
             <span>Shop as a client, or sell as a seller</span>
           </div>
         </li>
         <li>
-          <div class="step-dot" id="ls2" [class.active]="currentStep === 2" [class.done]="currentStep > 2">2</div>
+          <div class="step-dot" id="ls2" [class.active]="currentStep() === 2" [class.done]="currentStep() > 2">2</div>
           <div class="step-text">
             <strong>Your details</strong>
             <span>Name, email, and a strong password</span>
           </div>
         </li>
         <li>
-          <div class="step-dot" id="ls3" [class.active]="currentStep === 3">3</div>
+          <div class="step-dot" id="ls3" [class.active]="currentStep() === 3">3</div>
           <div class="step-text">
             <strong>Confirm</strong>
             <span>Accept the terms and create your account</span>
@@ -44,10 +44,10 @@
       <!-- top nav -->
       <div class="form-topnav">
         <div class="step-pills" id="stepPills">
-          <div class="step-pill" id="pill1" [class.active]="currentStep === 1" [class.done]="currentStep > 1"></div>
-          <div class="step-pill" id="pill2" [class.active]="currentStep === 2" [class.done]="currentStep > 2"
-            [class.todo]="currentStep < 2"></div>
-          <div class="step-pill" id="pill3" [class.active]="currentStep === 3" [class.todo]="currentStep < 3"></div>
+          <div class="step-pill" id="pill1" [class.active]="currentStep() === 1" [class.done]="currentStep() > 1"></div>
+          <div class="step-pill" id="pill2" [class.active]="currentStep() === 2" [class.done]="currentStep() > 2"
+            [class.todo]="currentStep() < 2"></div>
+          <div class="step-pill" id="pill3" [class.active]="currentStep() === 3" [class.todo]="currentStep() < 3"></div>
         </div>
       </div>
 
@@ -55,7 +55,7 @@
       <!-- ╔══════════════════════════════╗
          ║  STEP 1 — Role               ║
          ╚══════════════════════════════╝ -->
-      <div id="step1" [style.display]="currentStep === 1 ? 'block' : 'none'">
+      <div id="step1" [style.display]="currentStep() === 1 ? 'block' : 'none'">
         <div class="step-heading">
           <div class="step-label"><app-icon name="circle" [size]="8"></app-icon> Step 1 of 3</div>
           <h2>What brings you here?</h2>
@@ -105,7 +105,7 @@
       <!-- ╔══════════════════════════════╗
          ║  STEP 2 — Account details   ║
          ╚══════════════════════════════╝ -->
-      <div id="step2" [style.display]="currentStep === 2 ? 'block' : 'none'">
+      <div id="step2" [style.display]="currentStep() === 2 ? 'block' : 'none'">
         <div class="step-heading">
           <div class="step-label"><app-icon name="circle" [size]="8"></app-icon> Step 2 of 3</div>
           <h2>Your account details</h2>
@@ -114,59 +114,76 @@
 
         <div class="field-wrap">
           <label for="name">Full Name</label>
-          <input type="text" id="name" name="name" placeholder="Soufian Alj" autocomplete="name" formControlName="name"
-            [class.is-invalid]="showError(form, 'name')" [attr.aria-invalid]="showError(form, 'name')"
-            aria-describedby="name-error" />
-          <i class="bi bi-person f-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-              <g fill="none" stroke="currentColor" stroke-width="1.5">
-                <circle cx="12" cy="6" r="4" />
-                <path d="M20 17.5c0 2.485 0 4.5-8 4.5s-8-2.015-8-4.5S7.582 13 12 13s8 2.015 8 4.5Z" />
-              </g>
-            </svg>
-          </i>
-          <div class="err-msg" id="name-error" role="alert"><app-icon name="alert" [size]="14"></app-icon> {{ showError(form, 'name') ? err('name') : '' }}</div>
+          <div class="input-wrap">
+            <input type="text" id="name" name="name" placeholder="Soufian Alj" autocomplete="name" formControlName="name"
+              [class.is-invalid]="showError(form, 'name')" [attr.aria-invalid]="showError(form, 'name')"
+              [attr.aria-describedby]="showError(form, 'name') ? 'name-error' : null" />
+            <i class="bi bi-person f-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <g fill="none" stroke="currentColor" stroke-width="1.5">
+                  <circle cx="12" cy="6" r="4" />
+                  <path d="M20 17.5c0 2.485 0 4.5-8 4.5s-8-2.015-8-4.5S7.582 13 12 13s8 2.015 8 4.5Z" />
+                </g>
+              </svg>
+            </i>
+          </div>
+          @let nameError = fieldError('name');
+          @if (nameError) {
+            <div class="err-msg" id="name-error" role="alert"><app-icon name="alert" [size]="14"></app-icon> {{ nameError }}</div>
+          }
         </div>
 
         <div class="field-wrap">
           <label for="email">Email Address</label>
-          <input type="email" id="email" name="email" placeholder="buy01@example.com" autocomplete="email"
-            formControlName="email"
-            [class.is-invalid]="showError(form, 'email')" [attr.aria-invalid]="showError(form, 'email')"
-            aria-describedby="email-error" [class.is-valid]="isEmailValid" />
-          <i class="bi bi-envelope f-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-              <g fill="none" stroke="currentColor" stroke-width="1.5">
-                <path
-                  d="M2 12c0-3.771 0-5.657 1.172-6.828C4.343 4 6.229 4 10 4h4c3.771 0 5.657 0 6.828 1.172C22 6.343 22 8.229 22 12c0 3.771 0 5.657-1.172 6.828C19.657 20 17.771 20 14 20h-4c-3.771 0-5.657 0-6.828-1.172C2 17.657 2 15.771 2 12Z" />
-                <path stroke-linecap="round"
-                  d="m6 8l2.159 1.8c1.837 1.53 2.755 2.295 3.841 2.295c1.086 0 2.005-.765 3.841-2.296L18 8" />
-              </g>
-            </svg>
-          </i>
-          <div class="err-msg" id="email-error" role="alert"><app-icon name="alert" [size]="14"></app-icon> {{ showError(form, 'email') ? err('email') : '' }}</div>
-          <div class="ok-msg"><app-icon name="circle-check" [size]="14"></app-icon> Looks good!</div>
+          <div class="input-wrap">
+            <input type="email" id="email" name="email" placeholder="buy01@example.com" autocomplete="email"
+              formControlName="email"
+              [class.is-invalid]="showError(form, 'email')" [attr.aria-invalid]="showError(form, 'email')"
+              [attr.aria-describedby]="showError(form, 'email') ? 'email-error' : null" [class.is-valid]="isEmailValid" />
+            <i class="bi bi-envelope f-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <g fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path
+                    d="M2 12c0-3.771 0-5.657 1.172-6.828C4.343 4 6.229 4 10 4h4c3.771 0 5.657 0 6.828 1.172C22 6.343 22 8.229 22 12c0 3.771 0 5.657-1.172 6.828C19.657 20 17.771 20 14 20h-4c-3.771 0-5.657 0-6.828-1.172C2 17.657 2 15.771 2 12Z" />
+                  <path stroke-linecap="round"
+                    d="m6 8l2.159 1.8c1.837 1.53 2.755 2.295 3.841 2.295c1.086 0 2.005-.765 3.841-2.296L18 8" />
+                </g>
+              </svg>
+            </i>
+          </div>
+          @let emailError = fieldError('email');
+          @if (emailError) {
+            <div class="err-msg" id="email-error" role="alert"><app-icon name="alert" [size]="14"></app-icon> {{ emailError }}</div>
+          }
+          @if (isEmailValid) {
+            <div class="ok-msg"><app-icon name="circle-check" [size]="14"></app-icon> Looks good!</div>
+          }
         </div>
 
         <div class="field-wrap">
           <label for="password">Password</label>
-          <input [type]="passwordInputType" id="password" name="password" placeholder="••••••••"
-            autocomplete="new-password" formControlName="password"
-            [class.is-invalid]="showError(form, 'password')" [attr.aria-invalid]="showError(form, 'password')"
-            aria-describedby="password-error" />
-          <i class="bi bi-lock f-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-              <g fill="none" stroke="currentColor" stroke-width="1.5">
-                <path
-                  d="M2 16c0-2.828 0-4.243.879-5.121C3.757 10 5.172 10 8 10h8c2.828 0 4.243 0 5.121.879C22 11.757 22 13.172 22 16c0 2.828 0 4.243-.879 5.121C20.243 22 18.828 22 16 22H8c-2.828 0-4.243 0-5.121-.879C2 20.243 2 18.828 2 16Z" />
-                <path stroke-linecap="round" d="M6 10V8a6 6 0 1 1 12 0v2" />
-              </g>
-            </svg>
-          </i>
-          <button type="button" class="pw-toggle" (click)="togglePassword('password')" aria-label="Toggle password visibility">
-            <app-icon [name]="passwordVisible ? 'eye-off' : 'eye'" [size]="18"></app-icon>
-          </button>
-          <div class="err-msg" id="password-error" role="alert"><app-icon name="alert" [size]="14"></app-icon> {{ showError(form, 'password') ? err('password') : '' }}</div>
+          <div class="input-wrap">
+            <input [type]="passwordInputType" id="password" name="password" placeholder="••••••••"
+              autocomplete="new-password" formControlName="password"
+              [class.is-invalid]="showError(form, 'password')" [attr.aria-invalid]="showError(form, 'password')"
+              [attr.aria-describedby]="showError(form, 'password') ? 'password-error' : null" />
+            <i class="bi bi-lock f-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <g fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path
+                    d="M2 16c0-2.828 0-4.243.879-5.121C3.757 10 5.172 10 8 10h8c2.828 0 4.243 0 5.121.879C22 11.757 22 13.172 22 16c0 2.828 0 4.243-.879 5.121C20.243 22 18.828 22 16 22H8c-2.828 0-4.243 0-5.121-.879C2 20.243 2 18.828 2 16Z" />
+                  <path stroke-linecap="round" d="M6 10V8a6 6 0 1 1 12 0v2" />
+                </g>
+              </svg>
+            </i>
+            <button type="button" class="pw-toggle" (click)="togglePassword('password')" aria-label="Toggle password visibility">
+              <app-icon [name]="passwordVisible ? 'eye-off' : 'eye'" [size]="18"></app-icon>
+            </button>
+          </div>
+          @let passwordError = fieldError('password');
+          @if (passwordError) {
+            <div class="err-msg" id="password-error" role="alert"><app-icon name="alert" [size]="14"></app-icon> {{ passwordError }}</div>
+          }
           <!-- strength bar -->
           <div class="pw-strength" id="pwStrength" [class.visible]="passwordStrength.visible">
             <div class="pw-strength-bar">
@@ -179,23 +196,28 @@
 
         <div class="field-wrap">
           <label for="confirmPw">Confirm Password</label>
-          <input [type]="confirmPasswordInputType" id="confirmPw" name="confirmPassword" placeholder="••••••••"
-            autocomplete="new-password" formControlName="confirmPassword"
-            [class.is-invalid]="showError(form, 'confirmPassword')" [attr.aria-invalid]="showError(form, 'confirmPassword')"
-            aria-describedby="confirmPassword-error" />
-          <i class="bi bi-lock-fill f-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-              <g fill="none" stroke="currentColor" stroke-width="1.5">
-                <path
-                  d="M2 16c0-2.828 0-4.243.879-5.121C3.757 10 5.172 10 8 10h8c2.828 0 4.243 0 5.121.879C22 11.757 22 13.172 22 16c0 2.828 0 4.243-.879 5.121C20.243 22 18.828 22 16 22H8c-2.828 0-4.243 0-5.121-.879C2 20.243 2 18.828 2 16Z" />
-                <path stroke-linecap="round" d="M6 10V8a6 6 0 1 1 12 0v2" />
-              </g>
-            </svg>
-          </i>
-          <button type="button" class="pw-toggle" (click)="togglePassword('confirmPassword')" aria-label="Toggle confirm password visibility">
-            <app-icon [name]="confirmPasswordVisible ? 'eye-off' : 'eye'" [size]="18"></app-icon>
-          </button>
-          <div class="err-msg" id="confirmPassword-error" role="alert"><app-icon name="alert" [size]="14"></app-icon> {{ showError(form, 'confirmPassword') ? err('confirmPassword') : '' }}</div>
+          <div class="input-wrap">
+            <input [type]="confirmPasswordInputType" id="confirmPw" name="confirmPassword" placeholder="••••••••"
+              autocomplete="new-password" formControlName="confirmPassword"
+              [class.is-invalid]="showError(form, 'confirmPassword')" [attr.aria-invalid]="showError(form, 'confirmPassword')"
+              [attr.aria-describedby]="showError(form, 'confirmPassword') ? 'confirmPassword-error' : null" />
+            <i class="bi bi-lock-fill f-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <g fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path
+                    d="M2 16c0-2.828 0-4.243.879-5.121C3.757 10 5.172 10 8 10h8c2.828 0 4.243 0 5.121.879C22 11.757 22 13.172 22 16c0 2.828 0 4.243-.879 5.121C20.243 22 18.828 22 16 22H8c-2.828 0-4.243 0-5.121-.879C2 20.243 2 18.828 2 16Z" />
+                  <path stroke-linecap="round" d="M6 10V8a6 6 0 1 1 12 0v2" />
+                </g>
+              </svg>
+            </i>
+            <button type="button" class="pw-toggle" (click)="togglePassword('confirmPassword')" aria-label="Toggle confirm password visibility">
+              <app-icon [name]="confirmPasswordVisible ? 'eye-off' : 'eye'" [size]="18"></app-icon>
+            </button>
+          </div>
+          @let confirmPasswordError = fieldError('confirmPassword');
+          @if (confirmPasswordError) {
+            <div class="err-msg" id="confirmPassword-error" role="alert"><app-icon name="alert" [size]="14"></app-icon> {{ confirmPasswordError }}</div>
+          }
         </div>
 
         <button type="button" class="btn-register" (click)="goToStep(3)">
@@ -214,7 +236,7 @@
       <!-- ╔══════════════════════════════╗
          ║  STEP 3 — Profile / confirm ║
          ╚══════════════════════════════╝ -->
-      <div id="step3" [style.display]="currentStep === 3 ? 'block' : 'none'">
+      <div id="step3" [style.display]="currentStep() === 3 ? 'block' : 'none'">
         <div class="step-heading">
           <div class="step-label"><app-icon name="circle" [size]="8"></app-icon> Step 3 of 3</div>
           <h2>Review and confirm</h2>
@@ -224,7 +246,7 @@
         <!-- Terms -->
         <div class="terms-wrap">
           <input type="checkbox" id="terms" formControlName="terms"
-            [attr.aria-invalid]="showError(form, 'terms')" aria-describedby="terms-error" />
+            [attr.aria-invalid]="showError(form, 'terms')" [attr.aria-describedby]="showError(form, 'terms') ? 'terms-error' : null" />
           <label for="terms">
             I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I understand my data
             will be processed securely.
@@ -236,10 +258,10 @@
           </div>
         }
 
-        <button type="button" class="btn-register" id="submitBtn" [class.loading]="isSubmitting"
-          [disabled]="isSubmitting" (click)="submit()">
+        <button type="button" class="btn-register" id="submitBtn" [class.loading]="isSubmitting()"
+          [disabled]="isSubmitting()" (click)="submit()">
           <span class="btn-text">
-            <app-icon [name]="isSubmitting ? 'spinner' : 'user-check'" [class.spin]="isSubmitting" [size]="16"></app-icon>
+            <app-icon [name]="isSubmitting() ? 'spinner' : 'user-check'" [class.spin]="isSubmitting()" [size]="16"></app-icon>
             Create Account
           </span>
           <div class="btn-spinner"></div>
@@ -259,9 +281,9 @@
   </div>
 
   <!-- Toast -->
-  <div class="toast-alert" id="toast" [class.show]="toastVisible" [class.success]="toastType === 'success'"
-    [class.warning]="toastType === 'warning'">
-    <app-icon [name]="toastType === 'success' ? 'circle-check' : 'alert'" [size]="18"></app-icon>
-    <span id="toastMsg">{{ toastMessage }}</span>
+  <div class="toast-alert" id="toast" [class.show]="toastVisible()" [class.success]="toastType() === 'success'"
+    [class.warning]="toastType() === 'warning'">
+    <app-icon [name]="toastType() === 'success' ? 'circle-check' : 'alert'" [size]="18"></app-icon>
+    <span id="toastMsg">{{ toastMessage() }}</span>
   </div>
 </div>

@@ -1,160 +1,275 @@
 <div class="storefront-shell">
   <app-navbar></app-navbar>
 
-  <main class="container detail-page">
-    <div class="breadcrumb-row">
+  <main class="container detail-page" [class.has-buy-bar]="status() === 'ready' && canBuy()">
+    <nav class="breadcrumb-row" aria-label="Breadcrumb">
       <a routerLink="/products">Catalog</a>
       <app-icon name="chevron-right" [size]="14"></app-icon>
-      <strong aria-current="page">{{ productDetails()?.name || 'Product details' }}</strong>
-    </div>
+      <span aria-current="page">
+        @switch (status()) {
+          @case ('ready') { {{ product()?.name }} }
+          @case ('not-found') { Not found }
+          @default { Product }
+        }
+      </span>
+    </nav>
 
-    @if (isLoading()) {
-    <div class="surface-card detail-state">
-      <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24">
-        <g fill="none" stroke="currentColor" stroke-width="1.5">
-          <circle cx="12" cy="12" r="10" />
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="m15.977 8.715l-.441-.453a4.918 4.918 0 0 0-7.072 0c-1.952 1.999-1.952 5.24 0 7.239a4.919 4.919 0 0 0 7.072 0a5.184 5.184 0 0 0 1.425-4.259m-.983-2.527h-2.652m2.651 0V6" />
-        </g>
-      </svg>
-      <strong>Loading product</strong>
-    </div>
-    } @else if (errorMessage()) {
-    <div class="surface-card detail-state error-state">
-      <app-icon name="alert" [size]="24" [decorative]="false" ariaLabel="Product error"></app-icon>
-      <strong>Product could not load</strong>
-      <span>{{ errorMessage() }}</span>
-    </div>
-    } @else {
-    <div class="detail-layout">
-      <section class="gallery-column">
-        <div class="surface-card gallery-card">
-          @if (isMediaLoading()) {
-          <div class="gallery-stage gallery-empty-state">
-            <app-icon class="spin" name="spinner" [size]="24"></app-icon>
-            <strong>Loading images...</strong>
+    @switch (status()) {
+      @case ('loading') {
+        <!-- Whole-page skeleton while the product loads -->
+        <div class="detail-layout" aria-busy="true" aria-label="Loading product" data-testid="page-skeleton">
+          <div class="gallery-column">
+            <span class="gallery-stage skeleton"></span>
           </div>
-          } @else if (mediaErrorMessage()) {
-          <div class="gallery-stage gallery-empty-state">
-            <app-icon name="alert" [size]="24" [decorative]="false" ariaLabel="Product image error"></app-icon>
-            <strong>Images unavailable</strong>
-            <span>{{ mediaErrorMessage() }}</span>
+          <div class="info-column">
+            <div class="info-sticky" aria-hidden="true">
+              <span class="skeleton sk-line w-30"></span>
+              <span class="skeleton sk-title"></span>
+              <span class="skeleton sk-title w-60"></span>
+              <span class="skeleton sk-line w-40 sk-price"></span>
+              <span class="skeleton sk-line"></span>
+              <span class="skeleton sk-line"></span>
+              <span class="skeleton sk-line w-70"></span>
+              <span class="skeleton sk-button"></span>
+            </div>
           </div>
-          } @else if (selectedImage() ; as media) {
-          <div class="gallery-stage">
-            <img [src]="imageUrl(media)" [alt]="productDetails()?.name || 'Product photo'">
-          </div>
-          } @else {
-          <div class="gallery-stage gallery-empty-state">
-            <app-icon name="image-off" [size]="30"></app-icon>
-            <strong>No photos yet</strong>
-            <span>The seller has not added photos for this product.</span>
-          </div>
-          }
+        </div>
+      }
 
-          <div class="thumb-grid">
-            @for (mediaData of medias(); track mediaData.id) {
-            <button [class]="(selectedImage()?.id==mediaData.id)? 'thumb-btn active':'thumb-btn'" type="button"
-              (click)="selectImage(mediaData.id)">
-              <img [src]="imageUrl(mediaData)" alt="">
-              <span class="sr-only">Show photo</span>
+      @case ('not-found') {
+        <section class="detail-state surface-card rise-in" data-testid="not-found" aria-labelledby="nf-title">
+          <span class="state-icon"><app-icon name="package-open" [size]="26"></app-icon></span>
+          <h1 id="nf-title">Product not found</h1>
+          <p>It may have been removed by its seller, or the link is wrong.</p>
+          <a routerLink="/products" class="btn-primary">
+            <app-icon name="arrow-left" [size]="16"></app-icon>
+            Back to catalog
+          </a>
+        </section>
+      }
+
+      @case ('error') {
+        <section class="detail-state surface-card" role="alert">
+          <span class="state-icon is-error"><app-icon name="alert" [size]="26"></app-icon></span>
+          <h1>This product could not load</h1>
+          <p>{{ errorMessage() }}</p>
+          <div class="state-actions">
+            <button type="button" class="btn-primary" (click)="retry()">
+              <app-icon name="refresh" [size]="16"></app-icon>
+              Try again
             </button>
-            }
+            <a routerLink="/products" class="btn-light">Back to catalog</a>
           </div>
-        </div>
+        </section>
+      }
 
-      </section>
+      @default {
+        @if (product(); as p) {
+          <div class="detail-layout">
+            <!-- ───────── Gallery ───────── -->
+            <section class="gallery-column" aria-label="Product photos">
+              <div class="gallery" (keydown)="onGalleryKeydown($event)">
+                <div class="gallery-stage" [class.is-zoomed]="zoom() !== null"
+                  [style.--zx]="(zoom()?.x ?? 50) + '%'" [style.--zy]="(zoom()?.y ?? 50) + '%'"
+                  (pointermove)="onStagePointerMove($event)" (pointerleave)="endZoom()"
+                  (pointerdown)="onSwipeStart($event)" (pointerup)="onSwipeEnd($event)">
+                  @if (mediaLoading()) {
+                    <span class="skeleton stage-fill" aria-hidden="true"></span>
+                  } @else if (activeImage(); as img) {
+                    @if (!imageLoaded()) {
+                      <span class="skeleton stage-fill" aria-hidden="true" data-testid="image-skeleton"></span>
+                    }
+                    @for (m of [img]; track m.id) {
+                      <button type="button" class="stage-button" (click)="openLightbox()"
+                        [attr.aria-label]="'View ' + photoAlt(activeIndex()) + ' full screen'">
+                        <img [ngSrc]="imageUrl(m)" fill priority sizes="(max-width: 991px) 100vw, 58vw"
+                          [alt]="photoAlt(activeIndex())" [class.is-loaded]="imageLoaded()"
+                          (load)="imageLoaded.set(true)" (error)="imageLoaded.set(true)" />
+                      </button>
+                    }
+                    <span class="stage-hint" aria-hidden="true">
+                      <app-icon name="eye" [size]="14"></app-icon>
+                      Click to enlarge
+                    </span>
+                    @if (media().length > 1) {
+                      <button type="button" class="stage-arrow prev" (click)="prev()" aria-label="Previous photo">
+                        <app-icon name="arrow-left" [size]="18"></app-icon>
+                      </button>
+                      <button type="button" class="stage-arrow next" (click)="next()" aria-label="Next photo">
+                        <app-icon name="arrow-right" [size]="18"></app-icon>
+                      </button>
+                      <span class="stage-count" aria-live="polite">{{ activeIndex() + 1 }} / {{ media().length }}</span>
+                    }
+                  } @else {
+                    <span class="stage-fill letter-plinth stage-empty">
+                      <span class="letter-mark" aria-hidden="true">{{ initial() }}</span>
+                      <span class="stage-empty-note">No photos yet</span>
+                    </span>
+                  }
+                </div>
 
-      <section class="info-column">
-        <div class="detail-card">
-          <h1 class="detail-title">{{ productDetails()?.name }}</h1>
-
-          <div class="price-row">
-            <strong class="detail-price">{{ productDetails()?.price | currency: 'USD' }}</strong>
-            <span class="stock-pill">
-              <app-icon name="circle-check" [size]="16"></app-icon>
-              {{ productDetails()?.quantity }} in stock
-            </span>
-          </div>
-
-          <p class="detail-description">
-            {{ productDetails()?.description }}
-          </p>
-
-          @if (!productDetails()?.owner && !isSeller) {
-          <div class="buy-panel">
-            @if (stock() === 0) {
-            <p class="buy-soldout">
-              <app-icon name="alert" [size]="17"></app-icon>
-              Sold out. Check back soon.
-            </p>
-            } @else {
-            <div class="buy-row">
-              <div class="qty-stepper" role="group" aria-label="Quantity">
-                <button type="button" (click)="changeQuantity(-1)" [disabled]="quantity() <= 1"
-                  aria-label="Decrease quantity">−</button>
-                <output aria-live="polite">{{ quantity() }}</output>
-                <button type="button" (click)="changeQuantity(1)" [disabled]="quantity() >= canAddMore()"
-                  aria-label="Increase quantity">+</button>
+                @if (media().length > 1) {
+                  <div class="thumb-strip" role="group" aria-label="Choose a photo">
+                    @for (m of media(); track m.id; let i = $index) {
+                      <button type="button" class="thumb-btn" [class.active]="i === activeIndex()"
+                        [attr.aria-current]="i === activeIndex() ? 'true' : null" [attr.data-thumb]="i"
+                        [attr.aria-label]="'Show photo ' + (i + 1) + ' of ' + media().length" (click)="select(i)">
+                        <img [src]="imageUrl(m)" alt="" width="88" height="88" loading="lazy" decoding="async" />
+                      </button>
+                    }
+                  </div>
+                }
               </div>
-              <button type="button" class="btn-primary buy-add" (click)="addToCart()" [disabled]="canAddMore() === 0">
-                <app-icon name="shopping-bag" [size]="18"></app-icon>
-                Add to cart
-              </button>
-            </div>
-            @if (inCart() > 0) {
-            <p class="buy-note">
-              <app-icon name="circle-check" [size]="15"></app-icon>
-              {{ inCart() }} in your cart.
-              <a routerLink="/cart">View cart</a>
-            </p>
-            }
-            @if (canAddMore() === 0) {
-            <p class="buy-note">You have all available stock in your cart.</p>
-            }
-            }
-          </div>
-          }
+            </section>
 
-          @if(productDetails()?.owner) {
-          <div class="owner-panel">
-            <div class="owner-panel-copy">
-              <strong>You sell this product</strong>
-              <span>Change the details and photos, or take it off the store.</span>
-            </div>
-            <div class="action-row">
-              <button class="btn-light" type="button" (click)="updateProduct()">
-                <app-icon name="edit" [size]="17"></app-icon>
-                Edit product
-              </button>
-              <button class="btn-danger" type="button" (click)="delete()" [disabled]="isDeleting()">
-                <app-icon [name]="isDeleting() ? 'spinner' : 'trash'" [class.spin]="isDeleting()" [size]="17"></app-icon>
-                {{ isDeleting() ? 'Deleting...' : 'Delete' }}
-              </button>
-            </div>
-          </div>
-          }
+            <!-- ───────── Info (sticky on desktop) ───────── -->
+            <section class="info-column" aria-labelledby="product-title">
+              <div class="info-sticky rise-in">
+                <p class="detail-eyebrow">
+                  @if (isOwner()) { Your listing } @else { Sold by a Buy01 seller }
+                </p>
 
-          <ul class="detail-facts">
-            <li>
-              <app-icon name="package" [size]="18"></app-icon>
-              <div>
-                <strong>Pay on delivery</strong>
-                <span>Pay when your order arrives. No card needed at checkout.</span>
+                <h1 class="detail-title" id="product-title">{{ p.name }}</h1>
+
+                <div class="price-row">
+                  <strong class="detail-price">{{ p.price | currency: 'USD' }}</strong>
+                  <span class="stock-badge" [class]="'is-' + badge().tone" data-testid="stock-badge">
+                    <span class="stock-dot" aria-hidden="true"></span>
+                    {{ badge().label }}
+                  </span>
+                </div>
+
+                <p class="detail-description">{{ p.description }}</p>
+
+                @if (isOwner()) {
+                  <div class="owner-panel" data-testid="owner-panel">
+                    <div class="owner-panel-copy">
+                      <strong>You sell this product</strong>
+                      <span>Change the details and photos, or manage stock and orders from your dashboard.</span>
+                    </div>
+                    <div class="action-row">
+                      <a class="btn-primary" [routerLink]="['/seller/products', p.id, 'edit']">
+                        <app-icon name="edit" [size]="17"></app-icon>
+                        Edit product
+                      </a>
+                      <a class="btn-secondary" routerLink="/seller">
+                        <app-icon name="dashboard" [size]="17"></app-icon>
+                        Manage in dashboard
+                      </a>
+                    </div>
+                    <button class="delete-link" type="button" (click)="delete()" [disabled]="isDeleting()">
+                      <app-icon [name]="isDeleting() ? 'spinner' : 'trash'" [class.spin]="isDeleting()" [size]="15"></app-icon>
+                      {{ isDeleting() ? 'Deleting…' : 'Delete this product' }}
+                    </button>
+                  </div>
+                } @else if (role() === 'SELLER') {
+                  <p class="buy-note seller-note" data-testid="seller-note">
+                    <app-icon name="info" [size]="16"></app-icon>
+                    Seller accounts can't place orders. Sign in with a client account to buy.
+                  </p>
+                } @else {
+                  <div class="buy-panel" data-testid="buy-panel">
+                    <div class="buy-row">
+                      <div class="qty-stepper" role="group" aria-label="Quantity">
+                        <button type="button" (click)="changeQuantity(-1)" aria-label="Decrease quantity"
+                          [disabled]="addDisabled() || quantity() <= 1" data-testid="qty-minus">−</button>
+                        <output aria-live="polite" data-testid="qty">{{ quantity() }}</output>
+                        <button type="button" (click)="changeQuantity(1)" aria-label="Increase quantity"
+                          [disabled]="addDisabled() || quantity() >= maxQuantity()" data-testid="qty-plus">+</button>
+                      </div>
+                      <button type="button" class="btn-primary buy-add" (click)="addToCart()"
+                        [disabled]="addDisabled()" [attr.aria-busy]="adding()" data-testid="add-to-cart">
+                        <app-icon [name]="adding() ? 'spinner' : 'shopping-bag'" [class.spin]="adding()" [size]="18"></app-icon>
+                        {{ adding() ? 'Adding…' : addLabel() }}
+                      </button>
+                    </div>
+                    @if (inCart() > 0) {
+                      <p class="buy-note">
+                        <app-icon name="circle-check" [size]="15"></app-icon>
+                        {{ inCart() }} in your cart.
+                        <a routerLink="/cart">View cart</a>
+                      </p>
+                    }
+                    @if (role() === 'GUEST' && stock() > 0) {
+                      <p class="buy-note">You'll sign in first, then come right back to this page.</p>
+                    }
+                  </div>
+                }
+
+                <ul class="detail-facts">
+                  <li>
+                    <span class="fact-icon"><app-icon name="package" [size]="17"></app-icon></span>
+                    <span><strong>Pay on delivery</strong> No card needed at checkout.</span>
+                  </li>
+                  <li>
+                    <span class="fact-icon"><app-icon name="shield-check" [size]="17"></app-icon></span>
+                    <span><strong>Sold by a Buy01 seller</strong> Listed and managed by the seller's own account.</span>
+                  </li>
+                </ul>
               </div>
-            </li>
-            <li>
-              <app-icon name="shield-check" [size]="18"></app-icon>
-              <div>
-                <strong>Sold by a Buy01 seller</strong>
-                <span>Listed and managed by the seller's own account.</span>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </section>
-    </div>
+            </section>
+          </div>
+        }
+      }
     }
   </main>
+
+  <!-- ───────── You might also like ───────── -->
+  @if (status() === 'ready' && related().length > 0) {
+    <section class="container related" aria-labelledby="related-title" data-testid="related">
+      <div class="related-head">
+        <h2 id="related-title">You might also like</h2>
+        <a routerLink="/products" class="related-all">
+          Browse the catalog
+          <app-icon name="arrow-right" [size]="15"></app-icon>
+        </a>
+      </div>
+      <div class="product-grid animate-in" [class.is-single]="related().length === 1"
+        [class.is-pair]="related().length === 2">
+        @for (r of related(); track r.id; let i = $index) {
+          <app-product-card [product]="r" [image]="relatedImages()[r.id] || null" [index]="i"
+            [layout]="related().length === 1 ? 'feature' : related().length === 2 ? 'wide' : 'tile'" />
+        }
+      </div>
+    </section>
+  }
+
   <app-footer />
+
+  <!-- ───────── Mobile: sticky price + Add to cart ───────── -->
+  @if (status() === 'ready' && canBuy()) {
+    @if (product(); as p) {
+      <div class="buy-bar" data-testid="buy-bar">
+        <div class="buy-bar-copy">
+          <span class="buy-bar-name">{{ p.name }}</span>
+          <strong>{{ p.price | currency: 'USD' }}</strong>
+        </div>
+        <button type="button" class="btn-primary" (click)="addToCart()" [disabled]="addDisabled()"
+          [attr.aria-busy]="adding()">
+          <app-icon [name]="adding() ? 'spinner' : 'shopping-bag'" [class.spin]="adding()" [size]="17"></app-icon>
+          {{ adding() ? 'Adding…' : addLabel() }}
+        </button>
+      </div>
+    }
+  }
 </div>
+
+<!-- ───────── Lightbox ───────── -->
+<dialog #lightbox class="lightbox" aria-label="Product photo" (close)="lightboxOpen.set(false)"
+  (click)="onLightboxClick($event)" (keydown)="onGalleryKeydown($event)">
+  @if (lightboxOpen() && activeImage(); as img) {
+    <img class="lightbox-img" [src]="imageUrl(img)" [alt]="photoAlt(activeIndex())" />
+    <button type="button" class="lightbox-close" (click)="closeLightbox()" aria-label="Close">
+      <app-icon name="x" [size]="20"></app-icon>
+    </button>
+    @if (media().length > 1) {
+      <button type="button" class="lightbox-arrow prev" (click)="prev()" aria-label="Previous photo">
+        <app-icon name="arrow-left" [size]="20"></app-icon>
+      </button>
+      <button type="button" class="lightbox-arrow next" (click)="next()" aria-label="Next photo">
+        <app-icon name="arrow-right" [size]="20"></app-icon>
+      </button>
+      <span class="lightbox-count">{{ activeIndex() + 1 }} / {{ media().length }}</span>
+    }
+  }
+</dialog>

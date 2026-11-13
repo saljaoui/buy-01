@@ -2,189 +2,245 @@
 
   <app-navbar></app-navbar>
 
-  <!-- Hero: what Buy01 is, and the two things people come to do -->
-  <section class="store-hero">
+  <!-- ───────────── Hero ───────────── -->
+  <section class="store-hero" aria-labelledby="hero-title">
     <div class="container store-hero-inner">
       <div class="store-hero-copy">
-        <h1 class="store-hero-title">Well-made things, sold by the people behind them.</h1>
+        <p class="hero-eyebrow">Independent sellers · Pay on delivery</p>
+        <h1 class="store-hero-title" id="hero-title">Well-made things, sold by the people behind them.</h1>
         <p class="store-hero-lede">
           Browse products from independent sellers on Buy01. Order in a few clicks and pay when it
           reaches your door.
         </p>
-        <div class="hero-actions">
-          <button type="button" class="btn-primary" (click)="scrollCatalog()">
-            Browse the catalog
-            <app-icon name="arrow-down" [size]="16"></app-icon>
-          </button>
-          <a routerLink="/register" class="btn-secondary">Start selling</a>
+
+        <div class="hero-actions" data-testid="hero-actions">
+          @switch (role()) {
+            @case ('SELLER') {
+              <a routerLink="/seller/products/new" class="btn-primary">
+                <app-icon name="plus" [size]="16"></app-icon>
+                Add a product
+              </a>
+              <a routerLink="/seller" class="btn-secondary">
+                <app-icon name="dashboard" [size]="16"></app-icon>
+                Go to dashboard
+              </a>
+            }
+            @case ('CLIENT') {
+              <button type="button" class="btn-primary" (click)="scrollCatalog()">
+                Browse the catalog
+                <app-icon name="arrow-down" [size]="16"></app-icon>
+              </button>
+            }
+            @default {
+              <a routerLink="/register" class="btn-primary">
+                <app-icon name="user-plus" [size]="16"></app-icon>
+                Create account
+              </a>
+              <a routerLink="/login" class="btn-secondary">Sign in</a>
+              <button type="button" class="hero-text-link" (click)="scrollCatalog()">
+                or browse the catalog
+                <app-icon name="arrow-down" [size]="14"></app-icon>
+              </button>
+            }
+          }
         </div>
       </div>
 
-      <ul class="store-promises" aria-label="What every order includes">
-        <li>
-          <span class="promise-icon"><app-icon name="package" [size]="20"></app-icon></span>
-          <div>
-            <strong>Pay on delivery</strong>
-            <span>Pay when your order arrives. No card needed at checkout.</span>
+      <!-- Visual: a layered stack of the newest products -->
+      <div class="hero-visual" aria-label="Newest products" role="group"
+        [style.--tx]="tilt().x" [style.--ty]="tilt().y"
+        (pointermove)="onHeroPointerMove($event)" (pointerleave)="resetTilt()">
+        <span class="hero-halo" aria-hidden="true"></span>
+
+        @if (heroLoading()) {
+          <div class="hero-stack" aria-hidden="true">
+            <div class="hero-card layer-2 is-ghost"></div>
+            <div class="hero-card layer-1 is-ghost"></div>
+            <div class="hero-card layer-0 is-skeleton"><span class="skeleton"></span></div>
           </div>
-        </li>
-        <li>
-          <span class="promise-icon"><app-icon name="shield-check" [size]="20"></app-icon></span>
-          <div>
-            <strong>Real sellers, real accounts</strong>
-            <span>Every listing belongs to a signed-in seller who manages it.</span>
+        } @else if (heroItems().length === 0) {
+          <!-- 0 products: a quiet composition instead of an empty box -->
+          <div class="hero-stack is-empty" data-testid="hero-empty">
+            <div class="hero-card layer-2 is-ghost" aria-hidden="true"><app-icon name="package" [size]="26"></app-icon></div>
+            <div class="hero-card layer-1 is-ghost" aria-hidden="true"><app-icon name="store" [size]="26"></app-icon></div>
+            <div class="hero-card layer-0 hero-card--note">
+              <app-icon name="sparkles" [size]="22"></app-icon>
+              <strong>The first pieces are on their way</strong>
+              <span>New listings show up here as soon as a seller publishes them.</span>
+            </div>
           </div>
-        </li>
-        <li>
-          <span class="promise-icon"><app-icon name="store" [size]="20"></app-icon></span>
-          <div>
-            <strong>Straight from the source</strong>
-            <span>See the price, the photos and what is in stock before you order.</span>
+        } @else {
+          <div class="hero-stack" [attr.data-count]="heroItems().length">
+            <!-- Fewer than 3 products: decorative plinths keep the stack full -->
+            @for (slot of [heroItems().length, heroItems().length + 1]; track slot) {
+              @if (slot < 3) {
+                <div class="hero-card is-ghost" [class]="'layer-' + slot" aria-hidden="true"></div>
+              }
+            }
+            @for (item of heroItems(); track item.id; let i = $index) {
+              <a class="hero-card" [class]="'layer-' + i" [routerLink]="['/products', item.id]"
+                [attr.tabindex]="i === 0 ? null : -1" [attr.aria-hidden]="i === 0 ? null : 'true'"
+                [attr.aria-label]="i === 0 ? item.name + ', ' + (item.price | currency: 'USD') : null">
+                <span class="hero-card-media">
+                  @if (item.image; as src) {
+                    <img [ngSrc]="src" fill sizes="(max-width: 991px) 70vw, 25vw" [priority]="i === 0"
+                      [alt]="i === 0 ? item.name : ''" />
+                  } @else {
+                    <span class="letter-mark" aria-hidden="true">{{ initial(item.name) }}</span>
+                  }
+                </span>
+                @if (i === 0) {
+                  <span class="hero-card-caption">
+                    <span class="hero-card-tag">New in</span>
+                    <strong>{{ item.name }}</strong>
+                    <span class="hero-card-price">{{ item.price | currency: 'USD' }}</span>
+                  </span>
+                }
+              </a>
+            }
           </div>
-        </li>
-      </ul>
+          @if (catalogTotal() > 1) {
+            <p class="hero-count" aria-hidden="true">
+              <strong>{{ catalogTotal() }}</strong> pieces in the catalog
+            </p>
+          }
+        }
+      </div>
     </div>
   </section>
 
+  <!-- ───────────── Trust strip ───────────── -->
+  <section class="trust-strip" aria-label="What every order includes">
+    <ul class="container trust-list">
+      <li>
+        <span class="trust-icon"><app-icon name="package" [size]="18"></app-icon></span>
+        <span><strong>Pay on delivery</strong> No card needed at checkout.</span>
+      </li>
+      <li>
+        <span class="trust-icon"><app-icon name="shield-check" [size]="18"></app-icon></span>
+        <span><strong>Real sellers</strong> Every listing belongs to a signed-in seller.</span>
+      </li>
+      <li>
+        <span class="trust-icon"><app-icon name="store" [size]="18"></app-icon></span>
+        <span><strong>Straight from the source</strong> Price, photos and stock up front.</span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ───────────── Catalog ───────────── -->
   <main class="container catalog-page" id="catalog">
-    <div class="catalog-layout">
-      <section class="catalog-content">
-        <div class="section-heading">
-          <h2>The catalog</h2>
-          <div class="kicker" aria-live="polite">
-            {{ productCount() }} {{ productCount() === 1 ? 'product' : 'products' }}
-          </div>
+    <section class="catalog-content" aria-labelledby="catalog-title">
+      <div class="section-heading">
+        <h2 id="catalog-title">The catalog</h2>
+        <div class="kicker" aria-live="polite">
+          {{ productCount() }} {{ productCount() === 1 ? 'product' : 'products' }}
+        </div>
+      </div>
+
+      <!-- Search and filters (sticky; compact once stuck) -->
+      <div class="filter-sentinel" aria-hidden="true"></div>
+      <form class="filter-bar" [class.is-stuck]="filtersStuck()" [formGroup]="filters" role="search"
+        aria-label="Search and filter products" (submit)="$event.preventDefault()">
+        <label class="filter-search">
+          <app-icon name="search" [size]="17"></app-icon>
+          <span class="sr-only">Search products</span>
+          <input type="search" id="catalog-search" formControlName="q" placeholder="Search by name or description"
+            maxlength="100" />
+        </label>
+
+        <div class="filter-price">
+          <label>
+            <span class="sr-only">Minimum price</span>
+            <input type="number" formControlName="minPrice" min="0" step="1" placeholder="Min $" inputmode="decimal" />
+          </label>
+          <span class="filter-dash" aria-hidden="true">to</span>
+          <label>
+            <span class="sr-only">Maximum price</span>
+            <input type="number" formControlName="maxPrice" min="0" step="1" placeholder="Max $" inputmode="decimal" />
+          </label>
         </div>
 
-        <!-- Search and filters -->
-        <form class="filter-bar" [formGroup]="filters" role="search" (submit)="$event.preventDefault()">
-          <label class="filter-search">
-            <app-icon name="search" [size]="17"></app-icon>
-            <span class="sr-only">Search products</span>
-            <input type="search" formControlName="q" placeholder="Search by name or description" maxlength="100" />
-          </label>
+        <label class="filter-toggle">
+          <input type="checkbox" formControlName="inStock" />
+          <span>In stock only</span>
+        </label>
 
-          <div class="filter-price">
-            <label>
-              <span class="sr-only">Minimum price</span>
-              <input type="number" formControlName="minPrice" min="0" step="1" placeholder="Min $" inputmode="decimal" />
-            </label>
-            <span class="filter-dash" aria-hidden="true">to</span>
-            <label>
-              <span class="sr-only">Maximum price</span>
-              <input type="number" formControlName="maxPrice" min="0" step="1" placeholder="Max $" inputmode="decimal" />
-            </label>
-          </div>
-
-          <label class="filter-toggle">
-            <input type="checkbox" formControlName="inStock" />
-            <span>In stock only</span>
-          </label>
-
-          <label class="filter-sort">
-            <span class="sr-only">Sort by</span>
-            <select formControlName="sort">
-              @for (option of sortOptions; track option.value) {
+        <label class="filter-sort">
+          <span class="sr-only">Sort by</span>
+          <select formControlName="sort">
+            @for (option of sortOptions; track option.value) {
               <option [value]="option.value">{{ option.label }}</option>
-              }
-            </select>
-          </label>
+            }
+          </select>
+        </label>
 
-          @if (hasActiveFilters()) {
+        @if (hasActiveFilters()) {
           <button type="button" class="filter-clear" (click)="clearFilters()">
             <app-icon name="x" [size]="15"></app-icon>
             Clear
           </button>
+        }
+      </form>
+
+      @if (isLoading()) {
+        <div class="product-grid" aria-busy="true" aria-label="Loading products" data-testid="skeletons">
+          @for (s of skeletons; track s) {
+            <app-product-card />
           }
-        </form>
-        @if (isLoading()) {
-        <div class="catalog-state surface-card">
-          <app-icon class="spin" name="spinner" [size]="22"></app-icon>
-          <strong>Loading products</strong>
         </div>
-        } @else if (errorMessage()) {
-        <div class="catalog-state surface-card error-state">
-          <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24">
-            <g fill="none">
-              <path stroke="currentColor" stroke-width="1.5"
-                d="M3 10.417c0-3.198 0-4.797.378-5.335c.377-.537 1.88-1.052 4.887-2.081l.573-.196C10.405 2.268 11.188 2 12 2c.811 0 1.595.268 3.162.805l.573.196c3.007 1.029 4.51 1.544 4.887 2.081C21 5.62 21 7.22 21 10.417v1.574c0 5.638-4.239 8.375-6.899 9.536C13.38 21.842 13.02 22 12 22s-1.38-.158-2.101-.473C7.239 20.365 3 17.63 3 11.991v-1.574Z" />
-              <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M12 8v4" />
-              <circle cx="12" cy="15" r="1" fill="currentColor" />
-            </g>
-          </svg>
+      } @else if (errorMessage()) {
+        <div class="catalog-state surface-card error-state" role="alert">
+          <app-icon name="alert" [size]="28"></app-icon>
           <strong>Products could not load</strong>
           <span>{{ errorMessage() }}</span>
+          <button type="button" class="btn-light" (click)="loadProducts()">
+            <app-icon name="refresh" [size]="16"></app-icon>
+            Try again
+          </button>
         </div>
-        } @else if (productList().length === 0 && hasActiveFilters()) {
-        <div class="catalog-state surface-card">
-          <app-icon name="search" [size]="28"></app-icon>
-          <strong>No products match your search</strong>
-          <span>Try a different word, widen the price range, or clear the filters.</span>
-          <button type="button" class="btn-light" (click)="clearFilters()">Clear filters</button>
+      } @else if (productList().length === 0 && hasActiveFilters()) {
+        <div class="catalog-state surface-card" data-testid="no-results">
+          <span class="state-icon"><app-icon name="search" [size]="26"></app-icon></span>
+          <strong>Nothing matches those filters</strong>
+          <span>Try a different word, widen the price range, or start over.</span>
+          <button type="button" class="btn-primary" (click)="clearFilters()">
+            <app-icon name="x" [size]="16"></app-icon>
+            Clear filters
+          </button>
         </div>
-        } @else if (productList().length === 0) {
+      } @else if (productList().length === 0) {
         <div class="catalog-state surface-card">
-          <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24">
-            <g fill="none">
-              <path stroke="currentColor" stroke-width="1.5"
-                d="M7.5 18a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3Zm9 0a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3Z" />
-              <path fill="currentColor"
-                d="m2.261 3.092l.249-.708l-.249.708Zm-.012-.8a.75.75 0 1 0-.498 1.416l.498-1.416Zm2.337 2.031l.62-.423l-.62.423Zm1.302 10.263l-.545.516l.545-.516Zm14.77-4.703l.734.151l.001-.004l-.735-.147Zm-.5 2.425l.735.15l-.735-.15Zm.576-5.61l-.594.456l.595-.457Zm-1.6 8.352l-.474-.581l.474.581ZM5.708 9.76V7.038h-1.5V9.76h1.5ZM2.51 2.384l-.261-.092l-.498 1.416l.261.091l.498-1.415Zm8.428 13.866h5.302v-1.5h-5.302v1.5Zm-5.23-9.212c0-.707.001-1.297-.05-1.776c-.055-.497-.171-.95-.453-1.362l-1.238.846c.09.132.16.314.199.677c.041.38.042.875.042 1.615h1.5ZM2.012 3.8c.668.235 1.107.39 1.43.55c.303.148.437.268.525.397L5.205 3.9c-.284-.416-.662-.682-1.103-.899c-.42-.206-.958-.394-1.592-.617L2.012 3.8Zm2.196 5.96c0 1.453.014 2.5.15 3.3c.147.854.44 1.466.985 2.042l1.089-1.032c-.32-.338-.493-.668-.595-1.263c-.11-.65-.129-1.558-.129-3.047h-1.5Zm6.73 4.99c-1.417 0-2.4-.002-3.141-.107c-.715-.101-1.092-.285-1.365-.573l-1.089 1.032c.594.627 1.347.9 2.243 1.026c.87.124 1.98.122 3.351.122v-1.5Zm-5.98-7.88h12.13v-1.5H4.959v1.5Zm14.965 2.861l-.5 2.425l1.47.303l.5-2.425l-1.47-.303ZM17.09 6.87c.856 0 1.61.001 2.205.067c.295.034.517.08.672.134c.161.057.187.1.174.083l1.189-.914c-.235-.306-.565-.479-.866-.584a4.616 4.616 0 0 0-1.003-.21c-.695-.077-1.543-.076-2.371-.076v1.5Zm4.304 3.16c.17-.848.313-1.56.348-2.13c.037-.586-.03-1.164-.412-1.66l-1.189.914c.062.081.13.226.104.654c-.027.444-.144 1.037-.322 1.928l1.471.294Zm-5.153 6.22c.762 0 1.401.001 1.917-.062c.535-.065 1.024-.209 1.45-.556l-.947-1.163c-.125.102-.303.184-.686.23c-.403.05-.934.051-1.734.051v1.5Zm3.184-4.094c-.162.783-.27 1.303-.4 1.688c-.123.366-.239.523-.364.625l.947 1.163c.427-.348.666-.797.838-1.309c.166-.492.294-1.118.448-1.864l-1.47-.303Z" />
-              <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="m11.5 12.5l3-3m0 3l-3-3" />
-            </g>
-          </svg>
+          <span class="state-icon"><app-icon name="package-open" [size]="26"></app-icon></span>
           <strong>No products yet</strong>
           <span>New listings appear here as soon as a seller publishes them.</span>
-          <a routerLink="/register" class="btn-light">Become the first seller</a>
-        </div>
-        } @else {
-        <div class="product-grid">
-          @if (totalPages() > 0) {
-          <div class="pagination-info">
-            <span>{{ totalElements() }} product{{ totalElements() === 1 ? '' : 's' }}</span>
-          </div>
-          }
-          @for (product of productList(); track product.id) {
-          <article class="product-card">
-            <a class="product-media" [routerLink]="['/products', product.id]" tabindex="-1" aria-hidden="true">
-              @if (getProductImage(product.id); as imgUrl) {
-              <img [src]="imgUrl" [alt]="product.name" loading="lazy">
-              } @else {
-              <span class="media-placeholder">
-                <app-icon name="image-off" [size]="28"></app-icon>
-              </span>
-              }
-            </a>
-            <button class="wish-btn" type="button" aria-label="Save product">
-              <app-icon name="heart" [size]="17"></app-icon>
-            </button>
-            <div class="product-body">
-              <h3><a [routerLink]="['/products', product.id]">{{ product.name }}</a></h3>
-              <p>{{ product.description }}</p>
-              <div class="product-footer">
-                <strong class="product-price">{{ product.price | currency: 'USD' }}</strong>
-                <a class="mini-btn" [routerLink]="['/products', product.id]" [attr.aria-label]="'View ' + product.name">
-                  View
-                  <app-icon name="arrow-right" [size]="14"></app-icon>
-                </a>
-              </div>
-            </div>
-          </article>
+          @if (role() === 'SELLER') {
+            <a routerLink="/seller/products/new" class="btn-primary">Add the first product</a>
+          } @else if (role() === 'GUEST') {
+            <a routerLink="/register" class="btn-light">Become the first seller</a>
           }
         </div>
-        }
-        @if (totalPages() > 1) {
-        <div class="pagination-controls">
+      } @else {
+        <div class="product-grid" [class.animate-in]="animateCards()"
+          [class.is-single]="productList().length === 1" [class.is-pair]="productList().length === 2">
+          @for (product of productList(); track product.id; let i = $index) {
+            <app-product-card [product]="product" [image]="getProductImage(product.id)" [index]="i"
+              [layout]="cardLayout()" />
+          }
+        </div>
+      }
+
+      @if (totalPages() > 1) {
+        <nav class="pagination-controls" aria-label="Catalog pages">
           <button class="pagination-btn" type="button" (click)="prevPage()" [disabled]="currentPage() === 0">
             <app-icon name="arrow-left" [size]="16"></app-icon>
             Previous
           </button>
           <div class="pagination-pages">
             @for (page of pageRange(); track page) {
-            <button class="pagination-page" type="button" [class.active]="page === currentPage()"
-              (click)="goToPage(page)">
-              {{ page + 1 }}
-            </button>
+              <button class="pagination-page" type="button" [class.active]="page === currentPage()"
+                [attr.aria-current]="page === currentPage() ? 'page' : null" (click)="goToPage(page)">
+                {{ page + 1 }}
+              </button>
             }
           </div>
           <button class="pagination-btn" type="button" (click)="nextPage()"
@@ -192,9 +248,10 @@
             Next
             <app-icon name="arrow-right" [size]="16"></app-icon>
           </button>
-        </div>
-        }
-      </section>
-    </div>
+        </nav>
+      }
+    </section>
   </main>
+
   <app-footer />
+</div>

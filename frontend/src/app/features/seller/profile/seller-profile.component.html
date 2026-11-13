@@ -1,154 +1,104 @@
-<div class="seller-shell">
-  <app-seller-sidebar
-    activeItem="profile"
-    [initials]="userInitials()"
-    [name]="displayName()"
-    subtitle="Seller"
-  ></app-seller-sidebar>
-
-  <div class="seller-main">
-    <header class="seller-topbar">
-      <div class="seller-topbar-copy">
-        <strong>Seller profile</strong>
-        <span>Personal details and account settings</span>
-      </div>
-
-      <div class="seller-topbar-actions">
-        <button
-          class="primary-btn"
-          type="button"
-          (click)="saveChanges()"
-          [disabled]="isSaving()"
-        >
-          <app-icon [name]="isSaving() ? 'spinner' : 'check'" [class.spin]="isSaving()" [size]="16"></app-icon>
-          {{ isSaving() ? 'Saving...' : 'Save changes' }}
-        </button>
-      </div>
-    </header>
-
-    <main class="seller-body">
-
-      <div *ngIf="isLoading()" class="panel">
-        <div class="panel-body">
-          <app-icon class="spin" name="spinner" [size]="20"></app-icon>
-          Loading profile...
-        </div>
-      </div>
-
-      <ng-container *ngIf="!isLoading()">
-
-        <div *ngIf="errorMessage()" class="panel notice notice-error" role="alert">
-          <div class="panel-body">
-            <app-icon name="alert" [size]="20" [decorative]="false" ariaLabel="Profile error"></app-icon>
-            {{ errorMessage() }}
-          </div>
-        </div>
-
-        <div *ngIf="successMessage()" class="panel notice notice-success" role="status">
-          <div class="panel-body">
-            <app-icon name="circle-check" [size]="20"></app-icon>
-            {{ successMessage() }}
-          </div>
-        </div>
-
-        <section class="seller-banner profile-banner">
-          <div class="profile-banner-head">
-            <div class="profile-avatar">{{ userInitials() }}</div>
-            <div>
-              <div class="eyebrow"><span></span> Seller identity</div>
-              <h1>{{ displayName() }}</h1>
-              <p>Update your personal details and profile image.</p>
-            </div>
-          </div>
-          <div class="seller-banner-actions">
-            <button class="secondary-btn" type="button">
-              <app-icon name="camera" [size]="16"></app-icon>
-              Change avatar
-            </button>
-          </div>
-        </section>
-
-        <div class="profile-layout">
-          <div class="profile-stack">
-            <section class="panel">
-              <div class="panel-head">
-                <div>
-                  <h3>Personal information</h3>
-                  <p>Account fields used across the seller workspace</p>
-                </div>
-              </div>
-
-              <div class="panel-body">
-                <form class="field-grid" novalidate [formGroup]="form" (ngSubmit)="saveChanges()">
-                  <div class="field" [class.invalid]="showError(form, 'name')">
-                    <label for="fullName">Full name</label>
-                    <input
-                      id="fullName"
-                      type="text"
-                      formControlName="name"
-                      placeholder="Your full name"
-                      autocomplete="name"
-                      [attr.aria-invalid]="showError(form, 'name')"
-                      aria-describedby="name-error"
-                    />
-                    @if (showError(form, 'name')) {
-                      <div class="message" id="name-error" role="alert">{{ err('name') }}</div>
-                    }
-                  </div>
-
-                  <div class="field">
-                    <label for="email">Email address</label>
-                    <input
-                      id="email"
-                      type="email"
-                      [value]="displayEmail()"
-                      placeholder="your@email.com"
-                      readonly
-                    />
-                  </div>
-
-                  <div class="field">
-                    <label for="role">Account role</label>
-                    <input
-                      id="role"
-                      type="text"
-                      [value]="displayRole()"
-                      readonly
-                    />
-                  </div>
-                </form>
-              </div>
-            </section>
-          </div>
-
-          <aside class="profile-side">
-            <div class="sticky-side">
-              <section class="panel">
-                <div class="panel-head">
-                  <div>
-                    <h3>Avatar</h3>
-                    <p>Profile image (max 2 MB, image only)</p>
-                  </div>
-                </div>
-
-                <div class="panel-body">
-                  <div class="avatar-dropzone">
-                    <div class="avatar-preview">{{ userInitials() }}</div>
-                    <strong>Upload a new profile image</strong>
-                    <span>Recommended size: 800 × 800 px, square crop.</span>
-                    <button class="ghost-btn" type="button" [disabled]="isSaving()">
-                      <app-icon name="upload-cloud" [size]="16"></app-icon>
-                      Choose image
-                    </button>
-                  </div>
-                </div>
-              </section>
-            </div>
-          </aside>
-        </div>
-
-        <app-seller-sales></app-seller-sales>
-      </ng-container>
-    </main>
+@if (isLoading()) {
+  <div class="pr-hero pr-hero-skeleton" aria-busy="true" aria-label="Loading profile">
+    <span class="skeleton pr-sk-avatar"></span>
+    <span class="pr-sk-lines"><span class="skeleton"></span><span class="skeleton"></span></span>
   </div>
-</div>
+} @else if (errorMessage(); as message) {
+  <section class="panel">
+    <app-empty-state icon="alert" tone="error" title="Your profile could not load" [message]="message">
+      <button actions type="button" class="secondary-btn" (click)="loadUser()">
+        <app-icon name="refresh" [size]="16"></app-icon>
+        Try again
+      </button>
+    </app-empty-state>
+  </section>
+} @else if (user(); as u) {
+  <!-- One hero header -->
+  <section class="pr-hero rise-in" aria-labelledby="pr-name">
+    <div class="pr-avatar-wrap">
+      <button type="button" class="pr-avatar" (click)="pickAvatar()" [disabled]="avatarProgress() !== null"
+        [attr.aria-label]="u.avatar ? 'Change profile photo' : 'Add a profile photo'" data-testid="avatar-btn">
+        @if (u.avatar) {
+          <img [src]="u.avatar" alt="" />
+        } @else {
+          <span class="pr-initials">{{ initials() }}</span>
+        }
+        <span class="pr-avatar-overlay" aria-hidden="true">
+          <app-icon name="camera" [size]="20"></app-icon>
+          {{ u.avatar ? 'Change' : 'Add photo' }}
+        </span>
+        @if (avatarProgress() !== null) {
+          <span class="pr-avatar-busy" aria-hidden="true"></span>
+        }
+      </button>
+      @if (avatarProgress() !== null) {
+        <span class="pr-avatar-progress" role="progressbar" [attr.aria-valuenow]="avatarProgress()" aria-valuemin="0"
+          aria-valuemax="100" aria-label="Saving profile photo"><span [style.width.%]="avatarProgress()"></span></span>
+      }
+      <input #avatarInput type="file" class="pr-file" accept="image/jpeg,image/png,image/webp,image/avif"
+        (change)="onAvatarChosen($event)" tabindex="-1" aria-hidden="true" />
+    </div>
+
+    <div class="pr-identity">
+      <p class="pr-eyebrow">Your seller profile</p>
+      <h1 id="pr-name">{{ u.name }}</h1>
+      <div class="pr-meta">
+        <span class="pr-role"><app-icon name="store" [size]="14"></app-icon> Seller</span>
+        <span class="pr-email"><app-icon name="lock" [size]="14"></app-icon> {{ u.email }}</span>
+      </div>
+      <p class="pr-avatar-help">
+        Click your photo to change it. It's cropped to a square and shown in your seller panel and the store header.
+        @if (u.avatar && avatarProgress() === null) {
+          <button type="button" class="pr-link" (click)="removeAvatar()">Remove photo</button>
+        }
+      </p>
+      @if (avatarError(); as e) {
+        <p class="sf-error" role="alert"><app-icon name="alert" [size]="13"></app-icon>{{ e }}</p>
+      }
+    </div>
+  </section>
+
+  <div class="pr-grid">
+    <!-- Details form; Save sits under it and only enables on a real change -->
+    <section class="panel pr-form rise-in" aria-labelledby="pr-details">
+      <div class="panel-head">
+        <div>
+          <h3 id="pr-details">Account details</h3>
+          <p>How you appear to buyers</p>
+        </div>
+      </div>
+      <form class="panel-body" [formGroup]="form" (ngSubmit)="saveName()" novalidate>
+        <div class="sf-field">
+          <label class="sf-label" for="pr-name-input">Display name</label>
+          <input id="pr-name-input" class="sf-input" formControlName="name" maxlength="50" autocomplete="name"
+            [class.is-invalid]="showError(form, 'name')" [attr.aria-invalid]="showError(form, 'name')"
+            [attr.aria-describedby]="showError(form, 'name') ? 'pr-name-err' : null" />
+          @if (showError(form, 'name')) {
+            <p class="sf-error" id="pr-name-err"><app-icon name="alert" [size]="13"></app-icon>{{ err() }}</p>
+          }
+        </div>
+
+        <div class="sf-field">
+          <span class="sf-label" id="pr-email-label">Email</span>
+          <p class="pr-readonly" aria-labelledby="pr-email-label">
+            <app-icon name="lock" [size]="15"></app-icon>
+            <span>{{ u.email }}</span>
+          </p>
+          <p class="sf-hint">Your sign-in email can't be changed here.</p>
+        </div>
+
+        <div class="pr-form-actions">
+          <button type="submit" class="primary-btn" [disabled]="!canSave()" data-testid="save-profile">
+            <app-icon [name]="isSaving() ? 'spinner' : 'check'" [class.spin]="isSaving()" [size]="16"></app-icon>
+            {{ isSaving() ? 'Saving…' : 'Save changes' }}
+          </button>
+          @if (!canSave() && !isSaving()) {
+            <span class="sf-hint">Edit your name to save.</span>
+          }
+        </div>
+      </form>
+    </section>
+
+    <app-seller-sales class="pr-sales rise-in" />
+  </div>
+}

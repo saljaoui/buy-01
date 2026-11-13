@@ -1,8 +1,8 @@
 <section class="seller-sales" aria-labelledby="sales-title">
-  <div class="page-header">
+  <div class="ss-head">
     <div>
       <h2 id="sales-title">Sales</h2>
-      <p>Delivered, shipped and open orders. Cancelled orders aren't counted.</p>
+      <p>All time. Cancelled orders aren't counted.</p>
     </div>
     <a routerLink="/seller/orders" class="ghost-btn">
       <app-icon name="package" [size]="16"></app-icon>
@@ -11,63 +11,55 @@
   </div>
 
   @if (isLoading()) {
-  <div class="panel"><div class="panel-body sales-state">
-    <app-icon class="spin" name="spinner" [size]="18"></app-icon> Loading sales
-  </div></div>
-  } @else if (errorMessage(); as message) {
-  <div class="panel notice notice-error"><div class="panel-body">{{ message }}</div></div>
-  } @else if (stats(); as stats) {
-  <div class="stat-grid">
-    <div class="stat-tile">
-      <span>Revenue</span>
-      <strong>{{ stats.revenue | currency: 'USD' }}</strong>
-    </div>
-    <div class="stat-tile">
-      <span>Units sold</span>
-      <strong>{{ stats.unitsSold }}</strong>
-    </div>
-    <div class="stat-tile">
-      <span>Orders</span>
-      <strong>{{ stats.orderCount }}</strong>
-    </div>
-  </div>
-
-  <div class="panel">
-    <div class="panel-head">
-      <div>
-        <h3>Best sellers</h3>
-        <p>Your products ranked by units sold</p>
-      </div>
-    </div>
-    <div class="panel-body">
-      @if (stats.bestSellers.length === 0) {
-      <p class="sales-empty">No sales yet. Your best sellers will appear here after your first order.</p>
-      } @else {
-      <ol class="rank-list">
-        @for (product of stats.bestSellers; track product.productId) {
-        <li class="rank-item">
-          <span class="line-thumb">
-            @if (product.imageUrl) {
-            <img [src]="product.imageUrl" alt="" />
-            } @else {
-            <app-icon name="image-off" [size]="16"></app-icon>
-            }
-          </span>
-          <div>
-            <a class="rank-name" [routerLink]="['/products', product.productId]">{{ product.name }}</a>
-            <div class="rank-bar" aria-hidden="true">
-              <span [style.width.%]="(product.quantity / topQuantity()) * 100"></span>
-            </div>
-          </div>
-          <div class="rank-value">
-            <strong>{{ product.quantity }} sold</strong>
-            {{ product.amount | currency: 'USD' }}
-          </div>
-        </li>
-        }
-      </ol>
+    <div class="ss-stats" aria-busy="true" aria-label="Loading sales">
+      @for (i of [0, 1, 2]; track i) {
+        <span class="skeleton ss-skeleton"></span>
       }
     </div>
-  </div>
+  } @else if (errorMessage(); as message) {
+    <div class="panel">
+      <app-empty-state size="sm" icon="alert" tone="error" title="Sales could not load" [message]="message" />
+    </div>
+  } @else if (stats(); as stats) {
+    <div class="ss-stats">
+      <app-stat-card label="Revenue" format="currency" icon="chart" tone="copper" [value]="stats.revenue"
+        badge="All time" hint="Your share of every order that wasn’t cancelled." />
+      <app-stat-card label="Units sold" icon="shopping-bag" tone="green" [value]="stats.unitsSold" badge="All time"
+        hint="Items of yours that buyers ordered." />
+      <app-stat-card label="Orders" icon="package" tone="blue" [value]="stats.orderCount" badge="All time"
+        hint="Orders with at least one of your products." />
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <h3>Best sellers</h3>
+          <p>Your products ranked by units sold</p>
+        </div>
+      </div>
+      @if (stats.bestSellers.length === 0) {
+        <app-empty-state size="sm" icon="star" title="No best sellers yet"
+          message="Once buyers order your products, the most popular ones are ranked here.">
+          <a actions routerLink="/products" class="secondary-btn">
+            <app-icon name="store" [size]="15"></app-icon>
+            View your store
+          </a>
+        </app-empty-state>
+      } @else {
+        <ol class="ss-best">
+          @for (p of stats.bestSellers; track p.productId; let i = $index) {
+            <li>
+              <span class="ss-rank" [class.top]="i === 0">{{ i + 1 }}</span>
+              <span class="ss-name">
+                <strong>{{ p.name }}</strong>
+                <span class="ss-bar" aria-hidden="true"><span [style.width.%]="(p.quantity / topQuantity()) * 100"></span></span>
+              </span>
+              <span class="ss-qty">{{ p.quantity }} sold</span>
+              <strong class="ss-amount">{{ p.amount | currency: 'USD' }}</strong>
+            </li>
+          }
+        </ol>
+      }
+    </div>
   }
 </section>

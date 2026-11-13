@@ -14,10 +14,6 @@
        overflow: hidden;
    }
 
-   .err-msg {
-       position: absolute;
-   }
-
    .left-panel::before {
        content: '';
        position: absolute;
@@ -376,7 +372,6 @@
    .field-wrap .f-icon {
        position: absolute;
        left: 14px;
-       bottom: 13px;
        color: var(--text-light);
        font-size: 1rem;
        pointer-events: none;
@@ -418,7 +413,6 @@
    .pw-toggle {
        position: absolute;
        right: 14px;
-       bottom: 13px;
        background: none;
        border: none;
        color: var(--text-light);
@@ -525,28 +519,16 @@
    .field-wrap .err-msg {
        font-size: .73rem;
        color: var(--error);
-       display: none;
        align-items: center;
-       position: absolute;
        gap: .3rem;
-   }
-
-   .field-wrap input.is-invalid~.err-msg,
-   .field-wrap select.is-invalid~.err-msg {
-       display: flex;
    }
 
    .field-wrap .ok-msg {
        font-size: .73rem;
        color: var(--success);
        margin-top: .3rem;
-       display: none;
        align-items: center;
        gap: .3rem;
-   }
-
-   .field-wrap input.is-valid~.ok-msg {
-       display: flex;
    }
 
    /* terms */
