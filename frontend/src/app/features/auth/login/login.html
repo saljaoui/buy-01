@@ -7,127 +7,103 @@
         </div>
 
         <div class="hero-copy">
-            <h1>Your marketplace,<br><em>reimagined.</em></h1>
-            <p>Connect buyers and sellers on a secure, modern platform. List products, manage media, and grow your
-                business
-                with confidence.</p>
+            <h1>Well-made things, sold by the people behind them.</h1>
+            <p>Sign in to order from independent sellers, or to run your own shop on Buy01.</p>
         </div>
 
-        <div class="stats-row">
-            <div class="stat">
-                <div class="stat-num">24/7</div>
-                <div class="stat-label">Support</div>
-            </div>
-            <div class="stat">
-                <div class="stat-num">100%</div>
-                <div class="stat-label">Secure</div>
-            </div>
-            <div class="stat">
-                <div class="stat-num">Fast</div>
-                <div class="stat-label">Delivery</div>
-            </div>
-        </div>
-
-        <!-- floating product card -->
-        <div class="float-card">
-            <div class="fc-thumb">
-                <img src="/headphones.png" alt="Noise-Cancelling Pro headphones" />
-            </div>
-            <div class="fc-name">Noise-Cancelling Pro</div>
-            <div class="fc-price">$149.00</div>
-        </div>
+        <ul class="auth-promises">
+            <li>
+                <app-icon name="package" [size]="18"></app-icon>
+                <div>
+                    <strong>Pay on delivery</strong>
+                    <span>Pay when your order arrives.</span>
+                </div>
+            </li>
+            <li>
+                <app-icon name="store" [size]="18"></app-icon>
+                <div>
+                    <strong>Sell with one account</strong>
+                    <span>List products and add photos from your seller workspace.</span>
+                </div>
+            </li>
+        </ul>
     </div>
 
     <!-- ── Right Panel ── -->
     <div class="right-panel">
         <div class="form-card">
             <h2>Welcome back</h2>
-            <p class="subtitle">Sign in to your Buy01 account to continue.</p>
+            <p class="subtitle">Sign in to your Buy01 account.</p>
 
             <!-- Login Form -->
-            <form id="loginForm" novalidate (ngSubmit)="submit()">
+            <form id="loginForm" novalidate [formGroup]="form" (ngSubmit)="submit()">
                 <!-- Email -->
                 <div class="field-wrap">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email"
-                        [(ngModel)]="form.email" [class.is-invalid]="isEmailInvalid" />
-                    <i class="bi bi-envelope input-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                            <g fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path
-                                    d="M2 12c0-3.771 0-5.657 1.172-6.828C4.343 4 6.229 4 10 4h4c3.771 0 5.657 0 6.828 1.172C22 6.343 22 8.229 22 12c0 3.771 0 5.657-1.172 6.828C19.657 20 17.771 20 14 20h-4c-3.771 0-5.657 0-6.828-1.172C2 17.657 2 15.771 2 12Z" />
-                                <path stroke-linecap="round"
-                                    d="m6 8l2.159 1.8c1.837 1.53 2.755 2.295 3.841 2.295c1.086 0 2.005-.765 3.841-2.296L18 8" />
-                            </g>
-                        </svg>
-                    </i>
-                    <div class="err-msg">Please enter your email.</div>
+                    <div class="input-wrap">
+                      <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email"
+                          formControlName="email" [class.is-invalid]="showError(form, 'email')"
+                          [attr.aria-invalid]="showError(form, 'email')" [attr.aria-describedby]="showError(form, 'email') ? 'email-error' : null" />
+                      <i class="bi bi-envelope input-icon">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                              <g fill="none" stroke="currentColor" stroke-width="1.5">
+                                  <path
+                                      d="M2 12c0-3.771 0-5.657 1.172-6.828C4.343 4 6.229 4 10 4h4c3.771 0 5.657 0 6.828 1.172C22 6.343 22 8.229 22 12c0 3.771 0 5.657-1.172 6.828C19.657 20 17.771 20 14 20h-4c-3.771 0-5.657 0-6.828-1.172C2 17.657 2 15.771 2 12Z" />
+                                  <path stroke-linecap="round"
+                                      d="m6 8l2.159 1.8c1.837 1.53 2.755 2.295 3.841 2.295c1.086 0 2.005-.765 3.841-2.296L18 8" />
+                              </g>
+                          </svg>
+                      </i>
+                    </div>
+                    @let emailError = fieldError('email');
+                    @if (emailError) {
+                      <div class="err-msg" id="email-error" role="alert"><app-icon name="alert" [size]="14"></app-icon> {{ emailError }}</div>
+                    }
                 </div>
 
                 <!-- Password -->
                 <div class="field-wrap">
                     <label for="password">Password</label>
-                    <input [type]="passwordInputType" id="password" name="password" placeholder="••••••••"
-                        autocomplete="current-password" [(ngModel)]="form.password"
-                        [class.is-invalid]="isPasswordInvalid" />
-                    <i class="bi bi-lock input-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                            <g fill="none" stroke="currentColor" stroke-width="1.5">
-                                <path
-                                    d="M2 16c0-2.828 0-4.243.879-5.121C3.757 10 5.172 10 8 10h8c2.828 0 4.243 0 5.121.879C22 11.757 22 13.172 22 16c0 2.828 0 4.243-.879 5.121C20.243 22 18.828 22 16 22H8c-2.828 0-4.243 0-5.121-.879C2 20.243 2 18.828 2 16Z" />
-                                <path stroke-linecap="round" d="M6 10V8a6 6 0 1 1 12 0v2" />
-                            </g>
-                        </svg>
-                    </i>
-                    <button type="button" class="pw-toggle" id="pwToggle" (click)="togglePasswordVisibility()"
-                        aria-label="Toggle password visibility">
-                        <app-icon [name]="passwordVisible ? 'eye-off' : 'eye'" [size]="18"></app-icon>
-                    </button>
-                    <div class="err-msg">Password must be at least 8 characters.</div>
+                    <div class="input-wrap">
+                      <input [type]="passwordInputType" id="password" name="password" placeholder="••••••••"
+                          autocomplete="current-password" formControlName="password"
+                          [class.is-invalid]="showError(form, 'password')"
+                          [attr.aria-invalid]="showError(form, 'password')" [attr.aria-describedby]="showError(form, 'password') ? 'password-error' : null" />
+                      <i class="bi bi-lock input-icon">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                              <g fill="none" stroke="currentColor" stroke-width="1.5">
+                                  <path
+                                      d="M2 16c0-2.828 0-4.243.879-5.121C3.757 10 5.172 10 8 10h8c2.828 0 4.243 0 5.121.879C22 11.757 22 13.172 22 16c0 2.828 0 4.243-.879 5.121C20.243 22 18.828 22 16 22H8c-2.828 0-4.243 0-5.121-.879C2 20.243 2 18.828 2 16Z" />
+                                  <path stroke-linecap="round" d="M6 10V8a6 6 0 1 1 12 0v2" />
+                              </g>
+                          </svg>
+                      </i>
+                      <button type="button" class="pw-toggle" id="pwToggle" (click)="togglePasswordVisibility()"
+                          aria-label="Toggle password visibility">
+                          <app-icon [name]="passwordVisible ? 'eye-off' : 'eye'" [size]="18"></app-icon>
+                      </button>
+                    </div>
+                    @let passwordError = fieldError('password');
+                    @if (passwordError) {
+                      <div class="err-msg" id="password-error" role="alert"><app-icon name="alert" [size]="14"></app-icon> {{ passwordError }}</div>
+                    }
                 </div>
 
                 <!-- Meta row -->
                 <div class="meta-row">
                     <label class="remember-label">
-                        <input type="checkbox" id="rememberMe" name="rememberMe" [(ngModel)]="form.rememberMe" />
+                        <input type="checkbox" id="rememberMe" formControlName="rememberMe" />
                         Remember me
                     </label>
                     <a href="#" class="forgot-link">Forgot password?</a>
                 </div>
 
                 <!-- Submit -->
-                <button type="submit" class="btn-signin" [disabled]="isSubmitting">
-                    {{ isSubmitting ? 'Signing in...' : 'Sign In' }}
-                    <app-icon [name]="isSubmitting ? 'spinner' : 'arrow-right'" [class.spin]="isSubmitting" [size]="17"></app-icon>
+                <button type="submit" class="btn-signin" [disabled]="isSubmitting()">
+                    {{ isSubmitting() ? 'Signing in...' : 'Sign in' }}
+                    <app-icon [name]="isSubmitting() ? 'spinner' : 'arrow-right'" [class.spin]="isSubmitting()" [size]="17"></app-icon>
                 </button>
             </form>
-
-            <div class="divider">or continue with</div>
-
-            <!-- Social -->
-            <div class="social-row">
-                <button class="btn-social">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path
-                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                            fill="#4285F4" />
-                        <path
-                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                            fill="#34A853" />
-                        <path
-                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"
-                            fill="#FBBC05" />
-                        <path
-                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                            fill="#EA4335" />
-                    </svg>
-                    Google
-                </button>
-                <button class="btn-social">
-                    <app-icon name="code" [size]="16"></app-icon>
-                    GitHub
-                </button>
-            </div>
 
             <div class="signup-link">
                 Don't have an account? <a routerLink="/register">Create one</a>
@@ -136,9 +112,9 @@
     </div>
 
     <!-- Toast Notification -->
-    <div class="toast-alert" id="toast" [class.show]="toastVisible" [class.success]="toastType === 'success'">
-        <app-icon [name]="toastType === 'success' ? 'circle-check' : 'alert'" [size]="18"></app-icon>
-        <span id="toastMsg">{{ toastMessage }}</span>
+    <div class="toast-alert" id="toast" [class.show]="toastVisible()" [class.success]="toastType() === 'success'">
+        <app-icon [name]="toastType() === 'success' ? 'circle-check' : 'alert'" [size]="18"></app-icon>
+        <span id="toastMsg">{{ toastMessage() }}</span>
     </div>
 
 </div>

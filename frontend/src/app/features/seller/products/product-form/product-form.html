@@ -1,251 +1,240 @@
-<div class="seller-shell">
-  <app-seller-sidebar activeItem="create-product" [initials]="sellerInitials()" [name]="currentUser?.name || 'Seller'"
-    [subtitle]="currentUser?.email || 'Seller account'"></app-seller-sidebar>
+<app-page-header eyebrow="Catalog" [title]="mode() === 'edit' ? 'Edit product' : 'New product'"
+  [subtitle]="mode() === 'edit' ? 'Changes go live in your store as soon as you save.' : 'Write what buyers need to decide: a clear title, an honest description, a price and good photos.'">
+  @if (mode() === 'edit' && productId()) {
+    <a actions class="ghost-btn" [routerLink]="['/products', productId()]">
+      <app-icon name="eye" [size]="16"></app-icon>
+      View in store
+    </a>
+  }
+</app-page-header>
 
-  <div class="seller-main">
-    <header class="seller-topbar">
-      <div class="seller-topbar-copy">
-        <strong>Create / edit product</strong>
-        <span>{{ mode === 'edit' ? 'Editing existing backend product' : 'Creating a backend product listing' }}</span>
-      </div>
-
-      <div class="seller-topbar-actions">
-        <a class="ghost-btn" routerLink="/products">
-          <app-icon name="eye" [size]="16"></app-icon>
-          Preview
-        </a>
-        <a class="secondary-btn" routerLink="/seller">
-          <app-icon name="x" [size]="16"></app-icon>
-          Cancel
-        </a>
-        <button class="primary-btn" type="button" (click)="saveProduct()" [disabled]="isSaving() || isLoading()">
-          <app-icon [name]="isSaving() ? 'spinner' : 'check'" [class.spin]="isSaving()" [size]="16"></app-icon>
-          {{ isSaving() ? 'Saving...' : 'Save product' }}
-        </button>
-      </div>
-    </header>
-
-    <main class="seller-body">
-      <section class="seller-banner">
-        <div class="seller-banner-copy">
-          <div class="eyebrow"><span></span> Product editor</div>
-          <h1>Build a polished <em>listing</em> quickly.</h1>
-          <p>
-            This form keeps the same soft cards, dark accents, and structured spacing used across
-            the rest of the app while publishing directly to the backend.
-          </p>
+@if (isLoading()) {
+  <div class="pf-layout" aria-busy="true" aria-label="Loading product">
+    <div class="pf-form">
+      @for (i of [0, 1, 2]; track i) {
+        <div class="panel pf-skeleton"><span class="skeleton"></span></div>
+      }
+    </div>
+    <div class="pf-aside"><div class="panel pf-skeleton tall"><span class="skeleton"></span></div></div>
+  </div>
+} @else {
+  <form class="pf-layout" [formGroup]="form" (ngSubmit)="save()" novalidate>
+    <div class="pf-form">
+      @if (serverError(); as message) {
+        <div class="sf-notice is-error" role="alert">
+          <app-icon name="alert" [size]="18"></app-icon>
+          <span>{{ message }}</span>
         </div>
-      </section>
-
-      @if (isLoading()) {
-      <section class="panel">
-        <div class="panel-body">
-          <app-icon class="spin" name="spinner" [size]="24"></app-icon>
-          <strong>Loading product...</strong>
-        </div>
-      </section>
       }
 
-      @if (formErrors().length > 0) {
-      <section class="panel form-error-panel">
-        <div class="panel-body">
-          @for (error of formErrors(); track error) {
-          <div><app-icon name="alert" [size]="16"></app-icon>{{ error }}</div>
+      <!-- 1. Details -->
+      <section class="panel pf-section rise-in" aria-labelledby="pf-details">
+        <header class="pf-section-head">
+          <span class="pf-step">1</span>
+          <div>
+            <h2 id="pf-details">Details</h2>
+            <p>Name the product the way a buyer would search for it.</p>
+          </div>
+        </header>
+
+        <div class="sf-field">
+          <label class="sf-label" for="pf-name">Title</label>
+          <input id="pf-name" class="sf-input" formControlName="name" maxlength="100" placeholder="e.g. Hand-turned walnut bowl"
+            [class.is-invalid]="showError(form, 'name')" [attr.aria-invalid]="showError(form, 'name')"
+            [attr.aria-describedby]="showError(form, 'name') ? 'pf-name-err' : null" />
+          @if (showError(form, 'name')) {
+            <p class="sf-error" id="pf-name-err"><app-icon name="alert" [size]="13"></app-icon>{{ err('name') }}</p>
+          }
+        </div>
+
+        <div class="sf-field">
+          <div class="sf-label-row">
+            <label class="sf-label" for="pf-description">Description</label>
+            <span class="sf-counter" [class.near]="descriptionLength() > descriptionMax * 0.9" aria-live="polite">
+              {{ descriptionLength() }} / {{ descriptionMax }}
+            </span>
+          </div>
+          <textarea id="pf-description" class="sf-input" rows="6" formControlName="description" [attr.maxlength]="descriptionMax"
+            placeholder="Materials, size, how it's made, how to care for it…"
+            [class.is-invalid]="showError(form, 'description')" [attr.aria-invalid]="showError(form, 'description')"
+            [attr.aria-describedby]="showError(form, 'description') ? 'pf-desc-err' : 'pf-desc-hint'"></textarea>
+          @if (showError(form, 'description')) {
+            <p class="sf-error" id="pf-desc-err"><app-icon name="alert" [size]="13"></app-icon>{{ err('description') }}</p>
+          } @else {
+            <p class="sf-hint" id="pf-desc-hint">The first two lines show on the product card.</p>
           }
         </div>
       </section>
-      }
 
-      <div class="form-layout">
-        <section class="panel">
-          <div class="panel-head">
-            <div>
-              <h3>Product information</h3>
-              <p>Core details buyers will see in the storefront.</p>
+      <!-- 2. Pricing & stock -->
+      <section class="panel pf-section rise-in" aria-labelledby="pf-pricing">
+        <header class="pf-section-head">
+          <span class="pf-step">2</span>
+          <div>
+            <h2 id="pf-pricing">Pricing &amp; stock</h2>
+            <p>Buyers pay this price on delivery.</p>
+          </div>
+        </header>
+
+        <div class="pf-grid-2">
+          <div class="sf-field">
+            <label class="sf-label" for="pf-price">Price</label>
+            <div class="sf-affix" [class.is-invalid]="showError(form, 'price')">
+              <span class="sf-affix-text" aria-hidden="true">$</span>
+              <input id="pf-price" class="sf-input" type="number" inputmode="decimal" min="0.01" step="0.01"
+                formControlName="price" placeholder="0.00" [attr.aria-invalid]="showError(form, 'price')"
+                [attr.aria-describedby]="showError(form, 'price') ? 'pf-price-err' : null" />
+              <span class="sf-affix-text end" aria-hidden="true">USD</span>
             </div>
-            <span class="pill">Backend</span>
+            @if (showError(form, 'price')) {
+              <p class="sf-error" id="pf-price-err"><app-icon name="alert" [size]="13"></app-icon>{{ err('price') }}</p>
+            }
           </div>
 
-          <div class="panel-body form-stack">
-            <section class="form-section">
-              <div class="section-intro">
-                <h3>Core details</h3>
-                <p>Clear titles and descriptions help the product cards feel premium and consistent.</p>
-              </div>
+          <div class="sf-field">
+            <label class="sf-label" for="pf-stock">Stock</label>
+            <div class="sf-stepper" [class.is-invalid]="showError(form, 'quantity')">
+              <button type="button" (click)="stepStock(-1)" aria-label="One less in stock"
+                [disabled]="(form.controls.quantity.value ?? 0) <= 0">
+                <app-icon name="minus" [size]="16"></app-icon>
+              </button>
+              <input id="pf-stock" class="sf-input" type="number" inputmode="numeric" min="0" step="1" formControlName="quantity"
+                [attr.aria-invalid]="showError(form, 'quantity')"
+                [attr.aria-describedby]="showError(form, 'quantity') ? 'pf-stock-err' : 'pf-stock-hint'" />
+              <button type="button" (click)="stepStock(1)" aria-label="One more in stock">
+                <app-icon name="plus" [size]="16"></app-icon>
+              </button>
+            </div>
+            @if (showError(form, 'quantity')) {
+              <p class="sf-error" id="pf-stock-err"><app-icon name="alert" [size]="13"></app-icon>{{ err('quantity') }}</p>
+            } @else {
+              <p class="sf-hint" id="pf-stock-hint">At 5 or fewer, buyers see “Only N left”.</p>
+            }
+          </div>
+        </div>
+      </section>
 
-              <div class="field-grid">
-                <div class="field full" [class.invalid]="formSubmitted() && productInfo.name.trim().length < 2">
-                  <label for="title">Product title</label>
-                  <input id="title" type="text" placeholder="Noise-Cancelling Pro Headphones" name="name"
-                    [(ngModel)]="productInfo.name"
-                    [class.is-invalid]="formSubmitted() && productInfo.name.trim().length < 2" />
-                  <div class="message">Title is required before publishing.</div>
-                </div>
+      <!-- 3. Photos -->
+      <section class="panel pf-section rise-in" aria-labelledby="pf-photos">
+        <header class="pf-section-head">
+          <span class="pf-step">3</span>
+          <div>
+            <h2 id="pf-photos">Photos</h2>
+            <p>Up to {{ maxPhotos }}. The first one is the cover buyers see. Drag to reorder.</p>
+          </div>
+          <span class="pf-count">{{ photos().length }} / {{ maxPhotos }}</span>
+        </header>
 
-                <div class="field full">
-                  <label for="shortDescription">description</label>
-                  <textarea id="shortDescription"
-                    placeholder="Write a concise summary that will appear in cards and previews." name="description"
-                    [(ngModel)]="productInfo.description"></textarea>
-                  <div class="helper">Keep it focused on materials, benefits, and visual style.</div>
-                </div>
-              </div>
-            </section>
-
-            <section class="form-section">
-              <div class="section-intro">
-                <h3>Pricing and inventory</h3>
-                <p>Price and stock fields are validated before publishing to the product service.</p>
-              </div>
-
-              <div class="field-grid">
-                <div class="field" [class.invalid]="formSubmitted() && productInfo.price <= 0">
-                  <label for="price">Price</label>
-                  <input id="price" type="number" min="0" step="0.01" placeholder="149.00" name="price"
-                    [(ngModel)]="productInfo.price" />
-                  <div class="message">Enter a valid sale price.</div>
-                </div>
-
-                <div class="field">
-                  <label for="stock">Stock quantity</label>
-                  <input id="stock" type="number" placeholder="12" name="quantity" [(ngModel)]="productInfo.quantity" />
-                </div>
-              </div>
-            </section>
-
-            <section class="form-section">
-              <div class="section-intro">
-                <h3>Media gallery</h3>
-                <p>Dropzone and file cards stay visually aligned with the dashboard and media library.</p>
-              </div>
-
-              <div class="upload-dropzone media-dropzone">
-                <div class="drop-icon"><app-icon name="upload-cloud" [size]="30"></app-icon></div>
-                <strong>Upload product imagery</strong>
-                <span>Drag and drop hero shots, detail crops, or packaging images here.</span>
-
-                <div class="drop-actions">
-                  <input #imageInput type="file" id="imageInput" accept="image/*" multiple
-                    (change)="onFilesSelected($event)" style="display: none;">
-
-                  <button class="primary-btn" type="button" (click)="imageInput.click()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                      <g fill="none" stroke="currentColor" stroke-width="1.5">
-                        <path
-                          d="M2 14c0-3.771 0-5.657 1.172-6.828C4.343 6 6.229 6 10 6h4c3.771 0 5.657 0 6.828 1.172C22 8.343 22 10.229 22 14c0 3.771 0 5.657-1.172 6.828C19.657 22 17.771 22 14 22h-4c-3.771 0-5.657 0-6.828-1.172C2 19.657 2 17.771 2 14Z" />
-                        <path
-                          d="m4 7l-.012-1c.112-.931.347-1.574.837-2.063C5.765 3 7.279 3 10.307 3h3.211c3.028 0 4.541 0 5.482.937c.49.489.725 1.132.837 2.063v1" />
-                        <circle cx="17.5" cy="10.5" r="1.5" />
-                        <path stroke-linecap="round"
-                          d="m2 14.5l1.752-1.533a2.3 2.3 0 0 1 3.14.105l4.29 4.29a2 2 0 0 0 2.564.222l.299-.21a3 3 0 0 1 3.731.225L21 20.5" />
-                      </g>
-                    </svg>
-                    Choose images
+        @if (photos().length) {
+          <ol class="pf-photos" aria-label="Photos, in order">
+            @for (photo of photos(); track photo.key; let i = $index; let first = $first; let last = $last) {
+              <li class="pf-photo" [class.dragging]="dragKey() === photo.key" draggable="true"
+                (dragstart)="onDragStart(photo.key, $event)" (dragend)="dragKey.set(null)"
+                (dragover)="onDragOverPhoto($event)" (drop)="onDropPhoto(photo.key, $event)" data-testid="photo">
+                <img [src]="photo.preview" [alt]="'Photo ' + (i + 1)" />
+                @if (first) {
+                  <span class="pf-cover-badge">Cover</span>
+                }
+                @if (photo.source.kind === 'new' && photo.progress === null) {
+                  <span class="pf-new-badge">Not saved</span>
+                }
+                @if (photo.progress !== null) {
+                  <span class="pf-progress" role="progressbar" [attr.aria-valuenow]="photo.progress" aria-valuemin="0"
+                    aria-valuemax="100" [attr.aria-label]="'Uploading photo ' + (i + 1)">
+                    <span [style.width.%]="photo.progress"></span>
+                  </span>
+                }
+                <div class="pf-photo-actions">
+                  <span class="pf-grip" aria-hidden="true"><app-icon name="grip" [size]="16"></app-icon></span>
+                  <button type="button" (click)="movePhoto(i, -1)" [disabled]="first || isSaving()" [attr.aria-label]="'Move photo ' + (i + 1) + ' earlier'">
+                    <app-icon name="arrow-left" [size]="14"></app-icon>
+                  </button>
+                  <button type="button" (click)="movePhoto(i, 1)" [disabled]="last || isSaving()" [attr.aria-label]="'Move photo ' + (i + 1) + ' later'">
+                    <app-icon name="arrow-right" [size]="14"></app-icon>
+                  </button>
+                  @if (!first) {
+                    <button type="button" (click)="makeCover(i)" [disabled]="isSaving()" [attr.aria-label]="'Make photo ' + (i + 1) + ' the cover'" title="Make cover">
+                      <app-icon name="star" [size]="14"></app-icon>
+                    </button>
+                  }
+                  <button type="button" class="danger" (click)="removePhoto(photo)" [disabled]="isSaving()" [attr.aria-label]="'Remove photo ' + (i + 1)">
+                    <app-icon name="trash" [size]="14"></app-icon>
                   </button>
                 </div>
+              </li>
+            }
+          </ol>
+        }
 
-                <small>Allowed: JPG, PNG, WEBP, AVIF up to 2 MB each.</small>
-              </div>
+        <app-upload-zone [maxFiles]="maxPhotos - photos().length" [disabled]="isSaving()" [compact]="photos().length > 0"
+          [title]="photos().length ? 'Add more photos' : 'Drag photos here, or click to browse'"
+          [hint]="'JPG, PNG, WEBP or AVIF · up to 2 MB each · ' + (maxPhotos - photos().length) + ' left'"
+          (files)="addFiles($event)" />
 
-              <div class="upload-preview-grid">
-                <div class="image-grid" role="list" aria-label="Selected images">
-                  @for (item of selectedImages; track item.preview) {
-                  <article class="image-card" role="listitem">
-                    <div class="preview-art">
-                      <img [src]="item.preview" alt="" loading="lazy" />
+        @if (mode() === 'create' && photos().length) {
+          <p class="sf-hint pf-photo-note">
+            <app-icon name="info" [size]="14"></app-icon>
+            Photos upload right after the product is created, when you press Publish.
+          </p>
+        }
+      </section>
+    </div>
 
-                      <button class="delete-button" type="button" (click)="deleteImage(item)"
-                        [attr.aria-label]="'Delete ' + item.file.name" [title]="'Delete ' + item.file.name">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                          <g fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path
-                              d="M11.142 20c-2.227 0-3.341 0-4.27-.501c-.93-.502-1.52-1.42-2.701-3.259l-.681-1.06C2.497 13.634 2 12.86 2 12c0-.86.497-1.634 1.49-3.18l.68-1.06c1.181-1.838 1.771-2.757 2.701-3.259C7.801 4 8.915 4 11.142 4h2.637c3.875 0 5.813 0 7.017 1.172C22 6.343 22 8.229 22 12c0 3.771 0 5.657-1.204 6.828C19.592 20 17.654 20 13.78 20h-2.637Z" />
-                            <path stroke-linecap="round" d="m15.5 9.5l-5 5m0-5l5 5" />
-                          </g>
-                        </svg>
-                        <span class="sr-only">Delete</span>
-                      </button>
-                    </div>
+    <!-- Live preview (sticky) -->
+    <aside class="pf-aside" aria-label="Live preview">
+      <div class="pf-sticky">
+        <div class="pf-preview-head">
+          <span class="pf-live"><span aria-hidden="true"></span>Live preview</span>
+          <span class="pf-preview-sub">As buyers see it in the catalog</span>
+        </div>
+        <div class="pf-preview" inert>
+          <app-product-card [product]="preview()" [image]="previewImage()" sizes="(max-width: 939px) 70vw, 25vw" [priority]="true" />
+        </div>
+        <p class="pf-preview-stock">
+          Stock badge:
+          <span class="stock-badge" [class]="'is-' + previewBadge().tone">{{ previewBadge().label }}</span>
+        </p>
 
-                    <div class="file-details">
-                      <strong [title]="item.file.name">{{ item.file.name }}</strong>
-                      <span class="file-size">{{ (item.file.size / 1024 / 1024).toFixed(2) }} MB</span>
-                    </div>
-                  </article>
-                  }
-                </div>
-              </div>
-            </section>
+        <div class="panel pf-checklist">
+          <div class="pf-checklist-head">
+            <strong>Ready to publish</strong>
+            <span>{{ checklistDone() }} / {{ checklist().length }}</span>
           </div>
-        </section>
-
-        <aside class="form-side">
-          <div class="sticky-side">
-            <section class="panel">
-              <div class="panel-head">
-                <div>
-                  <h3>Publish summary</h3>
-                  <p>Quick review before saving</p>
-                </div>
-              </div>
-
-              <div class="panel-body summary-stack">
-                <div class="summary-row">
-                  <span>Visibility</span>
-                  <strong>Backend listing</strong>
-                </div>
-                <div class="summary-row">
-                  <span>Sales channel</span>
-                  <strong>Web storefront</strong>
-                </div>
-                <div class="summary-row">
-                  <span>Images attached</span>
-                  <strong>{{ selectedImages.length }} / {{ maxImages }}</strong>
-                </div>
-                @if (formErrors().length > 0) {
-                <div class="summary-alert">
-                  <app-icon name="alert" [size]="16"></app-icon>
-                  {{ formErrors()[0] }}
-                </div>
-                }
-              </div>
-            </section>
-
-            <section class="panel">
-              <div class="panel-head">
-                <div>
-                  <h3>Product Checklist</h3>
-                  <p>Complete these steps before publishing</p>
-                </div>
-              </div>
-
-              <div class="panel-body note-list">
-
-                <div class="note-item">
-                  <app-icon name="circle" [size]="16"></app-icon>
-                  Add product title
-                </div>
-
-                <div class="note-item">
-                  <app-icon name="circle" [size]="16"></app-icon>
-                  Write product description
-                </div>
-
-                <div class="note-item">
-                  <app-icon name="circle" [size]="16"></app-icon>
-                  Add a valid product price
-                </div>
-
-                <div class="note-item">
-                  <app-icon name="circle" [size]="16"></app-icon>
-                  Upload product images
-                </div>
-
-              </div>
-            </section>
-          </div>
-        </aside>
+          <ul>
+            @for (item of checklist(); track item.id) {
+              <li [class.done]="item.done" [attr.data-check]="item.id">
+                <app-icon [name]="item.done ? 'circle-check' : 'circle'" [size]="16"></app-icon>
+                {{ item.label }}
+                <span class="sr-only">{{ item.done ? '(done)' : '(to do)' }}</span>
+              </li>
+            }
+          </ul>
+        </div>
       </div>
-    </main>
-  </div>
-</div>
+    </aside>
+
+    <!-- Sticky action bar -->
+    <div class="pf-actionbar">
+      <div class="pf-actionbar-inner">
+        <span class="pf-status" aria-live="polite">
+          @if (isSaving()) {
+            <app-icon class="spin" name="spinner" [size]="15"></app-icon> {{ saveStep() }}
+          } @else if (hasUnsavedChanges()) {
+            <span class="pf-dot" aria-hidden="true"></span> Unsaved changes
+          } @else if (mode() === 'edit') {
+            <app-icon name="circle-check" [size]="15"></app-icon> All changes saved
+          } @else {
+            Fill in the details, then publish.
+          }
+        </span>
+        <div class="pf-actionbar-buttons">
+          <button type="button" class="secondary-btn" (click)="cancel()" [disabled]="isSaving()">Cancel</button>
+          <button type="submit" class="primary-btn pf-save" [disabled]="isSaving()" data-testid="save">
+            <app-icon [name]="isSaving() ? 'spinner' : 'check'" [class.spin]="isSaving()" [size]="16"></app-icon>
+            {{ isSaving() ? 'Saving…' : mode() === 'edit' ? 'Save changes' : 'Publish product' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+}

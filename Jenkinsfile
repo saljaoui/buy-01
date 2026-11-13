@@ -2,74 +2,105 @@
 pipeline {
     agent any
 
-    tools {
-        jdk 'jdk17'
+    options {
+        timestamps()
+        disableConcurrentBuilds()
+        timeout(time: 30, unit: 'MINUTES')
+        buildDiscarder(logRotator(numToKeepStr: '10'))
     }
-    
+
+    environment {
+        NOTIFY_EMAIL    = 'saljaoui1@gmail.com'
+        BACKEND_MODULES = 'services infrastructure/discovery-service infrastructure/api-gateway'
+    }
+
     stages {
-        stage('Debug Java') {
+
+        stage('Build') {
             steps {
                 sh '''
-                    echo "JAVA_HOME=$JAVA_HOME"
-                    java -version
+                    for d in $BACKEND_MODULES; do
+                        echo "Building $d"
+                        (cd "$d" && chmod +x mvnw && ./mvnw -B clean install -DskipTests)
+                    done
                 '''
             }
         }
-        stage('Build') {
-            steps {
-                echo 'Building all services...'
 
-                dir('services') {
-                    script {
-                        if (isUnix()) {
-                            sh 'chmod +x mvnw'
-                            sh './mvnw -version'
-                            sh './mvnw clean install -DskipTests'
-                        } else {
-                            bat 'mvnw.cmd clean install -DskipTests'
-                        }
-                    }
+        stage('Test backend') {
+            steps {
+                sh '''
+                    for d in $BACKEND_MODULES; do
+                        echo "Testing $d"
+                        (cd "$d" && ./mvnw -B test)
+                    done
+                '''
+            }
+            post {
+                always {
+                    junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
                 }
             }
         }
 
-        stage('Test') {
+        stage('Test frontend') {
             steps {
-                echo 'Testing all services...'
+                dir('frontend') {
+                    sh 'npm ci'
+                    sh 'npx ng test --watch=false --coverage --coverage-reporters=lcov --reporters=default --reporters=junit --output-file=test-results/junit.xml'
+                }
+            }
+            post {
+                always {
+                    junit allowEmptyResults: true, testResults: 'frontend/test-results/*.xml'
+                }
+            }
+        }
+        
+        stage('SonarQube analysis') {
+            environment {
+                SCANNER_HOME = tool 'sonar-scanner'
+            }
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh '$SCANNER_HOME/bin/sonar-scanner'
+                }
+            }
+        }
 
-                dir('services') {
-                    script {
-                        if (isUnix()) {
-                            sh './mvnw test'
-                        } else {
-                            bat 'mvnw.cmd test'
-                        }
-                    }
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
                 }
             }
         }
 
         stage('Deploy') {
             steps {
-                echo 'Deploying with Docker Compose...'
-                withCredentials([
-                    string(credentialsId: 'jwt-secret',
-                        variable: 'JWT_SECRET'),
-                    string(credentialsId: 'jwt-expiration',
-                        variable: 'JWT_EXPIRATION'),
-                    string(credentialsId: 'gateway-port',
-                        variable: 'GATEWAY_PORT'),
-                    string(credentialsId: 'frontend-port',
-                        variable: 'FRONTEND_PORT')
-                ]) {
-                    script {
-                        if (isUnix()) {
-                            sh 'docker compose -f docker-compose.yml down || true'
-                            sh 'docker compose -f docker-compose.yml up -d'
-                        } else {
-                            bat 'docker compose -f docker-compose.yml down'
-                            bat 'docker compose -f docker-compose.yml up -d'
-                        }
+                sh '''
+                    for img in $(docker images --format '{{.Repository}}' | grep '^buy-01-' | grep -v jenkins | sort -u); do
+                        docker tag "$img:latest" "$img:previous" || true
+                    done
+                '''
+                withCredentials([file(credentialsId: 'buy01-env', variable: 'ENV_FILE')]) {
+                    sh '''
+                        cp "$ENV_FILE" .env
+                        docker compose up -d --build --wait --wait-timeout 300
+                    '''
+                }
+            }
+            post {
+                unsuccessful {
+                    echo 'Deploy failed, rolling back to previous version'
+                    withCredentials([file(credentialsId: 'buy01-env', variable: 'ENV_FILE')]) {
+                        sh '''
+                            cp "$ENV_FILE" .env
+                            for img in $(docker images --format '{{.Repository}}:{{.Tag}}' | grep '^buy-01-.*:previous$' | cut -d: -f1); do
+                                docker tag "$img:previous" "$img:latest"
+                            done
+                            docker compose up -d --no-build --wait --wait-timeout 300
+                        '''
                     }
                 }
             }
@@ -77,16 +108,19 @@ pipeline {
     }
 
     post {
-        always {
-            echo '🏁 Pipeline finished'
-        }
-
         success {
-            echo '✅ Build, Test, and Deploy succeeded'
+            emailext to: "${NOTIFY_EMAIL}",
+                subject: "✅ SUCCESS: ${JOB_NAME} #${BUILD_NUMBER}",
+                body: "Build, tests and deployment succeeded.\n\nDetails: ${BUILD_URL}"
         }
-
         failure {
-            echo '❌ Pipeline failed'
+            emailext to: "${NOTIFY_EMAIL}",
+                subject: "❌ FAILED: ${JOB_NAME} #${BUILD_NUMBER}",
+                body: "Pipeline failed. If Deploy failed, the previous version was restored.\n\nLogs: ${BUILD_URL}console",
+                attachLog: true
+        }
+        always {
+            sh 'rm -f .env'
         }
     }
 }

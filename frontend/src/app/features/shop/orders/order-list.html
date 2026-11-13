@@ -1,0 +1,110 @@
+<div class="storefront-shell">
+  <app-navbar></app-navbar>
+
+  <main class="container shop-page">
+    <header class="shop-head">
+      <div>
+        <h1>Your orders</h1>
+        <p>Track deliveries, cancel before shipping, or order again.</p>
+      </div>
+      <a routerLink="/account" class="btn-light">
+        <app-icon name="chart" [size]="16"></app-icon>
+        Spending summary
+      </a>
+    </header>
+
+    @if (hasAnyOrder() || search.value || status() !== 'ALL') {
+    <div class="list-toolbar">
+      <div class="segmented" role="group" aria-label="Filter by status">
+        @for (filter of statusFilters; track filter.value) {
+        <button type="button" [attr.aria-pressed]="status() === filter.value" (click)="setStatus(filter.value)">
+          {{ filter.label }}
+        </button>
+        }
+      </div>
+      <label class="list-search">
+        <app-icon name="search" [size]="16"></app-icon>
+        <span class="sr-only">Search orders</span>
+        <input type="search" [formControl]="search" placeholder="Order number or product" />
+      </label>
+    </div>
+    }
+
+    @if (isLoading() && orders().length === 0) {
+    <section class="shop-card empty-state">
+      <app-icon class="spin" name="spinner" [size]="22"></app-icon>
+      <strong>Loading your orders</strong>
+    </section>
+    } @else if (errorMessage(); as message) {
+    <section class="shop-card empty-state">
+      <app-icon name="alert" [size]="22"></app-icon>
+      <strong>Orders could not load</strong>
+      <span>{{ message }}</span>
+      <button type="button" class="btn-light" (click)="load()">Try again</button>
+    </section>
+    } @else if (orders().length === 0 && !hasAnyOrder()) {
+    <section class="shop-card empty-state">
+      <app-icon name="package" [size]="24"></app-icon>
+      <strong>No orders yet</strong>
+      <span>When you place an order, you can follow it here from checkout to your door.</span>
+      <a routerLink="/products" class="btn-primary">Browse the catalog</a>
+    </section>
+    } @else if (orders().length === 0) {
+    <section class="shop-card empty-state">
+      <app-icon name="search" [size]="22"></app-icon>
+      <strong>No orders match</strong>
+      <span>Try another order number or status.</span>
+    </section>
+    } @else {
+    <ul class="order-list" [class.is-refreshing]="isLoading()">
+      @for (order of orders(); track order.id) {
+      <li>
+        <a class="order-row shop-card" [routerLink]="['/orders', order.id]">
+          <div class="order-row-main">
+            <div class="order-row-head">
+              <strong>{{ order.reference }}</strong>
+              <span class="status-badge" [class]="'status-badge status-' + order.status">
+                {{ statusLabel[order.status] }}
+              </span>
+            </div>
+            <span class="order-row-meta">
+              {{ order.createdAt | date: 'mediumDate' }} · {{ itemCount(order) }}
+              {{ itemCount(order) === 1 ? 'item' : 'items' }}
+            </span>
+            <span class="order-row-names">
+              @for (item of order.items; track item.productId; let last = $last) {
+              {{ item.name }}{{ last ? '' : ', ' }}
+              }
+            </span>
+          </div>
+
+          <div class="order-thumbs" aria-hidden="true">
+            @for (item of order.items.slice(0, 3); track item.productId) {
+            <span class="line-thumb">
+              @if (item.imageUrl) {
+              <img [src]="item.imageUrl" alt="" />
+              } @else {
+              <app-icon name="image-off" [size]="16"></app-icon>
+              }
+            </span>
+            }
+            @if (order.items.length > 3) {
+            <span class="line-thumb more">+{{ order.items.length - 3 }}</span>
+            }
+          </div>
+
+          <div class="order-row-total">
+            <strong>{{ order.total | currency: 'USD' }}</strong>
+            <span>Pay on delivery</span>
+          </div>
+
+          <app-icon class="order-row-chevron" name="chevron-right" [size]="18"></app-icon>
+        </a>
+      </li>
+      }
+    </ul>
+    }
+  </main>
+
+  <app-footer />
+</div>

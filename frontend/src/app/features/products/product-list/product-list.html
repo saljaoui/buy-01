@@ -2,304 +2,245 @@
 
   <app-navbar></app-navbar>
 
-  <!-- ── TICKER ─────────────────────────────────────────────── -->
-  <div class="hero-ticker">
-    <div class="ticker-track">
-      <span class="ticker-item"><b>10,000+</b> Active Listings</span>
-      <span class="ticker-dot"></span>
-      <span class="ticker-item">New Arrivals <b>Every Day</b></span>
-      <span class="ticker-dot"></span>
-      <span class="ticker-item">Avg. Rating <b>4.8 / 5</b></span>
-      <span class="ticker-dot"></span>
-      <span class="ticker-item"><b>24h</b> Fast Dispatch</span>
-      <span class="ticker-dot"></span>
-      <span class="ticker-item">Verified <b>Top Sellers</b></span>
-      <span class="ticker-dot"></span>
-      <span class="ticker-item">Secure <b>Checkout</b></span>
-      <span class="ticker-dot"></span>
-      <!-- mirror block for seamless loop -->
-      <span class="ticker-item"><b>10,000+</b> Active Listings</span>
-      <span class="ticker-dot"></span>
-      <span class="ticker-item">New Arrivals <b>Every Day</b></span>
-      <span class="ticker-dot"></span>
-      <span class="ticker-item">Avg. Rating <b>4.8 / 5</b></span>
-      <span class="ticker-dot"></span>
-      <span class="ticker-item"><b>24h</b> Fast Dispatch</span>
-      <span class="ticker-dot"></span>
-      <span class="ticker-item">Verified <b>Top Sellers</b></span>
-      <span class="ticker-dot"></span>
-      <span class="ticker-item">Secure <b>Checkout</b></span>
-      <span class="ticker-dot"></span>
-    </div>
-  </div>
-  <!-- ── HERO ───────────────────────────────────────────────── -->
-  <section class="page-hero catalog-hero">
-    <div class="hero-ghost-text">S O U F I A N</div>
-    <div class="hero-glow-line"></div>
-    <div class="container">
-      <div class="page-hero-inner">
-        <!-- LEFT: Copy -->
-        <div class="hero-copy-block">
-          <div class="hero-index">
-            <span class="hero-index-num">01</span>
-            <span class="hero-index-line"></span>
-            <span class="hero-index-label">New Arrivals Daily</span>
-          </div>
-          <h1 class="page-title">
-            Discover
-            <em>Premium</em>
-            <span class="word-sub">Products for your life</span>
-          </h1>
-          <div class="hero-desc-row">
-            <div class="hero-desc-marker"></div>
-            <p class="page-copy">
-              Explore our carefully curated collection of high-quality essentials.
-              Whether you're looking for cutting-edge electronics, modern home decor,
-              or wellness items — find exactly what you need from top-rated sellers.
-            </p>
-          </div>
-          <div class="hero-actions">
-            <a (click)="scrollCatalog()" class="btn-primary">
-              Explore catalog
-              <app-icon name="arrow-down" [size]="16"></app-icon>
-            </a>
-            <a routerLink="/register" class="btn-secondary">
-              Sell on Buy01
-              <app-icon name="arrow-right" [size]="16"></app-icon>
-            </a>
-          </div>
-        </div>
-        <!-- RIGHT: Panel -->
-        <div class="hero-panel">
-          <div class="hero-panel-inner">
-            <div class="hero-panel-head">
-              <div>
-                <div class="hero-panel-kicker">Trending Now</div>
-                <strong>Most popular this week</strong>
-              </div>
-              <div class="hero-chip">
-                <app-icon name="star" [size]="13"></app-icon>
-                Top Rated
-              </div>
-            </div>
-            <div class="hero-highlight">
-              <div class="hero-highlight-art">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path
-                    d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
-                  <path d="M5 3v4" />
-                  <path d="M19 17v4" />
-                  <path d="M3 5h4" />
-                  <path d="M17 19h4" />
-                </svg>
-              </div>
-              <div>
-                <h2>Featured Collections</h2>
-                <p>Hand-picked items highly reviewed by our community of shoppers.</p>
-              </div>
-            </div>
-            <div class="hero-panel-grid">
-              <div class="hero-mini-card">
-                <span>10k+</span>
-                <small>Listings</small>
-              </div>
-              <div class="hero-mini-card">
-                <span>4.8</span>
-                <small>Avg Rating</small>
-              </div>
-              <div class="hero-mini-card">
-                <span>24h</span>
-                <small>Dispatch</small>
-              </div>
-            </div>
-          </div>
+  <!-- ───────────── Hero ───────────── -->
+  <section class="store-hero" aria-labelledby="hero-title">
+    <div class="container store-hero-inner">
+      <div class="store-hero-copy">
+        <p class="hero-eyebrow">Independent sellers · Pay on delivery</p>
+        <h1 class="store-hero-title" id="hero-title">Well-made things, sold by the people behind them.</h1>
+        <p class="store-hero-lede">
+          Browse products from independent sellers on Buy01. Order in a few clicks and pay when it
+          reaches your door.
+        </p>
+
+        <div class="hero-actions" data-testid="hero-actions">
+          @switch (role()) {
+            @case ('SELLER') {
+              <a routerLink="/seller/products/new" class="btn-primary">
+                <app-icon name="plus" [size]="16"></app-icon>
+                Add a product
+              </a>
+              <a routerLink="/seller" class="btn-secondary">
+                <app-icon name="dashboard" [size]="16"></app-icon>
+                Go to dashboard
+              </a>
+            }
+            @case ('CLIENT') {
+              <button type="button" class="btn-primary" (click)="scrollCatalog()">
+                Browse the catalog
+                <app-icon name="arrow-down" [size]="16"></app-icon>
+              </button>
+            }
+            @default {
+              <a routerLink="/register" class="btn-primary">
+                <app-icon name="user-plus" [size]="16"></app-icon>
+                Create account
+              </a>
+              <a routerLink="/login" class="btn-secondary">Sign in</a>
+              <button type="button" class="hero-text-link" (click)="scrollCatalog()">
+                or browse the catalog
+                <app-icon name="arrow-down" [size]="14"></app-icon>
+              </button>
+            }
+          }
         </div>
       </div>
-      <!-- Bottom strip -->
-      <div class="hero-strip">
-        <div class="hero-strip-item">
-          <div class="hero-strip-num">10k+</div>
-          <div class="hero-strip-info">
-            <strong>Active Listings</strong>
-            <span>Updated daily</span>
+
+      <!-- Visual: a layered stack of the newest products -->
+      <div class="hero-visual" aria-label="Newest products" role="group"
+        [style.--tx]="tilt().x" [style.--ty]="tilt().y"
+        (pointermove)="onHeroPointerMove($event)" (pointerleave)="resetTilt()">
+        <span class="hero-halo" aria-hidden="true"></span>
+
+        @if (heroLoading()) {
+          <div class="hero-stack" aria-hidden="true">
+            <div class="hero-card layer-2 is-ghost"></div>
+            <div class="hero-card layer-1 is-ghost"></div>
+            <div class="hero-card layer-0 is-skeleton"><span class="skeleton"></span></div>
           </div>
-        </div>
-        <div class="hero-strip-item">
-          <div class="hero-strip-num">4.8</div>
-          <div class="hero-strip-info">
-            <strong>Average Rating</strong>
-            <span>From 32,000+ reviews</span>
+        } @else if (heroItems().length === 0) {
+          <!-- 0 products: a quiet composition instead of an empty box -->
+          <div class="hero-stack is-empty" data-testid="hero-empty">
+            <div class="hero-card layer-2 is-ghost" aria-hidden="true"><app-icon name="package" [size]="26"></app-icon></div>
+            <div class="hero-card layer-1 is-ghost" aria-hidden="true"><app-icon name="store" [size]="26"></app-icon></div>
+            <div class="hero-card layer-0 hero-card--note">
+              <app-icon name="sparkles" [size]="22"></app-icon>
+              <strong>The first pieces are on their way</strong>
+              <span>New listings show up here as soon as a seller publishes them.</span>
+            </div>
           </div>
-        </div>
-        <div class="hero-strip-item">
-          <div class="hero-strip-num">24h</div>
-          <div class="hero-strip-info">
-            <strong>Fast Dispatch</strong>
-            <span>Most orders ship same day</span>
+        } @else {
+          <div class="hero-stack" [attr.data-count]="heroItems().length">
+            <!-- Fewer than 3 products: decorative plinths keep the stack full -->
+            @for (slot of [heroItems().length, heroItems().length + 1]; track slot) {
+              @if (slot < 3) {
+                <div class="hero-card is-ghost" [class]="'layer-' + slot" aria-hidden="true"></div>
+              }
+            }
+            @for (item of heroItems(); track item.id; let i = $index) {
+              <a class="hero-card" [class]="'layer-' + i" [routerLink]="['/products', item.id]"
+                [attr.tabindex]="i === 0 ? null : -1" [attr.aria-hidden]="i === 0 ? null : 'true'"
+                [attr.aria-label]="i === 0 ? item.name + ', ' + (item.price | currency: 'USD') : null">
+                <span class="hero-card-media">
+                  @if (item.image; as src) {
+                    <img [ngSrc]="src" fill sizes="(max-width: 991px) 70vw, 25vw" [priority]="i === 0"
+                      [alt]="i === 0 ? item.name : ''" />
+                  } @else {
+                    <span class="letter-mark" aria-hidden="true">{{ initial(item.name) }}</span>
+                  }
+                </span>
+                @if (i === 0) {
+                  <span class="hero-card-caption">
+                    <span class="hero-card-tag">New in</span>
+                    <strong>{{ item.name }}</strong>
+                    <span class="hero-card-price">{{ item.price | currency: 'USD' }}</span>
+                  </span>
+                }
+              </a>
+            }
           </div>
-        </div>
-        <div class="hero-strip-item">
-          <div class="hero-strip-num">98%</div>
-          <div class="hero-strip-info">
-            <strong>Satisfaction</strong>
-            <span>Verified buyer reports</span>
-          </div>
-        </div>
+          @if (catalogTotal() > 1) {
+            <p class="hero-count" aria-hidden="true">
+              <strong>{{ catalogTotal() }}</strong> pieces in the catalog
+            </p>
+          }
+        }
       </div>
     </div>
   </section>
+
+  <!-- ───────────── Trust strip ───────────── -->
+  <section class="trust-strip" aria-label="What every order includes">
+    <ul class="container trust-list">
+      <li>
+        <span class="trust-icon"><app-icon name="package" [size]="18"></app-icon></span>
+        <span><strong>Pay on delivery</strong> No card needed at checkout.</span>
+      </li>
+      <li>
+        <span class="trust-icon"><app-icon name="shield-check" [size]="18"></app-icon></span>
+        <span><strong>Real sellers</strong> Every listing belongs to a signed-in seller.</span>
+      </li>
+      <li>
+        <span class="trust-icon"><app-icon name="store" [size]="18"></app-icon></span>
+        <span><strong>Straight from the source</strong> Price, photos and stock up front.</span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ───────────── Catalog ───────────── -->
   <main class="container catalog-page" id="catalog">
-    <div class="catalog-layout">
-      <aside class="filter-panel surface-card">
-        <div class="feature-strip d-flex flex-column gap-4">
-          <div class="feature-card">
-            <i class="bi bi-patch-check">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                <g fill="none" stroke="currentColor" stroke-width="1.5">
-                  <circle cx="12" cy="16" r="3" />
-                  <path
-                    d="m12 19.26l-2.263 2.17c-.324.31-.486.465-.623.52c-.313.122-.66.017-.824-.25c-.072-.117-.095-.328-.14-.75c-.025-.239-.038-.358-.077-.458a.827.827 0 0 0-.5-.48c-.104-.037-.229-.049-.477-.073c-.44-.044-.661-.065-.783-.134a.617.617 0 0 1-.26-.79c.056-.132.218-.287.542-.598L8.073 17l1.04-1.04M12 19.26l2.263 2.17c.324.31.486.465.623.52c.313.122.66.017.824-.25c.072-.117.095-.328.14-.75c.025-.239.038-.358.077-.458a.828.828 0 0 1 .5-.48c.105-.037.229-.049.477-.073c.44-.043.661-.065.783-.134a.617.617 0 0 0 .26-.79c-.056-.132-.218-.287-.542-.598L15.926 17L15 16.073" />
-                  <path
-                    d="M17.32 17.996c1.972-.021 3.072-.145 3.801-.875C22 16.243 22 14.828 22 12V8c0-2.828 0-4.243-.879-5.121C20.243 2 18.828 2 16 2H8c-2.828 0-4.243 0-5.121.879C2 3.757 2 5.172 2 8v4c0 2.828 0 4.243.879 5.121c.768.769 1.946.865 4.121.877" />
-                  <path stroke-linecap="round" d="M9 6h6M7 9.5h10" />
-                </g>
-              </svg>
-            </i>
-            <div>
-              <strong>Verified sellers</strong>
-              <span>Profiles reviewed before publishing</span>
-            </div>
-          </div>
-          <div class="feature-card">
-            <i class="bi bi-stars">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                <g fill="none">
-                  <path fill="currentColor"
-                    d="M7.506 15.265a.75.75 0 0 0 1.446-.4l-1.446.4Zm-1.43-7.99l.724-.2l-.723.2ZM4.705 5.92l-.2.723l.2-.723ZM3.2 4.725a.75.75 0 1 0-.402 1.445L3.2 4.725Zm16.988 11a.75.75 0 1 0-.378-1.451l.378 1.451Zm-9.991 1.834c.31 1.12-.37 2.303-1.574 2.616L9 21.626c1.977-.513 3.185-2.502 2.643-4.467l-1.446.4Zm-1.574 2.616c-1.212.315-2.428-.389-2.74-1.519l-1.446.4c.54 1.955 2.594 3.082 4.563 2.57l-.377-1.451Zm-2.74-1.519c-.31-1.12.37-2.303 1.574-2.616l-.377-1.45c-1.977.513-3.186 2.502-2.643 4.467l1.446-.4Zm1.574-2.616c1.212-.315 2.428.389 2.74 1.519l1.446-.4c-.54-1.955-2.594-3.082-4.563-2.57l.377 1.451Zm1.494-1.175L6.8 7.075l-1.446.4l2.152 7.79l1.446-.4ZM4.904 5.197l-1.703-.472l-.402 1.445l1.704.473l.401-1.446ZM6.8 7.075a2.707 2.707 0 0 0-1.896-1.878l-.4 1.446c.425.118.742.44.85.831l1.446-.4Zm4.31 11.01l9.079-2.36l-.378-1.451l-9.079 2.36l.377 1.451Z" />
-                  <path stroke="currentColor" stroke-width="1.5"
-                    d="M9.565 8.73c-.485-1.755-.727-2.633-.315-3.324c.411-.692 1.316-.927 3.126-1.398l1.92-.498c1.81-.47 2.715-.706 3.428-.307c.713.4.956 1.277 1.44 3.033l.515 1.862c.485 1.755.728 2.633.316 3.325c-.412.691-1.317.927-3.127 1.397l-1.92.499c-1.81.47-2.715.705-3.428.306c-.713-.4-.955-1.277-1.44-3.032L9.565 8.73Z" />
-                </g>
-              </svg>
-            </i>
-            <div>
-              <strong>Thoughtful curation</strong>
-              <span>Balanced grid with premium visual rhythm</span>
-            </div>
-          </div>
-          <div class="feature-card">
-            <i class="bi bi-truck">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                <path fill="none" stroke="currentColor" stroke-width="1.5"
-                  d="m5.67 9.914l3.062-4.143c1.979-2.678 2.969-4.017 3.892-3.734c.923.283.923 1.925.923 5.21v.31c0 1.185 0 1.777.379 2.148l.02.02c.387.363 1.003.363 2.236.363c2.22 0 3.329 0 3.704.673l.018.034c.354.683-.289 1.553-1.574 3.29l-3.062 4.144c-1.98 2.678-2.969 4.017-3.892 3.734c-.923-.283-.923-1.925-.923-5.21v-.31c0-1.185 0-1.777-.379-2.148l-.02-.02c-.387-.363-1.003-.363-2.236-.363c-2.22 0-3.329 0-3.704-.673a1.084 1.084 0 0 1-.018-.034c-.354-.683.289-1.552 1.574-3.29Z" />
-              </svg>
-            </i>
-            <div>
-              <strong>Fast fulfillment</strong>
-              <span>Clear shipping cues in the product detail flow</span>
-            </div>
-          </div>
+    <section class="catalog-content" aria-labelledby="catalog-title">
+      <div class="section-heading">
+        <h2 id="catalog-title">The catalog</h2>
+        <div class="kicker" aria-live="polite">
+          {{ productCount() }} {{ productCount() === 1 ? 'product' : 'products' }}
         </div>
-      </aside>
-      <section class="catalog-content">
-        <div class="section-heading">
-          <div>
-            <div class="kicker">{{ productCount() }} products available</div>
-          </div>
-          <div class="view-switch">
-            <button class="view-btn active" type="button" aria-label="Show grid view">
-              <app-icon name="grid" [size]="17"></app-icon>
-            </button>
-            <button class="view-btn" type="button" aria-label="Show list view">
-              <app-icon name="list" [size]="17"></app-icon>
-            </button>
-          </div>
+      </div>
+
+      <!-- Search and filters (sticky; compact once stuck) -->
+      <div class="filter-sentinel" aria-hidden="true"></div>
+      <form class="filter-bar" [class.is-stuck]="filtersStuck()" [formGroup]="filters" role="search"
+        aria-label="Search and filter products" (submit)="$event.preventDefault()">
+        <label class="filter-search">
+          <app-icon name="search" [size]="17"></app-icon>
+          <span class="sr-only">Search products</span>
+          <input type="search" id="catalog-search" formControlName="q" placeholder="Search by name or description"
+            maxlength="100" />
+        </label>
+
+        <div class="filter-price">
+          <label>
+            <span class="sr-only">Minimum price</span>
+            <input type="number" formControlName="minPrice" min="0" step="1" placeholder="Min $" inputmode="decimal" />
+          </label>
+          <span class="filter-dash" aria-hidden="true">to</span>
+          <label>
+            <span class="sr-only">Maximum price</span>
+            <input type="number" formControlName="maxPrice" min="0" step="1" placeholder="Max $" inputmode="decimal" />
+          </label>
         </div>
-        @if (isLoading()) {
-        <div class="catalog-state surface-card">
-          <strong>Loading products...</strong>
-          <span>Fetching the latest catalog from Buy01.</span>
+
+        <label class="filter-toggle">
+          <input type="checkbox" formControlName="inStock" />
+          <span>In stock only</span>
+        </label>
+
+        <label class="filter-sort">
+          <span class="sr-only">Sort by</span>
+          <select formControlName="sort">
+            @for (option of sortOptions; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </label>
+
+        @if (hasActiveFilters()) {
+          <button type="button" class="filter-clear" (click)="clearFilters()">
+            <app-icon name="x" [size]="15"></app-icon>
+            Clear
+          </button>
+        }
+      </form>
+
+      @if (isLoading()) {
+        <div class="product-grid" aria-busy="true" aria-label="Loading products" data-testid="skeletons">
+          @for (s of skeletons; track s) {
+            <app-product-card />
+          }
         </div>
-        } @else if (errorMessage()) {
-        <div class="catalog-state surface-card error-state">
-          <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24">
-            <g fill="none">
-              <path stroke="currentColor" stroke-width="1.5"
-                d="M3 10.417c0-3.198 0-4.797.378-5.335c.377-.537 1.88-1.052 4.887-2.081l.573-.196C10.405 2.268 11.188 2 12 2c.811 0 1.595.268 3.162.805l.573.196c3.007 1.029 4.51 1.544 4.887 2.081C21 5.62 21 7.22 21 10.417v1.574c0 5.638-4.239 8.375-6.899 9.536C13.38 21.842 13.02 22 12 22s-1.38-.158-2.101-.473C7.239 20.365 3 17.63 3 11.991v-1.574Z" />
-              <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M12 8v4" />
-              <circle cx="12" cy="15" r="1" fill="currentColor" />
-            </g>
-          </svg>
+      } @else if (errorMessage()) {
+        <div class="catalog-state surface-card error-state" role="alert">
+          <app-icon name="alert" [size]="28"></app-icon>
           <strong>Products could not load</strong>
           <span>{{ errorMessage() }}</span>
+          <button type="button" class="btn-light" (click)="loadProducts()">
+            <app-icon name="refresh" [size]="16"></app-icon>
+            Try again
+          </button>
         </div>
-        } @else if (productList().length === 0) {
+      } @else if (productList().length === 0 && hasActiveFilters()) {
+        <div class="catalog-state surface-card" data-testid="no-results">
+          <span class="state-icon"><app-icon name="search" [size]="26"></app-icon></span>
+          <strong>Nothing matches those filters</strong>
+          <span>Try a different word, widen the price range, or start over.</span>
+          <button type="button" class="btn-primary" (click)="clearFilters()">
+            <app-icon name="x" [size]="16"></app-icon>
+            Clear filters
+          </button>
+        </div>
+      } @else if (productList().length === 0) {
         <div class="catalog-state surface-card">
-          <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24">
-            <g fill="none">
-              <path stroke="currentColor" stroke-width="1.5"
-                d="M7.5 18a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3Zm9 0a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3Z" />
-              <path fill="currentColor"
-                d="m2.261 3.092l.249-.708l-.249.708Zm-.012-.8a.75.75 0 1 0-.498 1.416l.498-1.416Zm2.337 2.031l.62-.423l-.62.423Zm1.302 10.263l-.545.516l.545-.516Zm14.77-4.703l.734.151l.001-.004l-.735-.147Zm-.5 2.425l.735.15l-.735-.15Zm.576-5.61l-.594.456l.595-.457Zm-1.6 8.352l-.474-.581l.474.581ZM5.708 9.76V7.038h-1.5V9.76h1.5ZM2.51 2.384l-.261-.092l-.498 1.416l.261.091l.498-1.415Zm8.428 13.866h5.302v-1.5h-5.302v1.5Zm-5.23-9.212c0-.707.001-1.297-.05-1.776c-.055-.497-.171-.95-.453-1.362l-1.238.846c.09.132.16.314.199.677c.041.38.042.875.042 1.615h1.5ZM2.012 3.8c.668.235 1.107.39 1.43.55c.303.148.437.268.525.397L5.205 3.9c-.284-.416-.662-.682-1.103-.899c-.42-.206-.958-.394-1.592-.617L2.012 3.8Zm2.196 5.96c0 1.453.014 2.5.15 3.3c.147.854.44 1.466.985 2.042l1.089-1.032c-.32-.338-.493-.668-.595-1.263c-.11-.65-.129-1.558-.129-3.047h-1.5Zm6.73 4.99c-1.417 0-2.4-.002-3.141-.107c-.715-.101-1.092-.285-1.365-.573l-1.089 1.032c.594.627 1.347.9 2.243 1.026c.87.124 1.98.122 3.351.122v-1.5Zm-5.98-7.88h12.13v-1.5H4.959v1.5Zm14.965 2.861l-.5 2.425l1.47.303l.5-2.425l-1.47-.303ZM17.09 6.87c.856 0 1.61.001 2.205.067c.295.034.517.08.672.134c.161.057.187.1.174.083l1.189-.914c-.235-.306-.565-.479-.866-.584a4.616 4.616 0 0 0-1.003-.21c-.695-.077-1.543-.076-2.371-.076v1.5Zm4.304 3.16c.17-.848.313-1.56.348-2.13c.037-.586-.03-1.164-.412-1.66l-1.189.914c.062.081.13.226.104.654c-.027.444-.144 1.037-.322 1.928l1.471.294Zm-5.153 6.22c.762 0 1.401.001 1.917-.062c.535-.065 1.024-.209 1.45-.556l-.947-1.163c-.125.102-.303.184-.686.23c-.403.05-.934.051-1.734.051v1.5Zm3.184-4.094c-.162.783-.27 1.303-.4 1.688c-.123.366-.239.523-.364.625l.947 1.163c.427-.348.666-.797.838-1.309c.166-.492.294-1.118.448-1.864l-1.47-.303Z" />
-              <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="m11.5 12.5l3-3m0 3l-3-3" />
-            </g>
-          </svg>
+          <span class="state-icon"><app-icon name="package-open" [size]="26"></app-icon></span>
           <strong>No products yet</strong>
-          <span>Seller listings will appear here as soon as they are published.</span>
-        </div>
-        } @else {
-        <div class="product-grid">
-          @if (totalPages() > 0) {
-          <div class="pagination-info">
-            <span>{{ totalElements() }} product{{ totalElements() === 1 ? '' : 's' }}</span>
-          </div>
-          }
-          @for (product of productList(); track product.id) {
-          <article class="product-card">
-            <div class="product-media media-ceramic">
-              <div class="media-badges"><span class="media-badge new">New</span></div>
-              <button class="wish-btn" type="button" aria-label="Save product">
-                <app-icon name="heart" [size]="17"></app-icon>
-              </button>
-              @if (getProductImage(product.id); as imgUrl) {
-              <img [src]="imgUrl" [alt]="product.name" loading="lazy">
-              } @else {
-              <div class="media-placeholder">
-                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 14c0-3.771 0-5.657 1.172-6.828C4.343 6 6.229 6 10 6h4c3.771 0 5.657 0 6.828 1.172C22 8.343 22 10.229 22 14c0 3.771 0 5.657-1.172 6.828C19.657 22 17.771 22 14 22h-4c-3.771 0-5.657 0-6.828-1.172C2 19.657 2 17.771 2 14Z"/><path d="m4 7l-.012-1c.112-.931.347-1.574.837-2.063C5.765 3 7.279 3 10.307 3h3.211c3.028 0 4.541 0 5.482.937c.49.489.725 1.132.837 2.063v1"/><circle cx="17.5" cy="10.5" r="1.5"/><path stroke-linecap="round" d="m2 14.5l1.752-1.533a2.3 2.3 0 0 1 3.14.105l4.29 4.29a2 2 0 0 0 2.564.222l.299-.21a3 3 0 0 1 3.731.225L21 20.5"/></g></svg>
-              </div>
-              }
-            </div>
-            <div class="product-body">
-              <div class="product-meta">
-                <span class="seller-pill">buy-01</span>
-                <span class="rating-pill">5.0</span>
-              </div>
-              <h3> <a [routerLink]="['/products', product.id]">{{ product.name }}</a> </h3>
-              <p>{{ product.description }}</p>
-              <div class="product-footer">
-                <strong>${{product.price}}</strong>
-                <a class="mini-btn" [routerLink]="['/products', product.id]">
-                  View item
-                  <app-icon name="arrow-right" [size]="14"></app-icon>
-                </a>
-              </div>
-            </div>
-          </article>
+          <span>New listings appear here as soon as a seller publishes them.</span>
+          @if (role() === 'SELLER') {
+            <a routerLink="/seller/products/new" class="btn-primary">Add the first product</a>
+          } @else if (role() === 'GUEST') {
+            <a routerLink="/register" class="btn-light">Become the first seller</a>
           }
         </div>
-        }
-        @if (totalPages() > 1) {
-        <div class="pagination-controls">
+      } @else {
+        <div class="product-grid" [class.animate-in]="animateCards()"
+          [class.is-single]="productList().length === 1" [class.is-pair]="productList().length === 2">
+          @for (product of productList(); track product.id; let i = $index) {
+            <app-product-card [product]="product" [image]="getProductImage(product.id)" [index]="i"
+              [layout]="cardLayout()" />
+          }
+        </div>
+      }
+
+      @if (totalPages() > 1) {
+        <nav class="pagination-controls" aria-label="Catalog pages">
           <button class="pagination-btn" type="button" (click)="prevPage()" [disabled]="currentPage() === 0">
             <app-icon name="arrow-left" [size]="16"></app-icon>
             Previous
           </button>
           <div class="pagination-pages">
             @for (page of pageRange(); track page) {
-            <button class="pagination-page" type="button" [class.active]="page === currentPage()"
-              (click)="goToPage(page)">
-              {{ page + 1 }}
-            </button>
+              <button class="pagination-page" type="button" [class.active]="page === currentPage()"
+                [attr.aria-current]="page === currentPage() ? 'page' : null" (click)="goToPage(page)">
+                {{ page + 1 }}
+              </button>
             }
           </div>
           <button class="pagination-btn" type="button" (click)="nextPage()"
@@ -307,9 +248,10 @@
             Next
             <app-icon name="arrow-right" [size]="16"></app-icon>
           </button>
-        </div>
-        }
-      </section>
-    </div>
+        </nav>
+      }
+    </section>
   </main>
+
   <app-footer />
+</div>

@@ -1,0 +1,109 @@
+<div class="storefront-shell">
+  <app-navbar></app-navbar>
+
+  <main class="container shop-page">
+    <header class="shop-head">
+      <div>
+        <h1>Your cart</h1>
+        @if (!cart.isEmpty()) {
+        <p>{{ cart.count() }} {{ cart.count() === 1 ? 'item' : 'items' }}, ready when you are.</p>
+        }
+      </div>
+      @if (!cart.isEmpty()) {
+      <a routerLink="/products" class="shop-back">
+        <app-icon name="arrow-left" [size]="15"></app-icon>
+        Keep shopping
+      </a>
+      }
+    </header>
+
+    @if (lastRemoved(); as removed) {
+    <div class="undo-bar" role="status">
+      <span>Removed <strong>{{ removed.name }}</strong> from your cart.</span>
+      <button type="button" (click)="undo()">Undo</button>
+    </div>
+    }
+
+    @if (cart.isEmpty()) {
+    <section class="shop-card empty-state">
+      <app-icon name="shopping-bag" [size]="24"></app-icon>
+      <strong>Your cart is empty</strong>
+      <span>Find something you like in the catalog and add it here.</span>
+      <a routerLink="/products" class="btn-primary">Browse the catalog</a>
+    </section>
+    } @else {
+    <div class="shop-layout">
+      <section class="shop-card" aria-label="Items in your cart">
+        <ul class="line-list">
+          @for (item of cart.items(); track item.productId) {
+          <li class="line-item cart-line">
+            <a class="line-thumb" [routerLink]="['/products', item.productId]" tabindex="-1" aria-hidden="true">
+              @if (item.imageUrl) {
+              <img [src]="item.imageUrl" alt="" />
+              } @else {
+              <app-icon name="image-off" [size]="22"></app-icon>
+              }
+            </a>
+
+            <div class="line-info">
+              <a [routerLink]="['/products', item.productId]">{{ item.name }}</a>
+              <span>{{ item.price | currency: 'USD' }} each</span>
+
+              <div class="cart-controls">
+                <div class="qty-mini" role="group" [attr.aria-label]="'Quantity of ' + item.name">
+                  <button type="button" (click)="setQuantity(item, item.quantity - 1)" [disabled]="item.quantity <= 1"
+                    aria-label="Decrease quantity">−</button>
+                  <output>{{ item.quantity }}</output>
+                  <button type="button" (click)="setQuantity(item, item.quantity + 1)"
+                    [disabled]="item.quantity >= item.maxQuantity" aria-label="Increase quantity">+</button>
+                </div>
+                <button type="button" class="link-btn" (click)="remove(item)">Remove</button>
+              </div>
+              @if (item.quantity >= item.maxQuantity) {
+              <span class="cart-limit">Only {{ item.maxQuantity }} available</span>
+              }
+            </div>
+
+            <div class="line-total">{{ item.price * item.quantity | currency: 'USD' }}</div>
+          </li>
+          }
+        </ul>
+      </section>
+
+      <aside class="shop-aside">
+        <section class="shop-card">
+          <div class="shop-card-head">
+            <h2>Summary</h2>
+          </div>
+          <div class="shop-card-body">
+            <dl class="totals">
+              <div><dt>Subtotal</dt><dd>{{ cart.subtotal() | currency: 'USD' }}</dd></div>
+              <div><dt>Delivery</dt><dd>{{ shippingFee === 0 ? 'Free' : (shippingFee | currency: 'USD') }}</dd></div>
+              <div class="totals-grand"><dt>Total</dt><dd>{{ cart.subtotal() + shippingFee | currency: 'USD' }}</dd></div>
+            </dl>
+
+            @if (isSeller) {
+            <p class="seller-note">Seller accounts can't place orders. Sign in with a client account to buy.</p>
+            } @else {
+            <button type="button" class="btn-primary checkout-btn" (click)="checkout()">
+              Go to checkout
+              <app-icon name="arrow-right" [size]="16"></app-icon>
+            </button>
+            }
+
+            <div class="pay-note">
+              <app-icon name="package" [size]="18"></app-icon>
+              <div>
+                <strong>Pay on delivery</strong>
+                You pay when the order reaches you. Nothing is charged now.
+              </div>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </div>
+    }
+  </main>
+
+  <app-footer />
+</div>

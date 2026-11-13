@@ -1,0 +1,93 @@
+.confirm-dialog {
+  width: min(420px, calc(100vw - 2rem));
+  margin: auto;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+  color: var(--ink);
+}
+
+.confirm-dialog::backdrop {
+  background: rgba(20, 18, 16, 0.45);
+  backdrop-filter: blur(2px);
+}
+
+.cd-body {
+  padding: 1.6rem 1.6rem 1.1rem;
+}
+
+.cd-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 1rem;
+  border-radius: 50%;
+  background: var(--copper-wash);
+  color: var(--copper);
+}
+
+.cd-icon.danger {
+  background: var(--error-wash);
+  color: var(--error);
+}
+
+h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 400;
+}
+
+p {
+  margin-top: 0.45rem;
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.cd-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  padding: 1rem 1.6rem 1.4rem;
+}
+
+.cd-btn {
+  min-height: 42px;
+  padding: 0 1.1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cd-btn:hover {
+  background: var(--sunken);
+}
+
+.cd-btn.primary {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: #fff;
+}
+
+.cd-btn.primary.danger {
+  border-color: var(--error);
+  background: var(--error);
+}
+
+.cd-btn:focus-visible {
+  outline: 2px solid var(--copper);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .confirm-dialog[open] {
+    animation: b01-rise 0.22s var(--ease);
+  }
+}

@@ -37,6 +37,14 @@ function normalizeBaseUrl(url: string): string {
   return url.replace(/\/+$/, '');
 }
 
+export const SESSION_EXPIRED_MESSAGE = 'Your session has expired. Please log in again.';
+export const FORBIDDEN_MESSAGE = "You don't have permission to do this.";
+
+/** Login/register: a 401 there means wrong credentials, not an expired session. */
+export function isAuthEndpoint(url: string | null | undefined): boolean {
+  return !!url && /\/auth\/(login|register)(\?|$)/.test(url);
+}
+
 function resolveApiBaseUrl(): string {
   const config = runtimeConfig();
   const configuredUrl =
@@ -75,6 +83,11 @@ export class ApiClient {
 
   getErrorMessage(error: unknown, fallback = 'Something went wrong.'): string {
     if (error instanceof HttpErrorResponse) {
+      // Same text as the interceptor's toast, so the user sees one message, not two.
+      if (error.status === 401 && !isAuthEndpoint(error.url)) {
+        return SESSION_EXPIRED_MESSAGE;
+      }
+
       if (typeof error.error === 'string' && error.error.trim()) {
         return error.error;
       }
@@ -85,6 +98,10 @@ export class ApiClient {
 
       if (error.status === 0) {
         return 'Unable to reach the backend server.';
+      }
+
+      if (error.status === 403) {
+        return FORBIDDEN_MESSAGE;
       }
     }
 

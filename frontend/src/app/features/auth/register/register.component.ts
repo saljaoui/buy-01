@@ -1,42 +1,78 @@
-import { Component, OnDestroy, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, OnDestroy, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { AuthService } from '../auth.service';
 import { UserRole } from '../../../core/models/user.model';
+import { controlError, matchFields, notBlank, showError } from '../../../shared/forms/form-errors';
 import { IconComponent } from '../../../shared/icon/icon.component';
 
 type RegisterStep = 1 | 2 | 3;
 type ToastKind = 'error' | 'success' | 'warning';
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 @Component({
   selector: 'app-register',
-  imports: [FormsModule, RouterLink, IconComponent],
+  imports: [ReactiveFormsModule, RouterLink, IconComponent],
   templateUrl: './register.html',
   styleUrl: './register.scss',
 })
 export class RegisterComponent implements OnDestroy {
-  protected currentStep: RegisterStep = 1;
-  protected selectedRole: UserRole = 'CLIENT';
-  protected readonly form = {
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    terms: false,
+  // Signals, not plain fields: the app is zoneless, so state changed inside an HTTP
+  // callback (spinner, toast, step) only re-renders when it lives in a signal.
+  protected readonly currentStep = signal<RegisterStep>(1);
+  private readonly fb = inject(FormBuilder);
+
+  protected readonly form = this.fb.nonNullable.group(
+    {
+      role: ['CLIENT' as UserRole, Validators.required],
+      name: ['', [Validators.required, notBlank, Validators.maxLength(50)]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      confirmPassword: ['', Validators.required],
+      terms: [false, Validators.requiredTrue],
+    },
+    { validators: matchFields('password', 'confirmPassword') },
+  );
+
+  /** Fields shown on step 2. Used to validate that step before moving on. */
+  private readonly step2Fields = ['name', 'email', 'password', 'confirmPassword'] as const;
+
+  protected readonly showError = showError;
+  private readonly labels: Record<string, string> = {
+    name: 'Full name',
+    email: 'Email',
+    password: 'Password',
+    confirmPassword: 'Password confirmation',
+    terms: 'Terms',
   };
+
+  protected err(name: string): string {
+    if (name === 'confirmPassword' && this.form.controls.confirmPassword.hasError('mismatch')) {
+      return "Passwords don't match.";
+    }
+    if (name === 'terms') {
+      return 'You must accept the terms to continue.';
+    }
+    return controlError(this.form.get(name), this.labels[name] ?? name);
+  }
+
+  /** The message to show under a field, or '' when nothing should render (untouched, valid, or no text). */
+  protected fieldError(name: string): string {
+    return showError(this.form, name) ? this.err(name) : '';
+  }
+
+  protected get selectedRole(): UserRole {
+    return this.form.controls.role.value;
+  }
 
   protected passwordVisible = false;
   protected confirmPasswordVisible = false;
-  protected step2Submitted = false;
-  protected finalSubmitted = false;
-  protected isSubmitting = false;
-  protected toastVisible = false;
-  protected toastMessage = 'Something went wrong.';
-  protected toastType: ToastKind = 'error';
+  protected readonly isSubmitting = signal(false);
+  protected readonly toastVisible = signal(false);
+  protected readonly toastMessage = signal('Something went wrong.');
+  protected readonly toastType = signal<ToastKind>('error');
 
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
@@ -44,28 +80,22 @@ export class RegisterComponent implements OnDestroy {
   private redirectTimer: ReturnType<typeof setTimeout> | null = null;
 
   protected selectRole(role: UserRole): void {
-    this.selectedRole = role;
+    this.form.controls.role.setValue(role);
   }
 
   protected goToStep(step: RegisterStep): void {
-    if (step === 1) {
-      this.currentStep = 1;
+    if (step === 1 || step === 2) {
+      this.currentStep.set(step);
       return;
     }
-
-    if (step === 2) {
-      this.currentStep = 2;
-      return;
-    }
-
-    this.step2Submitted = true;
 
     if (this.hasStep2Errors) {
+      this.touchStep2();
       this.showToast('Please fix the highlighted fields before continuing.', 'warning');
       return;
     }
 
-    this.currentStep = 3;
+    this.currentStep.set(3);
   }
 
   protected togglePassword(field: 'password' | 'confirmPassword'): void {
@@ -77,32 +107,43 @@ export class RegisterComponent implements OnDestroy {
     this.confirmPasswordVisible = !this.confirmPasswordVisible;
   }
 
+  /** Pressing Enter: go to the next step, or submit on the last one. */
+  protected next(): void {
+    const step = this.currentStep();
+    if (step === 3) {
+      this.submit();
+    } else {
+      this.goToStep(step === 1 ? 2 : 3);
+    }
+  }
+
   protected submit(): void {
-    this.step2Submitted = true;
-    this.finalSubmitted = true;
+    this.form.markAllAsTouched();
 
     if (this.hasStep2Errors) {
-      this.currentStep = 2;
+      this.currentStep.set(2);
       this.showToast('Please complete your account details before submitting.', 'warning');
       return;
     }
 
-    if (this.hasFinalStepErrors || this.isSubmitting) {
+    if (this.hasFinalStepErrors || this.isSubmitting()) {
       this.showToast('Please complete the remaining required fields.', 'warning');
       return;
     }
 
     this.hideToast();
-    this.isSubmitting = true;
+    this.isSubmitting.set(true);
+
+    const { name, email, password, role } = this.form.getRawValue();
 
     this.authService
       .register({
-        name: this.form.name.trim(),
-        email: this.form.email.trim(),
-        password: this.form.password,
-        role: this.selectedRole,
+        name: name.trim(),
+        email: email.trim(),
+        password,
+        role,
       })
-      .pipe(finalize(() => (this.isSubmitting = false)))
+      .pipe(finalize(() => this.isSubmitting.set(false)))
       .subscribe({
         next: (session) => {
           this.authService.storeSession(session, true);
@@ -117,11 +158,19 @@ export class RegisterComponent implements OnDestroy {
             void this.router.navigate([target]);
           }, 1200);
         },
-        error: (error) => {
-          this.showToast(
-            this.authService.getErrorMessage(error, 'Unable to create your account.'),
-            'error',
-          );
+        error: (error: unknown) => {
+          const message = this.authService.getErrorMessage(error, 'Unable to create your account.');
+
+          // Duplicate email: send the user back to step 2 with the message on the email field.
+          // The `server` error clears itself as soon as they edit the email.
+          if (error instanceof HttpErrorResponse && error.status === 409) {
+            const email = this.form.controls.email;
+            email.setErrors({ ...(email.errors ?? {}), server: message });
+            email.markAsTouched();
+            this.currentStep.set(2);
+          }
+
+          this.showToast(message, 'error');
         },
       });
   }
@@ -134,27 +183,9 @@ export class RegisterComponent implements OnDestroy {
     return this.confirmPasswordVisible ? 'text' : 'password';
   }
 
-  protected get isNameInvalid(): boolean {
-    return this.step2Submitted && this.form.name.trim().length === 0;
-  }
-
-  protected get isEmailInvalid(): boolean {
-    return this.step2Submitted && !EMAIL_PATTERN.test(this.form.email.trim());
-  }
-
   protected get isEmailValid(): boolean {
-    return this.step2Submitted && EMAIL_PATTERN.test(this.form.email.trim());
-  }
-
-  protected get isPasswordInvalid(): boolean {
-    return this.step2Submitted && this.form.password.length < 8;
-  }
-
-  protected get isConfirmPasswordInvalid(): boolean {
-    return (
-      this.step2Submitted &&
-      (this.form.confirmPassword.length === 0 || this.form.confirmPassword !== this.form.password)
-    );
+    const email = this.form.controls.email;
+    return email.touched && email.valid;
   }
 
   protected get passwordStrength(): {
@@ -163,7 +194,7 @@ export class RegisterComponent implements OnDestroy {
     color: string;
     label: string;
   } {
-    const password = this.form.password;
+    const password = this.form.controls.password.value;
 
     if (password.length === 0) {
       return {
@@ -237,16 +268,15 @@ export class RegisterComponent implements OnDestroy {
   }
 
   protected get hasStep2Errors(): boolean {
-    return (
-      this.isNameInvalid ||
-      this.isEmailInvalid ||
-      this.isPasswordInvalid ||
-      this.isConfirmPasswordInvalid
-    );
+    return this.step2Fields.some((field) => this.form.controls[field].invalid);
   }
 
   protected get hasFinalStepErrors(): boolean {
-    return !this.form.terms;
+    return this.form.controls.terms.invalid;
+  }
+
+  private touchStep2(): void {
+    this.step2Fields.forEach((field) => this.form.controls[field].markAsTouched());
   }
 
   ngOnDestroy(): void {
@@ -260,21 +290,21 @@ export class RegisterComponent implements OnDestroy {
   }
 
   private showToast(message: string, type: ToastKind = 'error'): void {
-    this.toastMessage = message;
-    this.toastType = type;
-    this.toastVisible = true;
+    this.toastMessage.set(message);
+    this.toastType.set(type);
+    this.toastVisible.set(true);
 
     if (this.toastTimer) {
       clearTimeout(this.toastTimer);
     }
 
     this.toastTimer = setTimeout(() => {
-      this.toastVisible = false;
+      this.toastVisible.set(false);
     }, 3500);
   }
 
   private hideToast(): void {
-    this.toastVisible = false;
+    this.toastVisible.set(false);
 
     if (this.toastTimer) {
       clearTimeout(this.toastTimer);

@@ -1,0 +1,89 @@
+<div class="storefront-shell">
+  <app-navbar></app-navbar>
+
+  <main class="container shop-page">
+    <header class="shop-head account-head">
+      <div class="account-identity">
+        <span class="account-avatar" aria-hidden="true">{{ initials }}</span>
+        <div>
+          <h1>{{ user?.name }}</h1>
+          <p>{{ user?.email }}</p>
+        </div>
+      </div>
+      <a routerLink="/orders" class="btn-light">
+        <app-icon name="package" [size]="16"></app-icon>
+        Your orders
+      </a>
+    </header>
+
+    @if (isLoading()) {
+    <section class="shop-card empty-state">
+      <app-icon class="spin" name="spinner" [size]="22"></app-icon>
+      <strong>Loading your summary</strong>
+    </section>
+    } @else if (errorMessage(); as message) {
+    <section class="shop-card empty-state">
+      <app-icon name="alert" [size]="22"></app-icon>
+      <strong>Summary not available</strong>
+      <span>{{ message }}</span>
+    </section>
+    } @else if (stats(); as stats) {
+    <h2 class="section-title">Your spending</h2>
+    <div class="stat-grid">
+      <div class="stat-tile">
+        <span>Total spent</span>
+        <strong>{{ stats.totalSpent | currency: 'USD' }}</strong>
+      </div>
+      <div class="stat-tile">
+        <span>Orders</span>
+        <strong>{{ stats.orderCount }}</strong>
+      </div>
+      <div class="stat-tile">
+        <span>Items bought</span>
+        <strong>{{ stats.itemsBought }}</strong>
+      </div>
+    </div>
+
+    <section class="shop-card">
+      <div class="shop-card-head">
+        <h2>Most bought</h2>
+        <p>Cancelled orders aren't counted</p>
+      </div>
+      <div class="shop-card-body">
+        @if (stats.topProducts.length === 0) {
+        <div class="empty-state compact">
+          <span>Products you buy most often will show up here after your first order.</span>
+          <a routerLink="/products" class="btn-light">Browse the catalog</a>
+        </div>
+        } @else {
+        <ol class="rank-list">
+          @for (product of stats.topProducts; track product.productId) {
+          <li class="rank-item">
+            <span class="line-thumb">
+              @if (product.imageUrl) {
+              <img [src]="product.imageUrl" alt="" />
+              } @else {
+              <app-icon name="image-off" [size]="16"></app-icon>
+              }
+            </span>
+            <div>
+              <a class="rank-name" [routerLink]="['/products', product.productId]">{{ product.name }}</a>
+              <div class="rank-bar" aria-hidden="true">
+                <span [style.width.%]="(product.quantity / topQuantity()) * 100"></span>
+              </div>
+            </div>
+            <div class="rank-value">
+              <strong>{{ product.quantity }} bought</strong>
+              {{ product.amount | currency: 'USD' }}
+            </div>
+          </li>
+          }
+        </ol>
+        }
+      </div>
+    </section>
+    }
+  </main>
+
+  <app-footer />
+</div>

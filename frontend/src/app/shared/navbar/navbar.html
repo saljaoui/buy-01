@@ -5,21 +5,16 @@
         <img class="brand-logo" src="/logo.png" alt="Buy01 logo" />
       </a>
 
-      <div class="nav-search">
-        <i class="bi bi-search s-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-            <g fill="none" stroke="currentColor" stroke-width="1.5">
-              <circle cx="11.5" cy="11.5" r="9.5" />
-              <path stroke-linecap="round" d="m20 20l2 2" />
-            </g>
-          </svg>
-        </i>
-        <input type="text" placeholder="Search products, brands, or categories" />
-      </div>
+      <form class="nav-search" role="search" (submit)="search($event, searchInput.value)">
+        <i class="s-icon"><app-icon name="search" [size]="17"></app-icon></i>
+        <label class="sr-only" for="nav-search-input">Search products</label>
+        <input #searchInput id="nav-search-input" type="search" [value]="searchText()"
+          (input)="onSearchInput(searchInput.value)" placeholder="Search products" maxlength="100" />
+      </form>
 
       <div class="nav-actions">
         @if (currentUser; as user) {
-        <div class="nav-profile">
+        <a class="nav-profile" [routerLink]="isClient ? '/account' : '/seller/profile'">
           <div class="nav-avatar">
             @if (user.avatar) {
             <img [src]="user.avatar" [alt]="user.name" />
@@ -31,7 +26,14 @@
             <strong>{{ user.name }}</strong>
             <small>{{ profileLabel }}</small>
           </div>
-        </div>
+        </a>
+
+        @if (isClient) {
+        <a routerLink="/orders" class="nav-btn hide-mobile">
+          <app-icon name="package" [size]="17"></app-icon>
+          Orders
+        </a>
+        }
 
         @if (sellerDashboardLink; as dashboardLink) {
         <a [routerLink]="dashboardLink" class="nav-btn hide-mobile">
@@ -57,29 +59,25 @@
               </g>
             </svg>
           </i>
-          <span class="hide-mobile">Sign Out</span>
+          <span class="hide-mobile">Sign out</span>
         </button>
         } @else {
-        <a routerLink="/login" class="nav-btn hide-mobile">Sign In</a>
+        <a routerLink="/login" class="nav-btn hide-mobile">Sign in</a>
         <a routerLink="/register" class="nav-btn primary hide-mobile">
           <app-icon name="user-plus" [size]="16"></app-icon>
           Register
         </a>
         }
 
-        <button class="cart-btn" type="button" aria-label="Open cart">
-          <i class="bi bi-bag">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-              <g fill="none" stroke="currentColor" stroke-width="1.5">
-                <path
-                  d="M2 12c0-4.714 0-7.071 1.464-8.536C4.93 2 7.286 2 12 2c4.714 0 7.071 0 8.535 1.464C22 4.93 22 7.286 22 12c0 4.714 0 7.071-1.465 8.535C19.072 22 16.714 22 12 22s-7.071 0-8.536-1.465C2 19.072 2 16.714 2 12Z" />
-                <path stroke-linecap="round"
-                  d="M2 13h3.16c.905 0 1.358 0 1.756.183c.398.183.692.527 1.281 1.214l.606.706c.589.687.883 1.031 1.281 1.214c.398.183.85.183 1.756.183h.32c.905 0 1.358 0 1.756-.183c.398-.183.692-.527 1.281-1.214l.606-.706c.589-.687.883-1.031 1.281-1.214c.398-.183.85-.183 1.756-.183H22" />
-              </g>
-            </svg>
-          </i>
-          <span class="cart-badge">3</span>
-        </button>
+        @if (canShop) {
+        <a class="cart-btn" routerLink="/cart"
+          [attr.aria-label]="'Cart, ' + cart.count() + (cart.count() === 1 ? ' item' : ' items')">
+          <app-icon name="shopping-bag" [size]="19"></app-icon>
+          @if (cart.count() > 0) {
+          <span class="cart-badge" [class.bump]="cartBump()" aria-hidden="true">{{ cart.count() > 99 ? '99+' : cart.count() }}</span>
+          }
+        </a>
+        }
       </div>
     </div>
   </div>

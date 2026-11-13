@@ -40,7 +40,19 @@ export type AppIconName =
   | 'upload-cloud'
   | 'user-check'
   | 'user-plus'
-  | 'x';
+  | 'x'
+  | 'bell'
+  | 'log-out'
+  | 'external-link'
+  | 'chevron-left'
+  | 'chevron-down'
+  | 'minus'
+  | 'trending-up'
+  | 'trending-down'
+  | 'grip'
+  | 'truck'
+  | 'clock'
+  | 'rail';
 
 @Component({
   selector: 'app-icon',

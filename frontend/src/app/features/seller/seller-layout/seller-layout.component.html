@@ -1,0 +1,62 @@
+<div class="seller-shell" [class.menu-open]="menuOpen()" [class.is-rail]="collapsed()">
+  <a class="skip-link" href="#seller-content">Skip to content</a>
+
+  <!-- Phones: slim bar with a menu button; the sidebar becomes a drawer -->
+  <div class="seller-mobilebar">
+    <button type="button" class="seller-menu-btn" (click)="toggleMenu()" [attr.aria-expanded]="menuOpen()"
+      aria-controls="seller-sidebar" data-testid="seller-menu-btn">
+      <span class="seller-menu-icon" aria-hidden="true"><span></span></span>
+      <span class="sr-only">{{ menuOpen() ? 'Close menu' : 'Open menu' }}</span>
+    </button>
+    <a class="seller-mobilebar-brand" routerLink="/seller" aria-label="Seller dashboard">
+      <img src="/logo.png" alt="" width="30" height="30" />
+      <span>Seller studio</span>
+    </a>
+  </div>
+
+  <app-seller-sidebar id="seller-sidebar" [activeItem]="activeItem()" [collapsed]="collapsed()"
+    [productCount]="shell.productCount()" [mediaCount]="shell.mediaCount()"
+    [ordersNeedingAction]="shell.ordersNeedingAction()" [name]="user()?.name || 'Seller'"
+    [email]="user()?.email || ''" [avatar]="user()?.avatar ?? null" [initials]="initials()"
+    (toggleCollapse)="toggleRail()" (signOut)="signOut()" />
+
+  @if (menuOpen()) {
+    <button type="button" class="seller-backdrop" (click)="closeMenu()" aria-label="Close menu" tabindex="-1"></button>
+  }
+
+  <div class="seller-main">
+    <!-- Slim topbar: breadcrumb left; search, orders, View store right -->
+    <header class="seller-topbar">
+      <div class="seller-container seller-topbar-inner">
+        <nav class="seller-crumbs" aria-label="Breadcrumb">
+          <a routerLink="/seller">Seller</a>
+          <app-icon name="chevron-right" [size]="13"></app-icon>
+          <span aria-current="page" data-testid="crumb">{{ crumb() }}</span>
+        </nav>
+
+        <div class="seller-topbar-tools">
+          <app-seller-search />
+
+          <a class="topbar-icon-btn" routerLink="/seller/orders"
+            [attr.aria-label]="shell.ordersNeedingAction() ? shell.ordersNeedingAction() + ' orders need action' : 'Orders'"
+            [attr.title]="shell.ordersNeedingAction() ? shell.ordersNeedingAction() + ' orders need action' : 'No orders need action'"
+            data-testid="orders-indicator">
+            <app-icon name="bell" [size]="18"></app-icon>
+            @if (shell.ordersNeedingAction()) {
+              <span class="topbar-dot">{{ shell.ordersNeedingAction() > 9 ? '9+' : shell.ordersNeedingAction() }}</span>
+            }
+          </a>
+
+          <a class="topbar-store-link" routerLink="/products">
+            <app-icon name="store" [size]="16"></app-icon>
+            <span>View store</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main class="seller-page" id="seller-content" tabindex="-1">
+      <router-outlet />
+    </main>
+  </div>
+</div>

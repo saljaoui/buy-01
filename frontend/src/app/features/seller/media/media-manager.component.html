@@ -1,340 +1,220 @@
-<div class="seller-shell">
-  <app-seller-sidebar activeItem="media" [productCount]="totalProducts()" [initials]="userInitials()"
-    [name]="user()?.name || 'Seller'" [subtitle]="user()?.email || 'Seller account'"></app-seller-sidebar>
+<app-page-header eyebrow="Catalog" title="Media library"
+  [subtitle]="totalMedia() ? totalMedia() + ' photos across ' + productsWithMedia() + ' of ' + products().length + ' products. The first photo of each product is its cover.' : 'Every photo of every product, in one place.'">
+  @if (products().length && totalMedia() && !uploadOpen()) {
+    <button actions type="button" class="primary-btn" (click)="openUpload()" data-testid="upload-open">
+      <app-icon name="upload-cloud" [size]="16"></app-icon>
+      Upload photos
+    </button>
+  }
+</app-page-header>
 
-  <div class="seller-main">
-    <input #fileInput class="visually-hidden-file" type="file" accept="image/jpeg,image/png,image/webp,image/avif"
-      multiple (change)="onFilesSelected($event)" />
-
-    <header class="seller-topbar">
-      <div class="seller-topbar-copy">
-        <strong>Media management</strong>
-        <span>Gateway-backed product images</span>
-      </div>
-
-      <div class="seller-topbar-actions">
-        <button class="ghost-btn" type="button" (click)="loadMedia()"
-          [disabled]="isLoadingProducts() || isLoadingMedia() || products().length === 0">
-          <app-icon name="refresh" [size]="16"></app-icon>
-          Refresh
-        </button>
-        <button class="primary-btn" type="button" (click)="fileInput.click()"
-          [disabled]="isLoadingProducts() || products().length === 0 || isUploading()">
-          <app-icon name="upload-cloud" [size]="16"></app-icon>
-          Upload files
-        </button>
-      </div>
-    </header>
-
-    <main class="seller-body">
-      <section class="seller-banner">
-        <div class="seller-banner-copy">
-          <div class="eyebrow"><span></span> Media library</div>
-          <h1>Keep every asset <em>organized</em> and ready.</h1>
-          <p>
-            The upload area, file cards, and metadata panels mirror the same clean admin styling as
-            the dashboard and product editor.
-          </p>
+@if (isLoading() && products().length === 0) {
+  <div class="mm-skeleton" aria-busy="true" aria-label="Loading photos">
+    @for (i of [0, 1, 2, 3, 4, 5, 6, 7]; track i) {
+      <span class="skeleton"></span>
+    }
+  </div>
+} @else if (errorMessage()) {
+  <section class="panel">
+    <app-empty-state icon="alert" tone="error" title="Your photos could not load" [message]="errorMessage()">
+      <button actions type="button" class="secondary-btn" (click)="load()">
+        <app-icon name="refresh" [size]="16"></app-icon>
+        Try again
+      </button>
+    </app-empty-state>
+  </section>
+} @else if (products().length === 0) {
+  <!-- No products: one friendly state, one action -->
+  <section class="panel mm-empty" data-testid="no-products">
+    <app-empty-state icon="media" title="Photos live with products"
+      message="Create a product first. Its photos will show up here, ready to reorder or replace.">
+      <a actions class="primary-btn" routerLink="/seller/products/new">
+        <app-icon name="plus" [size]="16"></app-icon>
+        Create your first product
+      </a>
+    </app-empty-state>
+  </section>
+} @else {
+  @if (uploadOpen() || totalMedia() === 0) {
+    <!-- Upload panel -->
+    <section class="panel mm-upload rise-in" id="upload-panel" aria-labelledby="upload-title" data-testid="upload-panel">
+      <div class="panel-head">
+        <div>
+          <h3 id="upload-title">{{ totalMedia() === 0 ? 'Add your first photos' : 'Upload photos' }}</h3>
+          <p>Up to {{ maxPhotos }} per product. They're added after the photos it already has.</p>
         </div>
-
-        <div class="seller-banner-actions">
-          <button class="secondary-btn" type="button" (click)="showAllAssets()">
-            <app-icon name="grid" [size]="16"></app-icon>
-            Gallery view
+        @if (totalMedia() > 0) {
+          <button type="button" class="icon-btn" (click)="closeUpload()" [disabled]="isUploading()" aria-label="Close upload">
+            <app-icon name="x" [size]="16"></app-icon>
           </button>
-          <a class="primary-btn" routerLink="/seller/products/new">
-            <app-icon name="plus" [size]="16"></app-icon>
-            New product
-          </a>
-        </div>
-      </section>
-
-      @if (errorMessage()) {
-      <section class="panel media-error-panel">
-        <div class="panel-body">
-          <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24">
-            <g fill="none">
-              <path stroke="currentColor" stroke-width="1.5"
-                d="M3 10.417c0-3.198 0-4.797.378-5.335c.377-.537 1.88-1.052 4.887-2.081l.573-.196C10.405 2.268 11.188 2 12 2c.811 0 1.595.268 3.162.805l.573.196c3.007 1.029 4.51 1.544 4.887 2.081C21 5.62 21 7.22 21 10.417v1.574c0 5.638-4.239 8.375-6.899 9.536C13.38 21.842 13.02 22 12 22s-1.38-.158-2.101-.473C7.239 20.365 3 17.63 3 11.991v-1.574Z" />
-              <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M12 8v4" />
-              <circle cx="12" cy="15" r="1" fill="currentColor" />
-            </g>
-          </svg>
-          <strong>Media page could not load</strong>
-          <span>{{ errorMessage() }}</span>
-        </div>
-      </section>
-      }
-
-      <section class="panel upload-panel">
-        <div class="panel-head">
-          <div>
-            <h3>Upload area</h3>
-            <p>Attach images to a product owned by the current seller.</p>
-          </div>
-        </div>
-
-        <div class="panel-body">
-          @if (isLoadingProducts()) {
-          <div class="media-state">
-            <app-icon class="spin" name="spinner" [size]="24"></app-icon>
-            <strong>Loading products...</strong>
-          </div>
-          } @else if (products().length === 0) {
-          <div class="media-state">
-            <svg xmlns="http://www.w3.org/2000/svg" width="200" class="svg-icon" height="200" viewBox="0 0 24 24">
-              <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"
-                d="m15.578 3.382l2 1.05c2.151 1.129 3.227 1.693 3.825 2.708C22 8.154 22 9.417 22 11.94v.117c0 2.525 0 3.788-.597 4.802c-.598 1.015-1.674 1.58-3.825 2.709l-2 1.049C13.822 21.539 12.944 22 12 22s-1.822-.46-3.578-1.382l-2-1.05c-2.151-1.129-3.227-1.693-3.825-2.708C2 15.846 2 14.583 2 12.06v-.117c0-2.525 0-3.788.597-4.802c.598-1.015 1.674-1.58 3.825-2.708l2-1.05C10.178 2.461 11.056 2 12 2s1.822.46 3.578 1.382ZM21 7.5L12 12m0 0L3 7.5m9 4.5v9.5" />
-            </svg>
-            <strong>Create a product first before uploading media</strong>
-            <a class="primary-btn" routerLink="/seller/products/new">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                <g fill="none">
-                  <path stroke="currentColor" stroke-width="1.5"
-                    d="M7.5 18a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3Zm9 0a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3Z" />
-                  <path fill="currentColor"
-                    d="m2.261 3.092l.249-.708l-.249.708Zm-.012-.8a.75.75 0 1 0-.498 1.416l.498-1.416Zm2.337 2.031l.62-.423l-.62.423Zm1.302 10.263l-.545.516l.545-.516Zm14.77-4.703l.734.151l.001-.004l-.735-.147Zm-.5 2.425l.735.15l-.735-.15Zm.576-5.61l-.594.456l.595-.457Zm-1.6 8.352l-.474-.581l.474.581ZM5.708 9.76V7.038h-1.5V9.76h1.5ZM2.51 2.384l-.261-.092l-.498 1.416l.261.091l.498-1.415Zm8.428 13.866h5.302v-1.5h-5.302v1.5Zm-5.23-9.212c0-.707.001-1.297-.05-1.776c-.055-.497-.171-.95-.453-1.362l-1.238.846c.09.132.16.314.199.677c.041.38.042.875.042 1.615h1.5ZM2.012 3.8c.668.235 1.107.39 1.43.55c.303.148.437.268.525.397L5.205 3.9c-.284-.416-.662-.682-1.103-.899c-.42-.206-.958-.394-1.592-.617L2.012 3.8Zm2.196 5.96c0 1.453.014 2.5.15 3.3c.147.854.44 1.466.985 2.042l1.089-1.032c-.32-.338-.493-.668-.595-1.263c-.11-.65-.129-1.558-.129-3.047h-1.5Zm6.73 4.99c-1.417 0-2.4-.002-3.141-.107c-.715-.101-1.092-.285-1.365-.573l-1.089 1.032c.594.627 1.347.9 2.243 1.026c.87.124 1.98.122 3.351.122v-1.5Zm-5.98-7.88h12.13v-1.5H4.959v1.5Zm14.965 2.861l-.5 2.425l1.47.303l.5-2.425l-1.47-.303ZM17.09 6.87c.856 0 1.61.001 2.205.067c.295.034.517.08.672.134c.161.057.187.1.174.083l1.189-.914c-.235-.306-.565-.479-.866-.584a4.616 4.616 0 0 0-1.003-.21c-.695-.077-1.543-.076-2.371-.076v1.5Zm4.304 3.16c.17-.848.313-1.56.348-2.13c.037-.586-.03-1.164-.412-1.66l-1.189.914c.062.081.13.226.104.654c-.027.444-.144 1.037-.322 1.928l1.471.294Zm-5.153 6.22c.762 0 1.401.001 1.917-.062c.535-.065 1.024-.209 1.45-.556l-.947-1.163c-.125.102-.303.184-.686.23c-.403.05-.934.051-1.734.051v1.5Zm3.184-4.094c-.162.783-.27 1.303-.4 1.688c-.123.366-.239.523-.364.625l.947 1.163c.427-.348.666-.797.838-1.309c.166-.492.294-1.118.448-1.864l-1.47-.303Z" />
-                  <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5"
-                    d="M13 13v-2m0 0V9m0 2h2m-2 0h-2" />
-                </g>
-              </svg>
-              Create product
-            </a>
-          </div>
-          } @else {
-          <div class="upload-controls">
-            <label for="uploadProduct">Product</label>
-            <select id="uploadProduct" [ngModel]="uploadProductId()" (ngModelChange)="selectUploadProduct($event)"
-              [disabled]="isUploading()">
-              @for (product of products(); track product.id) {
-              <option [value]="product.id">{{ product.name }} ({{ mediaCountFor(product.id) }} images)</option>
-              }
-            </select>
-          </div>
-
-          <div class="upload-dropzone media-upload-zone">
-            <div class="zone-icon"><app-icon name="upload-cloud" [size]="30"></app-icon></div>
-            <strong>{{ selectedFileSummary() }}</strong>
-            <span>Allowed types: JPG, PNG, WEBP, AVIF. Maximum size: 2 MB per image.</span>
-
-            <div class="upload-actions">
-              <button class="primary-btn" type="button" (click)="fileInput.click()" [disabled]="isUploading()">
-                <app-icon name="upload-cloud" [size]="16"></app-icon>
-                Choose files
-              </button>
-              <button class="ghost-btn" type="button" (click)="uploadSelectedFiles()"
-                [disabled]="isUploading() || selectedFiles().length === 0">
-                <app-icon [name]="isUploading() ? 'spinner' : 'upload-cloud'" [class.spin]="isUploading()"
-                  [size]="16"></app-icon>
-                {{ isUploading() ? 'Uploading...' : 'Upload selected' }}
-              </button>
-              @if (selectedFiles().length > 0) {
-              <button class="ghost-btn" type="button" (click)="clearSelectedFiles()" [disabled]="isUploading()">
-                <app-icon name="x" [size]="16"></app-icon>
-                Clear
-              </button>
-              }
-            </div>
-
-            @if (selectedFiles().length > 0) {
-            <div class="selected-files">
-              @for (file of selectedFiles(); track file.name + file.size + file.lastModified) {
-              <span class="soft-pill">{{ file.name }} - {{ formatBytes(file.size) }}</span>
-              }
-            </div>
+        }
+      </div>
+      <div class="panel-body mm-upload-body">
+        <div class="sf-field">
+          <label class="sf-label" for="mm-product">Product</label>
+          <select id="mm-product" class="sf-input" [ngModel]="uploadProductId()" (ngModelChange)="selectUploadProduct($event)"
+            [disabled]="isUploading()">
+            @for (row of productsWithRoom(); track row.product.id) {
+              <option [value]="row.product.id" [disabled]="row.used >= maxPhotos">
+                {{ row.product.name }} · {{ row.used }}/{{ maxPhotos }} photos{{ row.used >= maxPhotos ? ' (full)' : '' }}
+              </option>
             }
-
-            @if (uploadError()) {
-            <div class="upload-error"><app-icon name="alert" [size]="16"></app-icon>{{ uploadError() }}</div>
-            }
-          </div>
-          }
+          </select>
         </div>
-      </section>
 
-      <section class="panel media-toolbar">
-        <div class="panel-body media-toolbar-body">
-          <div class="media-search">
-            <app-icon name="search" [size]="17"></app-icon>
-            <input type="text" placeholder="Search by file name or product" [ngModel]="searchTerm()"
-              (ngModelChange)="updateSearchTerm($event)" />
-          </div>
+        <app-upload-zone [maxFiles]="uploadRoom()" [disabled]="isUploading() || !uploadProductId()"
+          [hint]="'JPG, PNG, WEBP or AVIF · up to 2 MB each · ' + uploadRoom() + ' more for this product'"
+          limitTitle="This product has all its photos" limitHint="Delete one below, or choose another product."
+          (files)="addPending($event)" />
 
-          <div class="media-toolbar-actions">
-            <select [ngModel]="sortMode()" (ngModelChange)="updateSortMode($event)">
-              <option value="newest">Newest uploads</option>
-              <option value="oldest">Oldest uploads</option>
-              <option value="name">Name A-Z</option>
-            </select>
-            <select [ngModel]="filterProductId()" (ngModelChange)="updateFilterProduct($event)">
-              <option value="all">All products</option>
-              @for (product of products(); track product.id) {
-              <option [value]="product.id">{{ product.name }}</option>
-              }
-            </select>
-            <button class="ghost-btn" type="button" (click)="showAllAssets()">
-              <app-icon name="grid" [size]="16"></app-icon>
-              All assets
+        @if (pending().length) {
+          <ul class="mm-pending" aria-label="Photos to upload">
+            @for (item of pending(); track item.preview) {
+              <li [class.has-error]="item.error">
+                <img [src]="item.preview" alt="" />
+                <span class="mm-pending-copy">
+                  <strong>{{ item.file.name }}</strong>
+                  @if (item.error) {
+                    <span class="mm-pending-error">{{ item.error }}</span>
+                  } @else {
+                    <span>{{ formatBytes(item.file.size) }}{{ item.progress === 100 ? ' · uploaded' : '' }}</span>
+                  }
+                  @if (item.progress !== null) {
+                    <span class="mm-progress" role="progressbar" [attr.aria-valuenow]="item.progress" aria-valuemin="0" aria-valuemax="100"
+                      [attr.aria-label]="'Uploading ' + item.file.name"><span [style.width.%]="item.progress"></span></span>
+                  }
+                </span>
+                <button type="button" class="row-btn" (click)="removePending(item)" [disabled]="isUploading()"
+                  [attr.aria-label]="'Remove ' + item.file.name">
+                  <app-icon name="x" [size]="15"></app-icon>
+                </button>
+              </li>
+            }
+          </ul>
+          <div class="mm-upload-actions">
+            <button type="button" class="primary-btn" (click)="upload()" [disabled]="isUploading()" data-testid="upload-submit">
+              <app-icon [name]="isUploading() ? 'spinner' : 'upload-cloud'" [class.spin]="isUploading()" [size]="16"></app-icon>
+              {{ isUploading() ? 'Uploading…' : 'Upload ' + pending().length + (pending().length === 1 ? ' photo' : ' photos') }}
             </button>
           </div>
-        </div>
-      </section>
-
-      <div class="media-layout">
-        <section class="panel">
-          <div class="panel-head">
-            <div>
-              <h3>Library</h3>
-              <p>Images fetched from the media service for seller-owned products</p>
-            </div>
-          </div>
-
-          <div class="panel-body">
-            @if (isLoadingMedia()) {
-            <div class="media-state">
-              <app-icon class="spin" name="spinner" [size]="24"></app-icon>
-              <strong>Loading media...</strong>
-            </div>
-            } @else if (!isLoadingProducts() && products().length === 0) {
-            <div class="media-state">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" class="svg-icon" height="24" viewBox="0 0 24 24">
-                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"
-                  d="m15.578 3.382l2 1.05c2.151 1.129 3.227 1.693 3.825 2.708C22 8.154 22 9.417 22 11.94v.117c0 2.525 0 3.788-.597 4.802c-.598 1.015-1.674 1.58-3.825 2.709l-2 1.049C13.822 21.539 12.944 22 12 22s-1.822-.46-3.578-1.382l-2-1.05c-2.151-1.129-3.227-1.693-3.825-2.708C2 15.846 2 14.583 2 12.06v-.117c0-2.525 0-3.788.597-4.802c.598-1.015 1.674-1.58 3.825-2.708l2-1.05C10.178 2.461 11.056 2 12 2s1.822.46 3.578 1.382ZM21 7.5L12 12m0 0L3 7.5m9 4.5v9.5" />
-              </svg>
-              <strong>Create a product first before uploading media</strong>
-            </div>
-            } @else if (mediaAssets().length === 0) {
-            <div class="media-state">
-              <app-icon name="image-off" [size]="30"></app-icon>
-              <strong>No media for selected product</strong>
-              <span>Choose image files above to upload through the media service.</span>
-            </div>
-            } @else if (filteredAssets().length === 0) {
-            <div class="media-state">
-              <app-icon name="search" [size]="28"></app-icon>
-              <strong>No matching media</strong>
-              <span>Try a different product filter or search term.</span>
-            </div>
-            } @else {
-            <div class="media-grid">
-              @for (asset of filteredAssets(); track asset.id) {
-              <article class="media-card" [class.selected]="selectedAssetId() === asset.id">
-                <div class="media-preview">
-                  <img [src]="mediaService.imageUrl(asset.media)" [alt]="asset.fileName" loading="lazy" />
-                  <span class="file-badge">{{ asset.fileName.split('.').pop()?.toUpperCase() || 'IMG' }}</span>
-                </div>
-                <strong>{{ asset.fileName }}</strong>
-                <span>{{ asset.productName }}</span>
-                <div class="media-actions">
-                  <button class="row-btn" type="button" (click)="openAsset(asset)" title="View image"
-                    aria-label="View image">
-                    <app-icon name="eye" [size]="16"></app-icon>
-                  </button>
-                  <a class="row-btn" [routerLink]="['/seller/products', asset.productId, 'edit']" title="Edit product"
-                    aria-label="Edit product">
-                    <app-icon name="edit" [size]="16"></app-icon>
-                  </a>
-                  <button class="row-btn danger" type="button" (click)="deleteAsset(asset)"
-                    [disabled]="deletingAssetId() === asset.id" title="Delete media" aria-label="Delete media">
-                    <app-icon [name]="deletingAssetId() === asset.id ? 'spinner' : 'trash'"
-                      [class.spin]="deletingAssetId() === asset.id" [size]="16"></app-icon>
-                  </button>
-                </div>
-              </article>
-              }
-            </div>
-            }
-          </div>
-        </section>
-
-        <aside class="side-stack">
-          <section class="panel">
-            <div class="panel-head">
-              <div>
-                <h3>Library notes</h3>
-                <p>Backend media rules</p>
-              </div>
-            </div>
-
-            <div class="panel-body side-list">
-              <div class="side-item">
-                <strong>Allowed image types</strong>
-                <span>JPG, PNG, WEBP, and AVIF only.</span>
-              </div>
-              <div class="side-item">
-                <strong>Maximum size</strong>
-                <span>2 MB per file.</span>
-              </div>
-              <div class="side-item">
-                <strong>Selected product</strong>
-                <span>{{ selectedProduct()?.name || 'No product selected' }}</span>
-              </div>
-            </div>
-          </section>
-
-          <section class="panel">
-            <div class="panel-head">
-              <div>
-                <h3>Selected asset</h3>
-                <p>Current media metadata</p>
-              </div>
-            </div>
-
-            <div class="panel-body side-list">
-              @if (selectedAsset(); as asset) {
-              <div class="side-item">
-                <strong>File name</strong>
-                <span>{{ asset.fileName }}</span>
-              </div>
-              <div class="side-item">
-                <strong>Linked product</strong>
-                <span>{{ asset.productName }}</span>
-              </div>
-              <div class="side-item">
-                <strong>Media ID</strong>
-                <span>{{ asset.media.id }}</span>
-              </div>
-              <div class="side-actions">
-                <button class="ghost-btn" type="button" (click)="openAsset(asset)">
-                  <app-icon name="eye" [size]="16"></app-icon>
-                  View
-                </button>
-                <button class="ghost-btn danger-action" type="button" (click)="deleteAsset(asset)"
-                  [disabled]="deletingAssetId() === asset.id">
-                  <app-icon [name]="deletingAssetId() === asset.id ? 'spinner' : 'trash'"
-                    [class.spin]="deletingAssetId() === asset.id" [size]="16"></app-icon>
-                  Delete
-                </button>
-              </div>
-              } @else {
-              <div class="side-item">
-                <strong>No asset selected</strong>
-                <span>Uploaded media will appear here after the backend responds.</span>
-              </div>
-              }
-            </div>
-          </section>
-
-          <section class="panel">
-            <div class="panel-head">
-              <div>
-                <h3>Product media</h3>
-                <p>{{ selectedProductMediaCount() }} images for selected product</p>
-              </div>
-            </div>
-
-            <div class="panel-body side-list">
-              <button class="ghost-btn danger-action full-width-action" type="button"
-                (click)="clearSelectedProductMedia()"
-                [disabled]="!selectedProduct() || selectedProductMediaCount() === 0 || isClearingProductMedia()">
-                <app-icon [name]="isClearingProductMedia() ? 'spinner' : 'trash'"
-                  [class.spin]="isClearingProductMedia()" [size]="16"></app-icon>
-                {{ isClearingProductMedia() ? 'Deleting...' : 'Clear product media' }}
-              </button>
-            </div>
-          </section>
-        </aside>
+        }
       </div>
-    </main>
-  </div>
-</div>
+    </section>
+  }
+
+  @if (totalMedia() > 0) {
+    <!-- Toolbar -->
+    <div class="mm-toolbar">
+      <label class="mm-search">
+        <app-icon name="search" [size]="16"></app-icon>
+        <span class="sr-only">Search by product</span>
+        <input type="search" placeholder="Search by product" [ngModel]="search()" (ngModelChange)="search.set($event)" />
+      </label>
+      <select class="sf-input mm-select" aria-label="Show product" [ngModel]="productFilter()" (ngModelChange)="productFilter.set($event)">
+        <option value="all">All products</option>
+        @for (p of products(); track p.id) {
+          <option [value]="p.id">{{ p.name }}</option>
+        }
+      </select>
+      <select class="sf-input mm-select" aria-label="Sort" [ngModel]="sort()" (ngModelChange)="sort.set($event)">
+        <option value="newest">Newest products first</option>
+        <option value="oldest">Oldest products first</option>
+        <option value="name">Name A–Z</option>
+        <option value="most">Most photos</option>
+      </select>
+    </div>
+
+    @if (groups().length === 0) {
+      <section class="panel">
+        <app-empty-state size="sm" icon="search" title="No photos match" message="Try another product or clear the search.">
+          <button actions type="button" class="secondary-btn" (click)="clearFilters()">Clear filters</button>
+        </app-empty-state>
+      </section>
+    }
+
+    <!-- Gallery, grouped by product -->
+    @for (group of groups(); track group.product.id) {
+      <section class="mm-group rise-in" [attr.aria-label]="group.product.name" data-testid="media-group">
+        <header class="mm-group-head">
+          <div class="mm-group-title">
+            <h2>{{ group.product.name }}</h2>
+            <span class="mm-group-count" [class.full]="group.media.length >= maxPhotos">{{ group.media.length }} / {{ maxPhotos }}</span>
+          </div>
+          <div class="mm-group-actions">
+            @if (group.media.length < maxPhotos) {
+              <button type="button" class="ghost-btn" (click)="openUpload(group.product.id)">
+                <app-icon name="plus" [size]="15"></app-icon>
+                Add
+              </button>
+            }
+            <a class="ghost-btn" [routerLink]="['/seller/products', group.product.id, 'edit']">
+              <app-icon name="edit" [size]="15"></app-icon>
+              Edit product
+            </a>
+            <button type="button" class="ghost-btn danger-text" (click)="deleteAll(group)" [disabled]="busyProductId() === group.product.id">
+              <app-icon [name]="busyProductId() === group.product.id ? 'spinner' : 'trash'" [class.spin]="busyProductId() === group.product.id" [size]="15"></app-icon>
+              Delete all
+            </button>
+          </div>
+        </header>
+
+        <ul class="mm-grid">
+          @for (media of group.media; track media.id; let first = $first; let i = $index) {
+            <li class="mm-tile" [class.busy]="busyMediaId() === media.id" data-testid="media-tile">
+              <button type="button" class="mm-open" (click)="openLightbox(media)"
+                [attr.aria-label]="'View ' + group.product.name + ', photo ' + (i + 1)">
+                <img [src]="url(media)" [alt]="group.product.name + ', photo ' + (i + 1)" loading="lazy" decoding="async" />
+              </button>
+              @if (first) {
+                <span class="mm-cover">Cover</span>
+              }
+              @if (busyMediaId() === media.id) {
+                <span class="mm-busy"><app-icon class="spin" name="spinner" [size]="22"></app-icon></span>
+              }
+              <div class="mm-actions">
+                <button type="button" (click)="openLightbox(media)" [attr.aria-label]="'View photo ' + (i + 1)" title="View">
+                  <app-icon name="eye" [size]="15"></app-icon>
+                </button>
+                @if (!first) {
+                  <button type="button" (click)="setCover(group, media)" [disabled]="!!busyMediaId()"
+                    [attr.aria-label]="'Set photo ' + (i + 1) + ' as cover'" title="Set as cover" data-testid="set-cover">
+                    <app-icon name="star" [size]="15"></app-icon>
+                  </button>
+                }
+                <button type="button" class="danger" (click)="deleteMedia(group, media)" [disabled]="!!busyMediaId()"
+                  [attr.aria-label]="'Delete photo ' + (i + 1)" title="Delete" data-testid="delete-media">
+                  <app-icon name="trash" [size]="15"></app-icon>
+                </button>
+              </div>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  }
+}
+
+<!-- Lightbox -->
+<dialog #lightbox class="mm-lightbox" aria-label="Photo viewer" (close)="lightboxIndex.set(null)"
+  (click)="onLightboxClick($event)" (keydown)="onLightboxKey($event)">
+  @if (lightboxItem(); as item) {
+    <figure>
+      <img [src]="url(item.media)" [alt]="item.product.name + ', photo ' + (item.index + 1)" />
+      <figcaption>
+        <strong>{{ item.product.name }}</strong>
+        <span>Photo {{ item.index + 1 }} of {{ item.total }}{{ item.index === 0 ? ' · cover' : '' }}</span>
+      </figcaption>
+    </figure>
+    <button type="button" class="mm-lb-btn close" (click)="closeLightbox()" aria-label="Close">
+      <app-icon name="x" [size]="20"></app-icon>
+    </button>
+    @if (visibleMedia().length > 1) {
+      <button type="button" class="mm-lb-btn prev" (click)="step(-1)" aria-label="Previous photo">
+        <app-icon name="arrow-left" [size]="20"></app-icon>
+      </button>
+      <button type="button" class="mm-lb-btn next" (click)="step(1)" aria-label="Next photo">
+        <app-icon name="arrow-right" [size]="20"></app-icon>
+      </button>
+    }
+  }
+</dialog>

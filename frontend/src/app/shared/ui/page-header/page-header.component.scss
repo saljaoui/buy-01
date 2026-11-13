@@ -1,0 +1,78 @@
+:host {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  margin-bottom: 2rem;
+}
+
+.ph-copy {
+  min-width: 0;
+  max-width: 64ch;
+}
+
+.ph-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--copper);
+}
+
+.ph-eyebrow::before {
+  content: '';
+  width: 22px;
+  height: 1px;
+  background: currentColor;
+}
+
+.ph-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.4vw, 2.75rem);
+  font-weight: 400;
+  font-variation-settings: 'opsz' 72;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.ph-subtitle {
+  margin-top: 0.55rem;
+  font-size: var(--text-md);
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.ph-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.ph-actions:empty {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :host {
+    animation: b01-rise 0.5s var(--ease) backwards;
+  }
+}
+
+@media (max-width: 559px) {
+  :host {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ph-actions > ::ng-deep * {
+    flex: 1 1 auto;
+  }
+}

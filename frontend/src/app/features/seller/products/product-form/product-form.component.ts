@@ -1,290 +1,373 @@
-import { ChangeDetectorRef, Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Location } from '@angular/common';
+import { Component, DestroyRef, OnDestroy, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Observable, finalize, map, of, startWith, switchMap } from 'rxjs';
 
-import { ProductRequest, ProductResponse, ProductService } from '../../../../shared/services/product-service';
-import { Media, MediaService, ProductImage } from '../../../../shared/services/media-service';
-import { ToastService } from '../../../../shared/services/toast-service';
 import { ApiClient } from '../../../../core/api/api-client.service';
-import { AuthService } from '../../../auth/auth.service';
+import { HasUnsavedChanges } from '../../../../core/guards/unsaved-changes.guard';
+import { controlError, notBlank, showError } from '../../../../shared/forms/form-errors';
 import { IconComponent } from '../../../../shared/icon/icon.component';
-import { SellerSidebarComponent } from '../../seller-sidebar/seller-sidebar.component';
+import { ProductCardComponent } from '../../../../shared/products/product-card/product-card.component';
+import { stockBadge } from '../../../../shared/products/stock';
+import { MediaOrderService, PhotoSource, planOrder } from '../../../../shared/services/media-order.service';
+import { Media, MediaService } from '../../../../shared/services/media-service';
+import { ProductRequest, ProductResponse, ProductService } from '../../../../shared/services/product-service';
+import { ToastService } from '../../../../shared/services/toast-service';
+import { PageHeaderComponent } from '../../../../shared/ui/page-header/page-header.component';
+import { UploadZoneComponent } from '../../../../shared/ui/upload-zone/upload-zone.component';
+import { AuthService } from '../../../auth/auth.service';
+import { SellerShellService } from '../../seller-layout/seller-shell.service';
 
-const MAX_IMAGES = 3;
-const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
+export const MAX_PHOTOS = 3;
+const DESCRIPTION_MAX = 2000;
+
+/** A photo row in the form: stored already, or picked and waiting for Save. */
+export interface PhotoItem {
+  key: string;
+  source: PhotoSource;
+  preview: string;
+  /** Upload progress during Save (0..100), null when not uploading. */
+  progress: number | null;
+}
+
+let photoKey = 0;
 
 @Component({
   selector: 'app-product-form',
-  imports: [SellerSidebarComponent, FormsModule, RouterLink, IconComponent],
+  imports: [ReactiveFormsModule, RouterLink, IconComponent, PageHeaderComponent, UploadZoneComponent, ProductCardComponent],
   templateUrl: './product-form.html',
   styleUrl: './product-form.scss',
+  host: { '(window:beforeunload)': 'onBeforeUnload($event)' },
 })
-export class ProductFormComponent implements OnInit, OnDestroy {
+export class ProductFormComponent implements OnDestroy, HasUnsavedChanges {
   private readonly productService = inject(ProductService);
   private readonly mediaService = inject(MediaService);
-  private readonly toastService = inject(ToastService);
+  private readonly mediaOrder = inject(MediaOrderService);
+  private readonly toast = inject(ToastService);
+  private readonly api = inject(ApiClient);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly cdr = inject(ChangeDetectorRef);
-  private readonly api = inject(ApiClient);
-  private readonly authService = inject(AuthService);
+  private readonly location = inject(Location);
+  private readonly shell = inject(SellerShellService);
+  private readonly fb = inject(FormBuilder);
+  private readonly destroyRef = inject(DestroyRef);
+  protected readonly user = inject(AuthService).getStoredUser();
 
-  mode: 'create' | 'edit' = 'create';
-  productId = signal<string>('');
-  productDetails = signal<ProductResponse | undefined>(undefined);
-  isLoading = signal(false);
-  isSaving = signal(false);
-  formSubmitted = signal(false);
-  formErrors = signal<string[]>([]);
+  protected readonly maxPhotos = MAX_PHOTOS;
+  protected readonly descriptionMax = DESCRIPTION_MAX;
 
-  productInfo: ProductRequest = { name: '', description: '', price: 0, quantity: 100 };
-  selectedImages: ProductImage[] = [];
-  maxImages = MAX_IMAGES;
-  currentUser = this.authService.getStoredUser();
-  sellerInitials = computed(() => this.getInitials(this.currentUser?.name ?? ''));
+  readonly mode = signal<'create' | 'edit'>('create');
+  readonly productId = signal('');
+  readonly isLoading = signal(false);
+  readonly isSaving = signal(false);
+  readonly saveStep = signal<string | null>(null);
+  readonly serverError = signal<string | null>(null);
 
-  ngOnInit(): void {
-    this.route.paramMap.subscribe((params) => {
+  /** Photos as the seller wants them; the first one is the cover. */
+  readonly photos = signal<PhotoItem[]>([]);
+  /** Photos stored on the server when the page loaded (or after the last save). */
+  private storedMedia: Media[] = [];
+  private saved = false;
+  protected readonly dragKey = signal<string | null>(null);
+
+  // Same rules as the backend ProductRequest (@NotBlank, @Positive, @Min(0)).
+  readonly form = this.fb.group({
+    name: this.fb.nonNullable.control('', [Validators.required, notBlank, Validators.minLength(2), Validators.maxLength(100)]),
+    description: this.fb.nonNullable.control('', [
+      Validators.required,
+      notBlank,
+      Validators.minLength(10),
+      Validators.maxLength(DESCRIPTION_MAX),
+    ]),
+    price: this.fb.control<number | null>(null, [Validators.required, Validators.min(0.01)]),
+    quantity: this.fb.control<number | null>(10, [Validators.required, Validators.min(0), Validators.pattern(/^\d+$/)]),
+  });
+
+  /** Live form value, so the preview and checklist update as the seller types. */
+  private readonly value = toSignal(this.form.valueChanges.pipe(startWith(this.form.getRawValue()), map(() => this.form.getRawValue())), {
+    initialValue: this.form.getRawValue(),
+  });
+
+  protected readonly showError = showError;
+  private readonly labels: Record<string, string> = {
+    name: 'Title',
+    description: 'Description',
+    price: 'Price',
+    quantity: 'Stock',
+  };
+
+  readonly checklist = computed(() => {
+    const v = this.value();
+    return [
+      { id: 'name', label: 'A clear title', done: (v.name ?? '').trim().length >= 2 },
+      { id: 'description', label: 'A description (10+ characters)', done: (v.description ?? '').trim().length >= 10 },
+      { id: 'price', label: 'A price above $0', done: Number(v.price) > 0 },
+      { id: 'quantity', label: 'Stock set', done: v.quantity !== null && `${v.quantity}` !== '' && Number(v.quantity) >= 0 },
+      { id: 'photos', label: 'At least one photo', done: this.photos().length > 0 },
+    ];
+  });
+  readonly checklistDone = computed(() => this.checklist().filter((c) => c.done).length);
+
+  /** What buyers will see in the catalog. */
+  readonly preview = computed<ProductResponse>(() => {
+    const v = this.value();
+    return {
+      id: this.productId() || 'preview',
+      name: (v.name ?? '').trim() || 'Your product title',
+      description: (v.description ?? '').trim() || 'Your description appears here, two lines in the catalog.',
+      price: Number(v.price) > 0 ? Number(v.price) : 0,
+      quantity: Number(v.quantity ?? 0),
+      owner: false,
+    };
+  });
+  readonly previewImage = computed(() => this.photos()[0]?.preview ?? null);
+  readonly previewBadge = computed(() => stockBadge(Number(this.value().quantity ?? 0)));
+  readonly descriptionLength = computed(() => (this.value().description ?? '').length);
+
+  readonly photosChanged = signal(false);
+
+  constructor() {
+    this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
       const id = params.get('id');
       if (!id) return;
-      this.mode = 'edit';
+      this.mode.set('edit');
       this.productId.set(id);
-      this.loadProductData();
-      this.loadMediaData();
+      this.load(id);
     });
   }
 
   ngOnDestroy(): void {
-    this.selectedImages.forEach((image) => {
-      if (image.isNew) URL.revokeObjectURL(image.preview);
-    });
+    for (const p of this.photos()) if (p.source.kind === 'new') URL.revokeObjectURL(p.preview);
   }
 
-  private loadProductData(): void {
+  hasUnsavedChanges(): boolean {
+    return !this.saved && (this.form.dirty || this.photosChanged());
+  }
+
+  protected onBeforeUnload(event: BeforeUnloadEvent): void {
+    if (this.hasUnsavedChanges()) event.preventDefault();
+  }
+
+  err(name: string): string {
+    if (name === 'quantity' && this.form.controls.quantity.hasError('pattern')) return 'Stock must be a whole number.';
+    if (name === 'price' && this.form.controls.price.hasError('min')) return 'Price must be more than $0.';
+    return controlError(this.form.get(name), this.labels[name] ?? name);
+  }
+
+  // ---------- Loading (edit) ----------
+
+  private load(id: string): void {
     this.isLoading.set(true);
-    this.productService.getProduct(this.productId()).subscribe({
-      next: (product) => {
-        if (!product.owner) {
-          this.toastService.error('You can only edit products you own.');
-          this.router.navigate(['/products']);
-          return;
-        }
-        this.productDetails.set(product);
-        this.productInfo = {
-          name: product.name,
-          description: product.description,
-          price: product.price,
-          quantity: product.quantity,
-        };
-        this.isLoading.set(false);
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        this.toastService.error(this.api.getErrorMessage(err, 'Unable to load product.'));
-        this.isLoading.set(false);
-      },
-    });
+    this.productService
+      .getProduct(id)
+      .pipe(
+        switchMap((product) => {
+          if (!product.owner) throw new Error('not-owner');
+          return this.mediaService.getMediaByProduct(id).pipe(map((media) => ({ product, media })));
+        }),
+        finalize(() => this.isLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: ({ product, media }) => {
+          this.form.reset({
+            name: product.name,
+            description: product.description,
+            price: product.price,
+            quantity: product.quantity,
+          });
+          this.storedMedia = media;
+          this.photos.set(media.map((m) => this.existingItem(m)));
+          this.photosChanged.set(false);
+        },
+        error: (err) => {
+          if (err instanceof Error && err.message === 'not-owner') {
+            this.toast.error('You can only edit products you own.');
+          } else {
+            this.toast.error(this.api.getErrorMessage(err, 'Unable to load this product.'));
+          }
+          this.saved = true; // nothing to lose
+          void this.router.navigate(['/seller']);
+        },
+      });
   }
 
-  private loadMediaData(): void {
-    this.mediaService.getMediaByProduct(this.productId()).subscribe({
-      next: (mediaList) => {
-        this.selectedImages = mediaList.map((media) => this.toProductImage(media));
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        this.toastService.error(this.api.getErrorMessage(err, 'Unable to load product media.'));
-      },
-    });
+  private existingItem(media: Media): PhotoItem {
+    return { key: `p${photoKey++}`, source: { kind: 'existing', media }, preview: this.mediaService.imageUrl(media), progress: null };
   }
 
-  private toProductImage(media: Media): ProductImage {
-    return {
-      id: media.id,
-      file: new File([], media.id),
-      preview: this.mediaService.imageUrl(media),
-      isNew: false,
-      deleted: false,
-    };
+  // ---------- Stock stepper ----------
+
+  protected stepStock(delta: number): void {
+    const control = this.form.controls.quantity;
+    const next = Math.max(0, Math.floor(Number(control.value ?? 0)) + delta);
+    control.setValue(next);
+    control.markAsDirty();
+    control.markAsTouched();
   }
 
-  onFilesSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (!input.files?.length) return;
-    const remainingSlots = this.maxImages - this.selectedImages.length;
-    if (remainingSlots <= 0) {
-      this.toastService.error(`You can attach up to ${this.maxImages} images.`);
-      input.value = '';
-      return;
-    }
-    const files = Array.from(input.files).slice(0, remainingSlots);
-    const validFiles = files.filter((file) => this.isValidImage(file));
-    if (validFiles.length !== files.length) {
-      this.toastService.error('Only JPG, PNG, WEBP, or AVIF images up to 2 MB are allowed.');
-    }
-    const images: ProductImage[] = validFiles.map((file) => ({
-      id: '',
-      file,
+  // ---------- Photos ----------
+
+  protected addFiles(files: File[]): void {
+    const room = MAX_PHOTOS - this.photos().length;
+    const items = files.slice(0, room).map<PhotoItem>((file) => ({
+      key: `p${photoKey++}`,
+      source: { kind: 'new', file },
       preview: URL.createObjectURL(file),
-      isNew: true,
-      deleted: false,
+      progress: null,
     }));
-    this.selectedImages = [...this.selectedImages, ...images];
-    input.value = '';
+    if (!items.length) return;
+    this.photos.update((list) => [...list, ...items]);
+    this.photosChanged.set(true);
   }
 
-  deleteImage(image: ProductImage): void {
-    if (image.isNew) {
-      URL.revokeObjectURL(image.preview);
-      this.selectedImages = this.selectedImages.filter((item) => item !== image);
-      return;
-    }
-    image.deleted = true;
-    this.selectedImages = this.selectedImages.filter((item) => item !== image);
+  protected removePhoto(item: PhotoItem): void {
+    if (item.source.kind === 'new') URL.revokeObjectURL(item.preview);
+    this.photos.update((list) => list.filter((p) => p.key !== item.key));
+    this.photosChanged.set(true);
   }
 
-  private isValidImage(file: File): boolean {
-    return ALLOWED_IMAGE_TYPES.includes(file.type) && file.size <= MAX_IMAGE_SIZE;
+  protected movePhoto(index: number, delta: number): void {
+    const list = [...this.photos()];
+    const target = index + delta;
+    if (target < 0 || target >= list.length) return;
+    [list[index], list[target]] = [list[target], list[index]];
+    this.photos.set(list);
+    this.photosChanged.set(true);
   }
 
-  saveProduct(): void {
-    this.formSubmitted.set(true);
-    if (this.currentUser?.role !== 'SELLER') {
-      this.rejectSave('Only seller accounts can save products.');
-      this.router.navigate(['/products']);
-      return;
-    }
-    const errors = this.validateProduct();
-    if (errors.length > 0) {
-      this.formErrors.set(errors);
-      this.toastService.error(errors[0]);
-      return;
-    }
+  protected makeCover(index: number): void {
+    if (index === 0) return;
+    const list = [...this.photos()];
+    const [item] = list.splice(index, 1);
+    this.photos.set([item, ...list]);
+    this.photosChanged.set(true);
+  }
+
+  // Drag to reorder (mouse); the arrow buttons do the same for keyboard and touch.
+  protected onDragStart(key: string, event: DragEvent): void {
+    this.dragKey.set(key);
+    event.dataTransfer?.setData('text/plain', key);
+    if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
+  }
+
+  protected onDragOverPhoto(event: DragEvent): void {
+    if (this.dragKey()) event.preventDefault();
+  }
+
+  protected onDropPhoto(targetKey: string, event: DragEvent): void {
+    event.preventDefault();
+    const from = this.photos().findIndex((p) => p.key === this.dragKey());
+    const to = this.photos().findIndex((p) => p.key === targetKey);
+    this.dragKey.set(null);
+    if (from < 0 || to < 0 || from === to) return;
+    const list = [...this.photos()];
+    const [item] = list.splice(from, 1);
+    list.splice(to, 0, item);
+    this.photos.set(list);
+    this.photosChanged.set(true);
+  }
+
+  // ---------- Save ----------
+
+  protected cancel(): void {
+    void this.router.navigate(this.mode() === 'edit' ? ['/products', this.productId()] : ['/seller']);
+  }
+
+  save(): void {
     if (this.isSaving()) return;
+    this.form.markAllAsTouched();
+    if (this.user?.role !== 'SELLER') {
+      this.toast.error('Only seller accounts can save products.');
+      return;
+    }
+    if (this.form.invalid) {
+      this.toast.error('Please fix the highlighted fields.');
+      queueMicrotask(() => document.querySelector<HTMLElement>('.pf-form .is-invalid')?.focus());
+      return;
+    }
+
     this.isSaving.set(true);
-    this.formErrors.set([]);
-    if (this.mode === 'edit') {
-      this.updateProduct();
-    } else {
-      this.createProduct();
-    }
-  }
+    this.serverError.set(null);
+    const creating = this.mode() === 'create';
+    this.saveStep.set(creating ? 'Creating product…' : 'Saving details…');
 
-  private createProduct(): void {
-    this.productService.publishProduct(this.productPayload()).subscribe({
-      next: (product) => {
-        this.uploadImagesFor(product.id, 'Product created successfully.');
-      },
-      error: (err) => {
-        this.rejectSave(this.api.getErrorMessage(err, 'Product could not be created.'));
-      },
-    });
-  }
+    const product$: Observable<ProductResponse | void> = creating
+      ? this.productService.publishProduct(this.payload())
+      : this.productService.updateProduct(this.productId(), this.payload());
 
-  private updateProduct(): void {
-    this.productService.updateProduct(this.productId(), this.productPayload()).subscribe({
-      next: () => {
-        this.syncImagesFor(this.productId(), 'Product updated successfully.');
-      },
-      error: (err) => {
-        this.rejectSave(this.api.getErrorMessage(err, 'Product could not be updated.'));
-      },
-    });
-  }
-
-  private uploadImagesFor(productId: string, successMessage: string): void {
-    const files = this.activeImageFiles();
-    if (files.length === 0) {
-      this.finishSave(successMessage);
-      return;
-    }
-    let uploaded = 0;
-    files.forEach((file) => {
-      this.mediaService.upload(productId, file).subscribe({
+    product$
+      .pipe(
+        switchMap((result) => {
+          if (creating && result) {
+            // From here on the product exists: a failed upload can be retried as an edit.
+            this.mode.set('edit');
+            this.productId.set(result.id);
+            this.storedMedia = [];
+          }
+          return this.savePhotos(this.productId());
+        }),
+        finalize(() => {
+          this.isSaving.set(false);
+          this.saveStep.set(null);
+          this.photos.update((list) => list.map((p) => ({ ...p, progress: null })));
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
         next: () => {
-          uploaded++;
-          if (uploaded === files.length) this.finishSave(successMessage);
+          this.saved = true;
+          this.shell.refresh();
+          this.toast.success(creating ? 'Product published.' : 'Changes saved.', 5000, {
+            label: 'View product',
+            link: `/products/${this.productId()}`,
+          });
+          void this.router.navigate(['/products', this.productId()]);
         },
         error: (err) => {
-          this.rejectSave(this.api.getErrorMessage(err, 'Product created but image upload failed.'));
+          const message = this.api.getErrorMessage(err, 'The product could not be saved.');
+          this.serverError.set(
+            creating && this.mode() === 'edit' ? `The product was created, but a photo failed: ${message} Press Save to try again.` : message,
+          );
+          this.toast.error(message);
+          if (creating && this.mode() === 'edit') {
+            // Point the URL at the edit page without leaving this page, so pending photos stay.
+            this.location.replaceState(`/seller/products/${this.productId()}/edit`);
+          }
         },
       });
-    });
   }
 
-  private syncImagesFor(productId: string, successMessage: string): void {
-    const newFiles = this.activeImageFiles();
-    const deletedImages = this.selectedImages.filter((image) => image.deleted);
-    deletedImages.forEach((image) => {
-      this.mediaService.deleteMedia(image.id).subscribe();
-    });
-    if (newFiles.length === 0) {
-      this.finishSave(successMessage);
-      return;
-    }
-    let uploaded = 0;
-    newFiles.forEach((file) => {
-      this.mediaService.upload(productId, file).subscribe({
-        next: () => {
-          uploaded++;
-          if (uploaded === newFiles.length) this.finishSave(successMessage);
-        },
-        error: (err) => {
-          this.rejectSave(this.api.getErrorMessage(err, 'Product media update failed.'));
-        },
-      });
-    });
+  private savePhotos(productId: string): Observable<unknown> {
+    if (!this.photosChanged()) return of(null);
+    const wanted = this.photos().map((p) => p.source);
+    // Rows after the longest already-ordered prefix are (re-)uploaded; show their progress.
+    const { keep } = planOrder(this.storedMedia, wanted);
+    this.saveStep.set('Uploading photos…');
+    return this.mediaOrder
+      .apply(productId, this.storedMedia, wanted, (i, percent) =>
+        this.photos.update((list) => list.map((p, idx) => (idx === keep + i ? { ...p, progress: percent } : p))),
+      )
+      .pipe(
+        map((media) => {
+          for (const p of this.photos()) if (p.source.kind === 'new') URL.revokeObjectURL(p.preview);
+          this.storedMedia = media;
+          this.photos.set(media.map((m) => this.existingItem(m)));
+          this.photosChanged.set(false);
+          return media;
+        }),
+      );
   }
 
-  private finishSave(message: string): void {
-    this.toastService.success(message);
-    this.isSaving.set(false);
-    this.router.navigate(['/seller']);
-  }
-
-  private rejectSave(message: string): void {
-    this.formErrors.set([message]);
-    this.toastService.error(message);
-    this.isSaving.set(false);
-  }
-
-  private activeImageFiles(): File[] {
-    return this.selectedImages
-      .filter((image) => image.isNew && !image.deleted)
-      .map((image) => image.file);
-  }
-
-  private productPayload(): ProductRequest {
+  private payload(): ProductRequest {
+    const { name, description, price, quantity } = this.form.getRawValue();
     return {
-      name: this.productInfo.name.trim(),
-      description: this.productInfo.description.trim(),
-      price: Number(this.productInfo.price),
-      quantity: Number(this.productInfo.quantity),
+      name: name.trim(),
+      description: description.trim(),
+      price: Number(price),
+      quantity: Number(quantity),
     };
-  }
-
-  private validateProduct(): string[] {
-    const errors: string[] = [];
-    const { name, description, price, quantity } = this.productInfo;
-    if (name.trim().length < 2) errors.push('Product title must be at least 2 characters.');
-    if (description.trim().length < 10) errors.push('Description must be at least 10 characters.');
-    if (!Number.isFinite(Number(price)) || Number(price) <= 0)
-      errors.push('Enter a valid price greater than 0.');
-    if (!Number.isInteger(Number(quantity)) || Number(quantity) < 0)
-      errors.push('Stock quantity must be 0 or greater.');
-    return errors;
-  }
-
-  private getInitials(name: string): string {
-    return (
-      name
-        .trim()
-        .split(/\s+/)
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((part) => part[0]?.toUpperCase() ?? '')
-        .join('') || 'U'
-    );
   }
 }

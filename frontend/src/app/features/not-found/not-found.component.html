@@ -1,22 +1,24 @@
 <div class="not-found-shell">
-  <div class="not-found-card">
-    <div class="eyebrow"><span></span> Lost in the catalog</div>
-    <div class="not-found-code">404</div>
-    <h1>That page isn't available right now.</h1>
-    <p>
-      The route may have moved, the link may be outdated, or the page simply hasn't been wired in
-      yet. Head back to the storefront or return to the seller workspace.
+  <a class="not-found-brand" routerLink="/products">
+    <img src="/logo.png" alt="Buy01" />
+  </a>
+
+  <main class="not-found-card">
+    <p class="not-found-code" aria-hidden="true">404</p>
+    <h1>We can't find that page.</h1>
+    <p class="not-found-copy">
+      The link may be out of date, or the page has moved. The catalog is a good place to start again.
     </p>
 
     <div class="not-found-actions">
       <a routerLink="/products" class="btn-primary">
-        Back to products
+        Go to the catalog
         <app-icon name="arrow-right" [size]="16"></app-icon>
       </a>
       <a routerLink="/seller" class="btn-light">
-        Seller dashboard
         <app-icon name="dashboard" [size]="16"></app-icon>
+        Seller dashboard
       </a>
     </div>
-  </div>
+  </main>
 </div>
