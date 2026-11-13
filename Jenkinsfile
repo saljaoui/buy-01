@@ -3,6 +3,15 @@ pipeline {
     agent any
 
     stages {
+        stage('Debug Java') {
+            steps {
+                sh '''
+                    echo "JAVA_HOME=$JAVA_HOME"
+                    java -version
+                    ./mvnw -version
+                '''
+            }
+        }
         stage('Build') {
             steps {
                 echo 'Building all services...'
