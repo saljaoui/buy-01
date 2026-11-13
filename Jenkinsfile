@@ -12,7 +12,6 @@ pipeline {
                 sh '''
                     echo "JAVA_HOME=$JAVA_HOME"
                     java -version
-                    ./mvnw -version
                 '''
             }
         }
@@ -24,6 +23,7 @@ pipeline {
                     script {
                         if (isUnix()) {
                             sh 'chmod +x mvnw'
+                            sh './mvnw -version'
                             sh './mvnw clean install -DskipTests'
                         } else {
                             bat 'mvnw.cmd clean install -DskipTests'
