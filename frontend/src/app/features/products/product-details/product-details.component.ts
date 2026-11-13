@@ -1,3 +1,4 @@
+import { CurrencyPipe } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FooterComponent } from '../../../shared/footer/footer.component';
 import { NavbarComponent } from '../../../shared/navbar/navbar.component';
@@ -9,10 +10,13 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ApiClient } from '../../../core/api/api-client.service';
 import { IconComponent } from '../../../shared/icon/icon.component';
 import { environment } from '../../../../environments/environment';
+import { CartService } from '../../../shared/services/cart.service';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-product-details',
   imports: [
+    CurrencyPipe,
     FooterComponent,
     NavbarComponent,
     RouterLink,
@@ -48,6 +52,18 @@ export class ProductDetailsComponent implements OnInit {
   private readonly toastService = inject(ToastService);
   private readonly router = inject(Router);
   private readonly api = inject(ApiClient);
+  private readonly cart = inject(CartService);
+  private readonly auth = inject(AuthService);
+
+  /** Quantity chosen in the buy panel. */
+  quantity = signal(1);
+
+  /** Sellers manage products; only visitors and clients can buy. */
+  readonly isSeller = this.auth.getStoredUser()?.role === 'SELLER';
+  readonly stock = computed(() => Math.max(0, this.productDetails()?.quantity ?? 0));
+  readonly inCart = computed(() => this.cart.quantityOf(this.productDetails()?.id ?? ''));
+  /** How many more can still go in the cart without passing the stock. */
+  readonly canAddMore = computed(() => Math.max(0, this.stock() - this.inCart()));
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -157,5 +173,30 @@ export class ProductDetailsComponent implements OnInit {
         this.isDeleting.set(false);
       }
     });
+  }
+
+  changeQuantity(delta: number): void {
+    const max = Math.max(1, this.canAddMore());
+    this.quantity.set(Math.min(max, Math.max(1, this.quantity() + delta)));
+  }
+
+  addToCart(): void {
+    const product = this.productDetails();
+    if (!product || this.canAddMore() === 0) return;
+
+    const amount = Math.min(this.quantity(), this.canAddMore());
+    const first = this.medias()[0];
+    this.cart.add(
+      {
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        stock: product.quantity,
+        imageUrl: first ? this.imageUrl(first) : null,
+      },
+      amount,
+    );
+    this.quantity.set(1);
+    this.toastService.success(`Added ${amount} × ${product.name} to your cart.`);
   }
 }

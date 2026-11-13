@@ -1,8 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { AuthService } from '../../features/auth/auth.service';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthUser } from '../../features/auth/auth.models';
 import { IconComponent } from '../icon/icon.component';
+import { CartService } from '../services/cart.service';
 
 @Component({
   selector: 'app-navbar',
@@ -13,8 +14,28 @@ import { IconComponent } from '../icon/icon.component';
 export class NavbarComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  protected readonly cart = inject(CartService);
 
   protected currentUser = this.authService.getStoredUser();
+
+  /** Current search text, so the box shows what the catalog is filtered by. */
+  protected searchText = this.route.snapshot.queryParamMap.get('q') ?? '';
+
+  /** Sellers can't buy, so they get no cart. */
+  protected get canShop(): boolean {
+    return this.currentUser?.role !== 'SELLER';
+  }
+
+  protected get isClient(): boolean {
+    return this.currentUser?.role === 'CLIENT';
+  }
+
+  protected search(event: Event, value: string): void {
+    event.preventDefault();
+    const q = value.trim();
+    void this.router.navigate(['/products'], { queryParams: q ? { q } : {} });
+  }
 
   protected get sellerDashboardLink(): string | null {
     return this.currentUser?.role === 'SELLER' ? '/seller' : null;

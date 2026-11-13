@@ -48,11 +48,11 @@
 
 .upload-controls select {
   width: 100%;
-  border: 1.5px solid var(--border);
-  border-radius: 12px;
-  background: #faf8f4;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--sunken);
   color: var(--ink);
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.88rem;
   padding: 0.82rem 1rem;
   outline: none;
@@ -60,7 +60,7 @@
 
 .upload-controls select:focus {
   border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(200, 169, 110, 0.14);
+  box-shadow: 0 0 0 3px rgba(168, 106, 44, 0.14);
 }
 
 .media-upload-zone {
@@ -73,10 +73,10 @@
   width: 64px;
   height: 64px;
   margin: 0 auto;
-  border-radius: 18px;
+  border-radius: var(--radius-md);
   display: grid;
   place-items: center;
-  background: rgba(200, 169, 110, 0.12);
+  background: rgba(168, 106, 44, 0.12);
   color: var(--gold);
   font-size: 1.5rem;
 }
@@ -145,11 +145,11 @@
 .media-search input,
 .media-toolbar-actions select {
   width: 100%;
-  border: 1.5px solid var(--border);
-  border-radius: 12px;
-  background: #faf8f4;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--sunken);
   color: var(--ink);
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.88rem;
   padding: 0.82rem 1rem 0.82rem 2.7rem;
   outline: none;
@@ -170,7 +170,7 @@
 .media-search input:focus,
 .media-toolbar-actions select:focus {
   border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(200, 169, 110, 0.14);
+  box-shadow: 0 0 0 3px rgba(168, 106, 44, 0.14);
 }
 
 .media-layout {
@@ -188,20 +188,20 @@
 
 .media-card {
   padding: 1rem;
-  border-radius: 18px;
-  border: 1.5px solid var(--border);
-  background: #faf8f4;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--sunken);
 }
 
 .media-card.selected {
   border-color: var(--gold);
-  box-shadow: 0 14px 30px rgba(26, 26, 24, 0.08);
+  box-shadow: 0 14px 30px rgba(29, 27, 24, 0.08);
 }
 
 .media-preview {
   position: relative;
   height: 160px;
-  border-radius: 16px;
+  border-radius: var(--radius-md);
   display: grid;
   place-items: center;
   margin-bottom: 0.75rem;
@@ -225,7 +225,7 @@
   color: var(--ink);
   font-size: 0.64rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0;
 }
 
 .media-card strong {
@@ -273,8 +273,8 @@
 
 .side-item {
   padding: 0.9rem 0.95rem;
-  border-radius: 14px;
-  background: #faf8f4;
+  border-radius: var(--radius-md);
+  background: var(--sunken);
 }
 
 .side-item strong {
@@ -332,5 +332,54 @@ select:disabled {
   .media-toolbar-actions {
     flex-direction: column;
     align-items: stretch;
+  }
+}
+
+.upload-controls.invalid select {
+  border-color: var(--error);
+}
+
+.field-error {
+  margin-top: .35rem;
+  font-size: .75rem;
+  color: var(--error);
+}
+
+/* Toolbar: search grows, the two selects and the button sit on one row */
+.media-toolbar-body {
+  flex-wrap: nowrap;
+}
+
+.media-toolbar-actions {
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+}
+
+.media-search input,
+.media-toolbar-actions select {
+  height: 42px;
+  padding-top: 0;
+  padding-bottom: 0;
+  background: var(--surface);
+  font-size: var(--text-sm);
+}
+
+.media-toolbar-actions select {
+  width: auto;
+  min-width: 170px;
+}
+
+@media (max-width: 1100px) {
+  .media-toolbar-body,
+  .media-toolbar-actions {
+    flex-wrap: wrap;
+  }
+
+  .media-toolbar-actions {
+    width: 100%;
+  }
+
+  .media-toolbar-actions select {
+    flex: 1;
   }
 }

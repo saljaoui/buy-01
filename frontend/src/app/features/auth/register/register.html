@@ -7,15 +7,15 @@
 
     <div class="steps-visual">
       <div class="d-flex">
-        <h2>Join our<em> marketplace</em><br>in minutes.</h2>
+        <h2>Open your Buy01 account.</h2>
       </div>
-      <p>Create an account to start browsing products or build your seller storefront today.</p>
+      <p>Shop from independent sellers, or start selling your own products. It takes three short steps.</p>
       <ul class="step-list" id="leftStepList">
         <li>
           <div class="step-dot" id="ls1" [class.active]="currentStep === 1" [class.done]="currentStep > 1">1</div>
           <div class="step-text">
             <strong>Choose your role</strong>
-            <span>Client or Seller — pick what fits</span>
+            <span>Shop as a client, or sell as a seller</span>
           </div>
         </li>
         <li>
@@ -35,10 +35,6 @@
       </ul>
     </div>
 
-    <div class="left-quote">
-      <p>"The best marketplace is one where both sides win."</p>
-      <span>— Buy01 philosophy</span>
-    </div>
   </div>
 
   <!-- ══ RIGHT PANEL ══════════════════════════════ -->
@@ -55,6 +51,7 @@
         </div>
       </div>
 
+      <form novalidate [formGroup]="form" (ngSubmit)="next()">
       <!-- ╔══════════════════════════════╗
          ║  STEP 1 — Role               ║
          ╚══════════════════════════════╝ -->
@@ -62,7 +59,7 @@
         <div class="step-heading">
           <div class="step-label"><app-icon name="circle" [size]="8"></app-icon> Step 1 of 3</div>
           <h2>What brings you here?</h2>
-          <p>Choose a role — you can always create another account later.</p>
+          <p>Choose a role. You can always create another account later.</p>
         </div>
 
         <div class="role-cards">
@@ -117,8 +114,9 @@
 
         <div class="field-wrap">
           <label for="name">Full Name</label>
-          <input type="text" id="name" name="name" placeholder="Soufian Alj" autocomplete="name" [(ngModel)]="form.name"
-            [class.is-invalid]="isNameInvalid" />
+          <input type="text" id="name" name="name" placeholder="Soufian Alj" autocomplete="name" formControlName="name"
+            [class.is-invalid]="showError(form, 'name')" [attr.aria-invalid]="showError(form, 'name')"
+            aria-describedby="name-error" />
           <i class="bi bi-person f-icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
               <g fill="none" stroke="currentColor" stroke-width="1.5">
@@ -127,13 +125,15 @@
               </g>
             </svg>
           </i>
-          <div class="err-msg"><app-icon name="alert" [size]="14"></app-icon> Required</div>
+          <div class="err-msg" id="name-error" role="alert"><app-icon name="alert" [size]="14"></app-icon> {{ showError(form, 'name') ? err('name') : '' }}</div>
         </div>
 
         <div class="field-wrap">
           <label for="email">Email Address</label>
           <input type="email" id="email" name="email" placeholder="buy01@example.com" autocomplete="email"
-            [(ngModel)]="form.email" [class.is-invalid]="isEmailInvalid" [class.is-valid]="isEmailValid" />
+            formControlName="email"
+            [class.is-invalid]="showError(form, 'email')" [attr.aria-invalid]="showError(form, 'email')"
+            aria-describedby="email-error" [class.is-valid]="isEmailValid" />
           <i class="bi bi-envelope f-icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
               <g fill="none" stroke="currentColor" stroke-width="1.5">
@@ -144,14 +144,16 @@
               </g>
             </svg>
           </i>
-          <div class="err-msg"><app-icon name="alert" [size]="14"></app-icon> Enter a valid email</div>
+          <div class="err-msg" id="email-error" role="alert"><app-icon name="alert" [size]="14"></app-icon> {{ showError(form, 'email') ? err('email') : '' }}</div>
           <div class="ok-msg"><app-icon name="circle-check" [size]="14"></app-icon> Looks good!</div>
         </div>
 
         <div class="field-wrap">
           <label for="password">Password</label>
           <input [type]="passwordInputType" id="password" name="password" placeholder="••••••••"
-            autocomplete="new-password" [(ngModel)]="form.password" [class.is-invalid]="isPasswordInvalid" />
+            autocomplete="new-password" formControlName="password"
+            [class.is-invalid]="showError(form, 'password')" [attr.aria-invalid]="showError(form, 'password')"
+            aria-describedby="password-error" />
           <i class="bi bi-lock f-icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
               <g fill="none" stroke="currentColor" stroke-width="1.5">
@@ -164,7 +166,7 @@
           <button type="button" class="pw-toggle" (click)="togglePassword('password')" aria-label="Toggle password visibility">
             <app-icon [name]="passwordVisible ? 'eye-off' : 'eye'" [size]="18"></app-icon>
           </button>
-          <div class="err-msg"><app-icon name="alert" [size]="14"></app-icon> Min 8 chars required</div>
+          <div class="err-msg" id="password-error" role="alert"><app-icon name="alert" [size]="14"></app-icon> {{ showError(form, 'password') ? err('password') : '' }}</div>
           <!-- strength bar -->
           <div class="pw-strength" id="pwStrength" [class.visible]="passwordStrength.visible">
             <div class="pw-strength-bar">
@@ -178,8 +180,9 @@
         <div class="field-wrap">
           <label for="confirmPw">Confirm Password</label>
           <input [type]="confirmPasswordInputType" id="confirmPw" name="confirmPassword" placeholder="••••••••"
-            autocomplete="new-password" [(ngModel)]="form.confirmPassword"
-            [class.is-invalid]="isConfirmPasswordInvalid" />
+            autocomplete="new-password" formControlName="confirmPassword"
+            [class.is-invalid]="showError(form, 'confirmPassword')" [attr.aria-invalid]="showError(form, 'confirmPassword')"
+            aria-describedby="confirmPassword-error" />
           <i class="bi bi-lock-fill f-icon">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
               <g fill="none" stroke="currentColor" stroke-width="1.5">
@@ -192,7 +195,7 @@
           <button type="button" class="pw-toggle" (click)="togglePassword('confirmPassword')" aria-label="Toggle confirm password visibility">
             <app-icon [name]="confirmPasswordVisible ? 'eye-off' : 'eye'" [size]="18"></app-icon>
           </button>
-          <div class="err-msg"><app-icon name="alert" [size]="14"></app-icon> Passwords don't match</div>
+          <div class="err-msg" id="confirmPassword-error" role="alert"><app-icon name="alert" [size]="14"></app-icon> {{ showError(form, 'confirmPassword') ? err('confirmPassword') : '' }}</div>
         </div>
 
         <button type="button" class="btn-register" (click)="goToStep(3)">
@@ -215,17 +218,23 @@
         <div class="step-heading">
           <div class="step-label"><app-icon name="circle" [size]="8"></app-icon> Step 3 of 3</div>
           <h2>Review and confirm</h2>
-          <p>You're creating a {{ selectedRole.toLowerCase() }} account for {{ form.name || 'your profile' }}.</p>
+          <p>You're creating a {{ selectedRole.toLowerCase() }} account for {{ form.controls.name.value || 'your profile' }}.</p>
         </div>
 
         <!-- Terms -->
         <div class="terms-wrap">
-          <input type="checkbox" id="terms" name="terms" [(ngModel)]="form.terms" />
+          <input type="checkbox" id="terms" formControlName="terms"
+            [attr.aria-invalid]="showError(form, 'terms')" aria-describedby="terms-error" />
           <label for="terms">
             I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I understand my data
             will be processed securely.
           </label>
         </div>
+        @if (showError(form, 'terms')) {
+          <div class="terms-error" id="terms-error" role="alert">
+            <app-icon name="alert" [size]="14"></app-icon> {{ err('terms') }}
+          </div>
+        }
 
         <button type="button" class="btn-register" id="submitBtn" [class.loading]="isSubmitting"
           [disabled]="isSubmitting" (click)="submit()">
@@ -243,6 +252,7 @@
           </a>
         </p>
       </div>
+      </form>
 
       <div class="signin-link">Already have an account? <a routerLink="/login">Sign in</a></div>
     </div>

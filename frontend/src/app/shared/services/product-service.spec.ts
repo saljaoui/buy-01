@@ -195,3 +195,31 @@ describe('ProductService', () => {
     req.flush(updatedProduct);
   });
 });
+
+import { applySearch } from './product-service';
+
+describe('applySearch (catalog search & filters)', () => {
+  const products = [
+    { id: '1', name: 'Walnut Lamp', description: 'Warm light', price: 129, quantity: 6, owner: false },
+    { id: '2', name: 'Linen Throw', description: 'Soft linen', price: 64, quantity: 0, owner: false },
+    { id: '3', name: 'Notebook', description: 'Dot grid paper', price: 18, quantity: 200, owner: false },
+  ];
+  const base = { page: 0, size: 12 };
+
+  it('matches keywords in name and description', () => {
+    expect(applySearch(products, { ...base, q: 'linen' }).content.map((p) => p.id)).toEqual(['2']);
+    expect(applySearch(products, { ...base, q: 'GRID' }).content.map((p) => p.id)).toEqual(['3']);
+  });
+
+  it('filters by price range and stock', () => {
+    expect(applySearch(products, { ...base, minPrice: 20, maxPrice: 100 }).content.map((p) => p.id)).toEqual(['2']);
+    expect(applySearch(products, { ...base, inStock: true }).totalElements).toBe(2);
+  });
+
+  it('sorts and paginates', () => {
+    expect(applySearch(products, { ...base, sort: 'price-asc' }).content.map((p) => p.id)).toEqual(['3', '2', '1']);
+    const page = applySearch(products, { page: 1, size: 2, sort: 'name' });
+    expect(page.totalPages).toBe(2);
+    expect(page.content.map((p) => p.id)).toEqual(['1']);
+  });
+});

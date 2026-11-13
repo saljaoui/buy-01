@@ -1,0 +1,73 @@
+<section class="seller-sales" aria-labelledby="sales-title">
+  <div class="page-header">
+    <div>
+      <h2 id="sales-title">Sales</h2>
+      <p>Delivered, shipped and open orders. Cancelled orders aren't counted.</p>
+    </div>
+    <a routerLink="/seller/orders" class="ghost-btn">
+      <app-icon name="package" [size]="16"></app-icon>
+      View orders
+    </a>
+  </div>
+
+  @if (isLoading()) {
+  <div class="panel"><div class="panel-body sales-state">
+    <app-icon class="spin" name="spinner" [size]="18"></app-icon> Loading sales
+  </div></div>
+  } @else if (errorMessage(); as message) {
+  <div class="panel notice notice-error"><div class="panel-body">{{ message }}</div></div>
+  } @else if (stats(); as stats) {
+  <div class="stat-grid">
+    <div class="stat-tile">
+      <span>Revenue</span>
+      <strong>{{ stats.revenue | currency: 'USD' }}</strong>
+    </div>
+    <div class="stat-tile">
+      <span>Units sold</span>
+      <strong>{{ stats.unitsSold }}</strong>
+    </div>
+    <div class="stat-tile">
+      <span>Orders</span>
+      <strong>{{ stats.orderCount }}</strong>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <div>
+        <h3>Best sellers</h3>
+        <p>Your products ranked by units sold</p>
+      </div>
+    </div>
+    <div class="panel-body">
+      @if (stats.bestSellers.length === 0) {
+      <p class="sales-empty">No sales yet. Your best sellers will appear here after your first order.</p>
+      } @else {
+      <ol class="rank-list">
+        @for (product of stats.bestSellers; track product.productId) {
+        <li class="rank-item">
+          <span class="line-thumb">
+            @if (product.imageUrl) {
+            <img [src]="product.imageUrl" alt="" />
+            } @else {
+            <app-icon name="image-off" [size]="16"></app-icon>
+            }
+          </span>
+          <div>
+            <a class="rank-name" [routerLink]="['/products', product.productId]">{{ product.name }}</a>
+            <div class="rank-bar" aria-hidden="true">
+              <span [style.width.%]="(product.quantity / topQuantity()) * 100"></span>
+            </div>
+          </div>
+          <div class="rank-value">
+            <strong>{{ product.quantity }} sold</strong>
+            {{ product.amount | currency: 'USD' }}
+          </div>
+        </li>
+        }
+      </ol>
+      }
+    </div>
+  </div>
+  }
+</section>

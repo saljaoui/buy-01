@@ -1,32 +1,77 @@
 @use './styles/public-shell' as *;
 @use './styles/seller-shell' as *;
+@use './styles/shop' as *;
 
-/* =========================
-   Global Design Variables
-========================= */
+/* =====================================================================
+   Buy01 design tokens
+   Palette is taken from the logo (copper-amber bag on warm ink).
+   Rule: products bring the colour; the interface stays quiet.
+   Copper is used only for the primary action and the active state.
+===================================================================== */
 
 :root {
-  --cream: #f5f0e8;
-  --ink: #1a1a18;
-  --gold: #c8a96e;
-  --gold-lt: #e8d5b0;
-  --muted: #7a7a6e;
-  --card-bg: #ffffff;
+  /* ---- Core palette ---- */
+  --stone: #f4f2ee;        /* page background */
+  --surface: #ffffff;      /* cards, panels */
+  --sunken: #f8f7f4;       /* inputs, table heads, quiet wells */
+  --ink: #1d1b18;          /* text, dark surfaces */
+  --ink-2: #2a2723;        /* hover on dark */
+  --copper: #a86a2c;       /* accent on light (AA on white) */
+  --copper-strong: #8e5822;/* accent hover / pressed */
+  --copper-bright: #d9a35e;/* accent on ink only */
+  --copper-wash: #f5ece1;  /* tinted backgrounds */
+  --line: #e3ded6;         /* borders */
+  --line-soft: #ece8e1;    /* dividers inside cards */
+  --muted: #6a645b;        /* secondary text (AA on stone) */
+  --faint: #8f887d;        /* tertiary text, placeholders */
 
-  /* status */
-  --error: #c0392b;
-  --success: #27ae60;
-  --warning: #f39c12;
-  --info: #3498db;
+  /* ---- Status ---- */
+  --success: #2f6b4f;
+  --success-wash: #e8f1ec;
+  --error: #b23a2a;
+  --error-wash: #f9ebe8;
+  --warning: #a2650f;
+  --warning-wash: #f8efe0;
+  --info: #2f5e8a;
+  --info-wash: #e8eff6;
 
-  /* UI helpers */
-  --border: #e5e0d6;
-  --hover: #f0e9dd;
-  --shadow: rgba(0,0,0,0.08);
+  /* ---- Type ---- */
+  --font-display: 'Newsreader Variable', 'Iowan Old Style', Georgia, serif;
+  --font-ui: 'Hanken Grotesk Variable', 'Segoe UI', system-ui, sans-serif;
 
-  /* text variations */
-  --text-muted: #8c8c80;
-  --text-light: #b5b5a8;
+  /* Major-third scale (1.25) */
+  --text-xs: 0.75rem;   /* 12 */
+  --text-sm: 0.875rem;  /* 14 */
+  --text-md: 1rem;      /* 16 */
+  --text-lg: 1.25rem;   /* 20 */
+  --text-xl: 1.5625rem; /* 25 */
+  --text-2xl: 1.953rem; /* 31 */
+  --text-3xl: 2.441rem; /* 39 */
+  --text-4xl: 3.052rem; /* 49 */
+
+  /* ---- Shape: radius grows with the size of the thing ---- */
+  --radius-sm: 8px;     /* buttons, inputs, chips */
+  --radius-md: 14px;    /* cards, panels */
+  --radius-lg: 20px;    /* image frames, large surfaces */
+
+  /* ---- Elevation: warm, low, only where something floats ---- */
+  --shadow-sm: 0 1px 2px rgba(29, 27, 24, 0.05);
+  --shadow-md: 0 1px 2px rgba(29, 27, 24, 0.04), 0 8px 24px -12px rgba(29, 27, 24, 0.14);
+  --shadow-lg: 0 24px 60px -24px rgba(29, 27, 24, 0.28);
+
+  --focus-ring: 0 0 0 3px rgba(168, 106, 44, 0.28);
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  /* ---- Legacy names, mapped to the new system (used across page styles) ---- */
+  --cream: var(--stone);
+  --gold: var(--copper);
+  --gold-lt: #e7d3bb;
+  --card-bg: var(--surface);
+  --border: var(--line);
+  --hover: #f6f3ee;
+  --shadow: rgba(29, 27, 24, 0.08);
+  --text-muted: var(--muted);
+  --text-light: var(--faint);
 }
 
 *,
@@ -37,37 +82,138 @@
   padding: 0;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+
 body {
-  font-family: 'DM Sans', sans-serif;
-  background-color: var(--cream);
+  font-family: var(--font-ui);
+  font-size: var(--text-md);
+  line-height: 1.55;
+  color: var(--ink);
+  background-color: var(--stone);
   min-height: 100vh;
   overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'ss01' on, 'cv11' on;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.012em;
+  line-height: 1.15;
+  color: inherit;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* Numbers line up in tables, prices and counters */
+.data-table td,
+.metric-value,
+[class*='price'] {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* One accent word in italic gold is a cliché: let the headline speak as one line */
+h1 em, h2 em, h3 em {
+  font-style: italic;
+  color: inherit;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--faint);
+  opacity: 1;
+}
+
+img {
+  max-width: 100%;
+}
+
+::selection {
+  background: rgba(168, 106, 44, 0.2);
+  color: var(--ink);
+}
+
+/* Keyboard focus is always visible, mouse focus stays clean */
+:focus-visible {
+  outline: 2px solid var(--copper);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+}
+
+/* Screen-reader-only helper */
+.sr-only {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* =========================
-   Scrollbar Styling
+   Scrollbar
 ========================= */
 
-/* Chrome, Edge, Safari */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--cream);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--gold);
+  background: #d6d0c6;
+  border: 3px solid var(--stone);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--gold-lt);
+  background: #bfb7aa;
 }
 
-/* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--gold) var(--cream);
+  scrollbar-color: #d6d0c6 transparent;
+}
+
+/* =========================
+   Respect reduced motion
+========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

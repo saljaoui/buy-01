@@ -21,6 +21,11 @@ export class ToastService {
     type: ToastType = 'info',
     duration = 3000
   ) {
+    // Don't stack the same message twice (e.g. interceptor + page both report one error).
+    if (this.toasts().some((t) => t.message === message && t.type === type)) {
+      return;
+    }
+
     const toast: Toast = {
       id: ++this.counter,
       message,

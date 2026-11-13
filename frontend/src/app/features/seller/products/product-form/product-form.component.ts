@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { ProductRequest, ProductResponse, ProductService } from '../../../../shared/services/product-service';
@@ -7,6 +7,7 @@ import { Media, MediaService, ProductImage } from '../../../../shared/services/m
 import { ToastService } from '../../../../shared/services/toast-service';
 import { ApiClient } from '../../../../core/api/api-client.service';
 import { AuthService } from '../../../auth/auth.service';
+import { controlError, notBlank, showError } from '../../../../shared/forms/form-errors';
 import { IconComponent } from '../../../../shared/icon/icon.component';
 import { SellerSidebarComponent } from '../../seller-sidebar/seller-sidebar.component';
 
@@ -16,7 +17,7 @@ const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avi
 
 @Component({
   selector: 'app-product-form',
-  imports: [SellerSidebarComponent, FormsModule, RouterLink, IconComponent],
+  imports: [SellerSidebarComponent, ReactiveFormsModule, RouterLink, IconComponent],
   templateUrl: './product-form.html',
   styleUrl: './product-form.scss',
 })
@@ -29,16 +30,38 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly api = inject(ApiClient);
   private readonly authService = inject(AuthService);
+  private readonly fb = inject(FormBuilder);
 
   mode: 'create' | 'edit' = 'create';
   productId = signal<string>('');
   productDetails = signal<ProductResponse | undefined>(undefined);
   isLoading = signal(false);
   isSaving = signal(false);
-  formSubmitted = signal(false);
+  /** Errors coming back from the server (shown in the red panel at the top). */
   formErrors = signal<string[]>([]);
 
-  productInfo: ProductRequest = { name: '', description: '', price: 0, quantity: 100 };
+  // Same rules as the backend ProductRequest (@NotBlank, @Positive, @Min(0)).
+  readonly form = this.fb.group({
+    name: this.fb.nonNullable.control('', [Validators.required, notBlank, Validators.minLength(2), Validators.maxLength(100)]),
+    description: this.fb.nonNullable.control('', [Validators.required, notBlank, Validators.minLength(10), Validators.maxLength(2000)]),
+    price: this.fb.control<number | null>(null, [Validators.required, Validators.min(0.01)]),
+    quantity: this.fb.control<number | null>(100, [Validators.required, Validators.min(0), Validators.pattern(/^\d+$/)]),
+  });
+
+  protected readonly showError = showError;
+  private readonly labels: Record<string, string> = {
+    name: 'Product title',
+    description: 'Description',
+    price: 'Price',
+    quantity: 'Stock quantity',
+  };
+
+  err(name: string): string {
+    if (name === 'quantity' && this.form.controls.quantity.hasError('pattern')) {
+      return 'Stock quantity must be a whole number.';
+    }
+    return controlError(this.form.get(name), this.labels[name] ?? name);
+  }
   selectedImages: ProductImage[] = [];
   maxImages = MAX_IMAGES;
   currentUser = this.authService.getStoredUser();
@@ -71,12 +94,12 @@ export class ProductFormComponent implements OnInit, OnDestroy {
           return;
         }
         this.productDetails.set(product);
-        this.productInfo = {
+        this.form.reset({
           name: product.name,
           description: product.description,
           price: product.price,
           quantity: product.quantity,
-        };
+        });
         this.isLoading.set(false);
         this.cdr.detectChanges();
       },
@@ -149,16 +172,14 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   }
 
   saveProduct(): void {
-    this.formSubmitted.set(true);
+    this.form.markAllAsTouched();
     if (this.currentUser?.role !== 'SELLER') {
       this.rejectSave('Only seller accounts can save products.');
       this.router.navigate(['/products']);
       return;
     }
-    const errors = this.validateProduct();
-    if (errors.length > 0) {
-      this.formErrors.set(errors);
-      this.toastService.error(errors[0]);
+    if (this.form.invalid) {
+      this.toastService.error('Please fix the highlighted fields.');
       return;
     }
     if (this.isSaving()) return;
@@ -256,24 +277,13 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   }
 
   private productPayload(): ProductRequest {
+    const { name, description, price, quantity } = this.form.getRawValue();
     return {
-      name: this.productInfo.name.trim(),
-      description: this.productInfo.description.trim(),
-      price: Number(this.productInfo.price),
-      quantity: Number(this.productInfo.quantity),
+      name: name.trim(),
+      description: description.trim(),
+      price: Number(price),
+      quantity: Number(quantity),
     };
-  }
-
-  private validateProduct(): string[] {
-    const errors: string[] = [];
-    const { name, description, price, quantity } = this.productInfo;
-    if (name.trim().length < 2) errors.push('Product title must be at least 2 characters.');
-    if (description.trim().length < 10) errors.push('Description must be at least 10 characters.');
-    if (!Number.isFinite(Number(price)) || Number(price) <= 0)
-      errors.push('Enter a valid price greater than 0.');
-    if (!Number.isInteger(Number(quantity)) || Number(quantity) < 0)
-      errors.push('Stock quantity must be 0 or greater.');
-    return errors;
   }
 
   private getInitials(name: string): string {

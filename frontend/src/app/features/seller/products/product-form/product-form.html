@@ -5,8 +5,8 @@
   <div class="seller-main">
     <header class="seller-topbar">
       <div class="seller-topbar-copy">
-        <strong>Create / edit product</strong>
-        <span>{{ mode === 'edit' ? 'Editing existing backend product' : 'Creating a backend product listing' }}</span>
+        <strong>{{ mode === 'edit' ? 'Edit product' : 'New product' }}</strong>
+        <span>{{ mode === 'edit' ? 'Changes go live when you save' : 'Visible in the store once you save' }}</span>
       </div>
 
       <div class="seller-topbar-actions">
@@ -29,11 +29,8 @@
       <section class="seller-banner">
         <div class="seller-banner-copy">
           <div class="eyebrow"><span></span> Product editor</div>
-          <h1>Build a polished <em>listing</em> quickly.</h1>
-          <p>
-            This form keeps the same soft cards, dark accents, and structured spacing used across
-            the rest of the app while publishing directly to the backend.
-          </p>
+          <h1>{{ mode === 'edit' ? 'Edit product' : 'New product' }}</h1>
+          <p>Write what buyers need to decide: a clear title, an honest description, a price and good photos.</p>
         </div>
       </section>
 
@@ -56,38 +53,44 @@
       </section>
       }
 
-      <div class="form-layout">
+      <form class="form-layout" novalidate [formGroup]="form" (ngSubmit)="saveProduct()">
         <section class="panel">
           <div class="panel-head">
             <div>
               <h3>Product information</h3>
-              <p>Core details buyers will see in the storefront.</p>
+              <p>What buyers see on the product page.</p>
             </div>
-            <span class="pill">Backend</span>
           </div>
 
           <div class="panel-body form-stack">
             <section class="form-section">
               <div class="section-intro">
                 <h3>Core details</h3>
-                <p>Clear titles and descriptions help the product cards feel premium and consistent.</p>
+                <p>Name the product the way a buyer would search for it.</p>
               </div>
 
               <div class="field-grid">
-                <div class="field full" [class.invalid]="formSubmitted() && productInfo.name.trim().length < 2">
+                <div class="field full" [class.invalid]="showError(form, 'name')">
                   <label for="title">Product title</label>
-                  <input id="title" type="text" placeholder="Noise-Cancelling Pro Headphones" name="name"
-                    [(ngModel)]="productInfo.name"
-                    [class.is-invalid]="formSubmitted() && productInfo.name.trim().length < 2" />
-                  <div class="message">Title is required before publishing.</div>
+                  <input id="title" type="text" placeholder="Noise-Cancelling Pro Headphones"
+                    formControlName="name"
+                    [attr.aria-invalid]="showError(form, 'name')" aria-describedby="name-error" />
+                  @if (showError(form, 'name')) {
+                  <div class="message" id="name-error" role="alert">{{ err('name') }}</div>
+                  }
                 </div>
 
-                <div class="field full">
-                  <label for="shortDescription">description</label>
+                <div class="field full" [class.invalid]="showError(form, 'description')">
+                  <label for="shortDescription">Description</label>
                   <textarea id="shortDescription"
-                    placeholder="Write a concise summary that will appear in cards and previews." name="description"
-                    [(ngModel)]="productInfo.description"></textarea>
+                    placeholder="Write a concise summary that will appear in cards and previews."
+                    formControlName="description"
+                    [attr.aria-invalid]="showError(form, 'description')" aria-describedby="description-error"></textarea>
+                  @if (showError(form, 'description')) {
+                  <div class="message" id="description-error" role="alert">{{ err('description') }}</div>
+                  } @else {
                   <div class="helper">Keep it focused on materials, benefits, and visual style.</div>
+                  }
                 </div>
               </div>
             </section>
@@ -95,20 +98,27 @@
             <section class="form-section">
               <div class="section-intro">
                 <h3>Pricing and inventory</h3>
-                <p>Price and stock fields are validated before publishing to the product service.</p>
+                <p>Set the price buyers pay and how many you have ready to sell.</p>
               </div>
 
               <div class="field-grid">
-                <div class="field" [class.invalid]="formSubmitted() && productInfo.price <= 0">
+                <div class="field" [class.invalid]="showError(form, 'price')">
                   <label for="price">Price</label>
-                  <input id="price" type="number" min="0" step="0.01" placeholder="149.00" name="price"
-                    [(ngModel)]="productInfo.price" />
-                  <div class="message">Enter a valid sale price.</div>
+                  <input id="price" type="number" min="0" step="0.01" placeholder="149.00"
+                    formControlName="price"
+                    [attr.aria-invalid]="showError(form, 'price')" aria-describedby="price-error" />
+                  @if (showError(form, 'price')) {
+                  <div class="message" id="price-error" role="alert">{{ err('price') }}</div>
+                  }
                 </div>
 
-                <div class="field">
+                <div class="field" [class.invalid]="showError(form, 'quantity')">
                   <label for="stock">Stock quantity</label>
-                  <input id="stock" type="number" placeholder="12" name="quantity" [(ngModel)]="productInfo.quantity" />
+                  <input id="stock" type="number" min="0" step="1" placeholder="12" formControlName="quantity"
+                    [attr.aria-invalid]="showError(form, 'quantity')" aria-describedby="quantity-error" />
+                  @if (showError(form, 'quantity')) {
+                  <div class="message" id="quantity-error" role="alert">{{ err('quantity') }}</div>
+                  }
                 </div>
               </div>
             </section>
@@ -116,7 +126,7 @@
             <section class="form-section">
               <div class="section-intro">
                 <h3>Media gallery</h3>
-                <p>Dropzone and file cards stay visually aligned with the dashboard and media library.</p>
+                <p>Add up to 3 photos. The first one is shown in the catalog.</p>
               </div>
 
               <div class="upload-dropzone media-dropzone">
@@ -192,7 +202,7 @@
               <div class="panel-body summary-stack">
                 <div class="summary-row">
                   <span>Visibility</span>
-                  <strong>Backend listing</strong>
+                  <strong>Public listing</strong>
                 </div>
                 <div class="summary-row">
                   <span>Sales channel</span>
@@ -221,23 +231,23 @@
 
               <div class="panel-body note-list">
 
-                <div class="note-item">
-                  <app-icon name="circle" [size]="16"></app-icon>
+                <div class="note-item" [class.done]="form.controls.name.valid">
+                  <app-icon [name]="form.controls.name.valid ? 'circle-check' : 'circle'" [size]="16"></app-icon>
                   Add product title
                 </div>
 
-                <div class="note-item">
-                  <app-icon name="circle" [size]="16"></app-icon>
+                <div class="note-item" [class.done]="form.controls.description.valid">
+                  <app-icon [name]="form.controls.description.valid ? 'circle-check' : 'circle'" [size]="16"></app-icon>
                   Write product description
                 </div>
 
-                <div class="note-item">
-                  <app-icon name="circle" [size]="16"></app-icon>
+                <div class="note-item" [class.done]="form.controls.price.valid">
+                  <app-icon [name]="form.controls.price.valid ? 'circle-check' : 'circle'" [size]="16"></app-icon>
                   Add a valid product price
                 </div>
 
-                <div class="note-item">
-                  <app-icon name="circle" [size]="16"></app-icon>
+                <div class="note-item" [class.done]="selectedImages.length > 0">
+                  <app-icon [name]="selectedImages.length > 0 ? 'circle-check' : 'circle'" [size]="16"></app-icon>
                   Upload product images
                 </div>
 
@@ -245,7 +255,7 @@
             </section>
           </div>
         </aside>
-      </div>
+      </form>
     </main>
   </div>
 </div>

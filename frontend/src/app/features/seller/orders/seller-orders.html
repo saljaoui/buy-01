@@ -1,0 +1,125 @@
+<div class="seller-shell">
+  <app-seller-sidebar activeItem="orders" [initials]="initials" [name]="user?.name || 'Seller'"
+    [subtitle]="user?.email || 'Seller account'"></app-seller-sidebar>
+
+  <div class="seller-main">
+    <header class="seller-topbar">
+      <div class="seller-topbar-copy">
+        <strong>Orders</strong>
+        <span>Orders that include your products</span>
+      </div>
+    </header>
+
+    <main class="seller-body">
+      <section class="seller-banner">
+        <div class="seller-banner-copy">
+          <h1>Orders</h1>
+          <p>
+            @if (openCount() > 0) {
+            {{ openCount() }} {{ openCount() === 1 ? 'order needs' : 'orders need' }} your attention. Confirm new
+            orders, then mark them shipped and delivered.
+            } @else {
+            Confirm new orders, then mark them shipped and delivered. Buyers pay the courier on delivery.
+            }
+          </p>
+        </div>
+      </section>
+
+      <div class="list-toolbar">
+        <div class="segmented" role="group" aria-label="Filter by status">
+          @for (filter of statusFilters; track filter.value) {
+          <button type="button" [attr.aria-pressed]="status() === filter.value" (click)="setStatus(filter.value)">
+            {{ filter.label }}
+          </button>
+          }
+        </div>
+        <label class="list-search">
+          <app-icon name="search" [size]="16"></app-icon>
+          <span class="sr-only">Search orders</span>
+          <input type="search" [formControl]="search" placeholder="Order number, buyer or product" />
+        </label>
+      </div>
+
+      <section class="panel">
+        @if (isLoading() && views().length === 0) {
+        <div class="empty-state">
+          <app-icon class="spin" name="spinner" [size]="22"></app-icon>
+          <strong>Loading orders</strong>
+        </div>
+        } @else if (errorMessage(); as message) {
+        <div class="empty-state">
+          <app-icon name="alert" [size]="22"></app-icon>
+          <strong>Orders could not load</strong>
+          <span>{{ message }}</span>
+        </div>
+        } @else if (views().length === 0) {
+        <div class="empty-state">
+          <app-icon name="package" [size]="24"></app-icon>
+          <strong>{{ status() === 'ALL' && !search.value ? 'No orders yet' : 'No orders match' }}</strong>
+          <span>
+            {{ status() === 'ALL' && !search.value
+              ? 'When a buyer orders one of your products, it shows up here.'
+              : 'Try another status or search.' }}
+          </span>
+          @if (status() === 'ALL' && !search.value) {
+          <a routerLink="/seller/products/new" class="primary-btn">Add a product</a>
+          }
+        </div>
+        } @else {
+        <div class="table-shell">
+          <table class="data-table" [class.is-refreshing]="isLoading()">
+            <thead>
+              <tr>
+                <th>Order</th>
+                <th>Buyer</th>
+                <th>Your items</th>
+                <th>Your total</th>
+                <th>Status</th>
+                <th><span class="sr-only">Action</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (view of views(); track view.order.id) {
+              <tr>
+                <td>
+                  <strong class="cell-strong">{{ view.order.reference }}</strong>
+                  <span class="cell-sub">{{ view.order.createdAt | date: 'MMM d, h:mm a' }}</span>
+                </td>
+                <td>
+                  <strong class="cell-strong">{{ view.order.buyerName }}</strong>
+                  <span class="cell-sub">{{ view.order.address.city }}</span>
+                </td>
+                <td>
+                  <span class="cell-items">
+                    @for (item of view.items; track item.productId; let last = $last) {
+                    {{ item.quantity }} × {{ item.name }}{{ last ? '' : ', ' }}
+                    }
+                  </span>
+                </td>
+                <td><strong class="cell-strong">{{ view.sellerTotal | currency: 'USD' }}</strong></td>
+                <td>
+                  <span class="status-badge" [class]="'status-badge status-' + view.order.status">
+                    {{ statusLabel[view.order.status] }}
+                  </span>
+                </td>
+                <td class="cell-action">
+                  @if (nextAction(view.order.status); as action) {
+                  <button type="button" class="ghost-btn" (click)="advance(view)"
+                    [disabled]="updatingId() === view.order.id">
+                    @if (updatingId() === view.order.id) {
+                    <app-icon class="spin" name="spinner" [size]="15"></app-icon>
+                    }
+                    {{ action }}
+                  </button>
+                  }
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        }
+      </section>
+    </main>
+  </div>
+</div>

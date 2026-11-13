@@ -8,7 +8,7 @@ import {
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
 
-import { ApiClient } from './api-client.service';
+import { ApiClient, FORBIDDEN_MESSAGE, SESSION_EXPIRED_MESSAGE } from './api-client.service';
 
 describe('ApiClient', () => {
   let service: ApiClient;
@@ -117,10 +117,27 @@ describe('ApiClient', () => {
     const error = new HttpErrorResponse({
       error: { message: 'Invalid credentials' },
       status: 401,
+      url: 'http://localhost:8080/api/auth/login',
     });
 
     expect(service.getErrorMessage(error))
       .toBe('Invalid credentials');
+  });
+
+  it('should return the session-expired message for 401 outside login/register', () => {
+    const error = new HttpErrorResponse({
+      error: { message: 'JWT expired' },
+      status: 401,
+      url: 'http://localhost:8080/api/users/me',
+    });
+
+    expect(service.getErrorMessage(error)).toBe(SESSION_EXPIRED_MESSAGE);
+  });
+
+  it('should return a permission message for 403 without a backend message', () => {
+    const error = new HttpErrorResponse({ status: 403 });
+
+    expect(service.getErrorMessage(error, 'Product could not be deleted.')).toBe(FORBIDDEN_MESSAGE);
   });
 
   it('should handle network errors', () => {

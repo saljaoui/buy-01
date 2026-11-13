@@ -120,7 +120,7 @@
   color: var(--ink);
   border-color: var(--gold);
   transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(200, 169, 110, 0.2);
+  box-shadow: 0 4px 12px rgba(168, 106, 44, 0.2);
 }
 
 /* Responsive Stacking */
@@ -147,4 +147,41 @@
     justify-content: center;
     gap: 1.5rem;
   }
+}
+/* Design system: accent on ink switches to bright copper; text gets readable contrast */
+.b01-mini-footer {
+  --gold: var(--copper-bright);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.b01-mini-footer__accent {
+  display: none;
+}
+
+.b01-mini-footer__container {
+  max-width: 1280px;
+  padding: 2rem;
+}
+
+.b01-mini-footer__copyright {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: var(--text-sm);
+}
+
+.b01-mini-footer__link {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: var(--text-sm);
+  text-decoration: none;
+}
+
+.b01-mini-footer__link:hover {
+  color: #fff;
+}
+
+.b01-mini-footer__social-icon {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.b01-mini-footer__social-icon:hover {
+  color: var(--copper-bright);
 }

@@ -58,6 +58,48 @@ export class AuthService {
     return localStorage.getItem(AUTH_TOKEN_KEY) ?? sessionStorage.getItem(AUTH_TOKEN_KEY);
   }
 
+  /**
+   * Returns the logged-in user only if the session is valid:
+   * a token exists, it is not expired, and a user is stored.
+   * Invalid sessions are cleared automatically.
+   */
+  getAuthenticatedUser(): AuthUser | null {
+    const token = this.getStoredToken();
+    const user = this.getStoredUser();
+
+    if (!token || !user || this.isTokenExpired(token)) {
+      if (token || user) {
+        this.clearSession();
+      }
+      return null;
+    }
+
+    return user;
+  }
+
+  isAuthenticated(): boolean {
+    return this.getAuthenticatedUser() !== null;
+  }
+
+  /** Reads the `exp` claim of a JWT. Malformed tokens count as expired. */
+  isTokenExpired(token: string): boolean {
+    try {
+      const payloadPart = token.split('.')[1];
+      if (!payloadPart) {
+        return true;
+      }
+      const base64 = payloadPart.replace(/-/g, '+').replace(/_/g, '/');
+      const payload = JSON.parse(atob(base64)) as { exp?: number };
+
+      if (typeof payload.exp !== 'number') {
+        return false;
+      }
+      return payload.exp * 1000 <= Date.now();
+    } catch {
+      return true;
+    }
+  }
+
   getStoredUser(): AuthUser | null {
     const storedUser =
       localStorage.getItem(AUTH_USER_KEY) ?? sessionStorage.getItem(AUTH_USER_KEY);

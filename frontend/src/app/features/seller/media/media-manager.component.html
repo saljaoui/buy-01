@@ -9,7 +9,7 @@
     <header class="seller-topbar">
       <div class="seller-topbar-copy">
         <strong>Media management</strong>
-        <span>Gateway-backed product images</span>
+        <span>Photos for each of your products</span>
       </div>
 
       <div class="seller-topbar-actions">
@@ -30,11 +30,8 @@
       <section class="seller-banner">
         <div class="seller-banner-copy">
           <div class="eyebrow"><span></span> Media library</div>
-          <h1>Keep every asset <em>organized</em> and ready.</h1>
-          <p>
-            The upload area, file cards, and metadata panels mirror the same clean admin styling as
-            the dashboard and product editor.
-          </p>
+          <h1>Media library</h1>
+          <p>Every product image in one place. Add photos to a product, review them, or remove old ones.</p>
         </div>
 
         <div class="seller-banner-actions">
@@ -102,14 +99,18 @@
             </a>
           </div>
           } @else {
-          <div class="upload-controls">
+          <form class="upload-form" novalidate [formGroup]="uploadForm" (ngSubmit)="uploadSelectedFiles()">
+          <div class="upload-controls" [class.invalid]="uploadFieldError('productId')">
             <label for="uploadProduct">Product</label>
-            <select id="uploadProduct" [ngModel]="uploadProductId()" (ngModelChange)="selectUploadProduct($event)"
-              [disabled]="isUploading()">
+            <select id="uploadProduct" formControlName="productId"
+              [attr.aria-invalid]="!!uploadFieldError('productId')" aria-describedby="uploadProduct-error">
               @for (product of products(); track product.id) {
               <option [value]="product.id">{{ product.name }} ({{ mediaCountFor(product.id) }} images)</option>
               }
             </select>
+            @if (uploadFieldError('productId')) {
+            <div class="field-error" id="uploadProduct-error" role="alert">{{ uploadFieldError('productId') }}</div>
+            }
           </div>
 
           <div class="upload-dropzone media-upload-zone">
@@ -122,7 +123,7 @@
                 <app-icon name="upload-cloud" [size]="16"></app-icon>
                 Choose files
               </button>
-              <button class="ghost-btn" type="button" (click)="uploadSelectedFiles()"
+              <button class="ghost-btn" type="submit"
                 [disabled]="isUploading() || selectedFiles().length === 0">
                 <app-icon [name]="isUploading() ? 'spinner' : 'upload-cloud'" [class.spin]="isUploading()"
                   [size]="16"></app-icon>
@@ -144,29 +145,32 @@
             </div>
             }
 
-            @if (uploadError()) {
-            <div class="upload-error"><app-icon name="alert" [size]="16"></app-icon>{{ uploadError() }}</div>
+            @if (uploadFieldError('files')) {
+            <div class="upload-error" role="alert"><app-icon name="alert" [size]="16"></app-icon>{{ uploadFieldError('files') }}</div>
+            } @else if (uploadError()) {
+            <div class="upload-error" role="alert"><app-icon name="alert" [size]="16"></app-icon>{{ uploadError() }}</div>
             }
           </div>
+          </form>
           }
         </div>
       </section>
 
       <section class="panel media-toolbar">
-        <div class="panel-body media-toolbar-body">
+        <form class="panel-body media-toolbar-body" novalidate [formGroup]="filters" role="search">
           <div class="media-search">
             <app-icon name="search" [size]="17"></app-icon>
-            <input type="text" placeholder="Search by file name or product" [ngModel]="searchTerm()"
-              (ngModelChange)="updateSearchTerm($event)" />
+            <input type="search" placeholder="Search by file name or product" formControlName="search"
+              aria-label="Search media" maxlength="100" />
           </div>
 
           <div class="media-toolbar-actions">
-            <select [ngModel]="sortMode()" (ngModelChange)="updateSortMode($event)">
+            <select formControlName="sort" aria-label="Sort media">
               <option value="newest">Newest uploads</option>
               <option value="oldest">Oldest uploads</option>
               <option value="name">Name A-Z</option>
             </select>
-            <select [ngModel]="filterProductId()" (ngModelChange)="updateFilterProduct($event)">
+            <select formControlName="product" aria-label="Filter by product">
               <option value="all">All products</option>
               @for (product of products(); track product.id) {
               <option [value]="product.id">{{ product.name }}</option>
@@ -177,7 +181,7 @@
               All assets
             </button>
           </div>
-        </div>
+        </form>
       </section>
 
       <div class="media-layout">
@@ -185,7 +189,7 @@
           <div class="panel-head">
             <div>
               <h3>Library</h3>
-              <p>Images fetched from the media service for seller-owned products</p>
+              <p>All photos across your products</p>
             </div>
           </div>
 
@@ -207,7 +211,7 @@
             <div class="media-state">
               <app-icon name="image-off" [size]="30"></app-icon>
               <strong>No media for selected product</strong>
-              <span>Choose image files above to upload through the media service.</span>
+              <span>Choose a product above and add its first photos.</span>
             </div>
             } @else if (filteredAssets().length === 0) {
             <div class="media-state">
@@ -252,7 +256,7 @@
             <div class="panel-head">
               <div>
                 <h3>Library notes</h3>
-                <p>Backend media rules</p>
+                <p>What you can upload</p>
               </div>
             </div>
 
@@ -276,7 +280,7 @@
             <div class="panel-head">
               <div>
                 <h3>Selected asset</h3>
-                <p>Current media metadata</p>
+                <p>Details of the selected photo</p>
               </div>
             </div>
 
@@ -309,7 +313,7 @@
               } @else {
               <div class="side-item">
                 <strong>No asset selected</strong>
-                <span>Uploaded media will appear here after the backend responds.</span>
+                <span>Select a photo to see its details.</span>
               </div>
               }
             </div>

@@ -1,7 +1,8 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { FormBuilder, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { forkJoin, map } from 'rxjs';
+import { Observable, forkJoin, map } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { ApiClient } from '../../../core/api/api-client.service';
@@ -18,6 +19,10 @@ const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
 
 type SortMode = 'newest' | 'oldest' | 'name';
 
+/** The "files" control must hold at least one file. */
+const atLeastOneFile: ValidatorFn = (control) =>
+  Array.isArray(control.value) && control.value.length > 0 ? null : { required: true };
+
 interface MediaAsset {
   id: string;
   media: Media;
@@ -29,7 +34,7 @@ interface MediaAsset {
 
 @Component({
   selector: 'app-media-manager',
-  imports: [SellerSidebarComponent, FormsModule, RouterLink, IconComponent],
+  imports: [SellerSidebarComponent, ReactiveFormsModule, RouterLink, IconComponent],
   templateUrl: './media-manager.component.html',
   styleUrl: './media-manager.component.scss',
 })
@@ -40,16 +45,32 @@ export class MediaManagerComponent implements OnInit {
   private readonly toastService = inject(ToastService);
   private readonly api = inject(ApiClient);
   private readonly router = inject(Router);
+  private readonly fb = inject(FormBuilder);
+  private readonly destroyRef = inject(DestroyRef);
+
+  /** Upload form: which product + which files. */
+  readonly uploadForm = this.fb.nonNullable.group({
+    productId: ['', Validators.required],
+    files: [[] as File[], atLeastOneFile],
+  });
+
+  /** Toolbar: search / sort / filter. */
+  readonly filters = this.fb.nonNullable.group({
+    search: ['', Validators.maxLength(100)],
+    sort: ['newest' as SortMode],
+    product: ['all'],
+  });
 
   user = signal<AuthUser | null>(null);
   products = signal<ProductResponse[]>([]);
   mediaAssets = signal<MediaAsset[]>([]);
-  selectedFiles = signal<File[]>([]);
-  uploadProductId = signal('');
-  filterProductId = signal('all');
+  // Read-only signals that follow the form values, so the computed() lists below keep working.
+  selectedFiles = this.controlSignal(this.uploadForm.controls.files);
+  uploadProductId = this.controlSignal(this.uploadForm.controls.productId);
+  filterProductId = this.controlSignal(this.filters.controls.product);
+  searchTerm = this.controlSignal(this.filters.controls.search);
+  sortMode = this.controlSignal(this.filters.controls.sort);
   selectedAssetId = signal<string | null>(null);
-  searchTerm = signal('');
-  sortMode = signal<SortMode>('newest');
 
   isLoadingProducts = signal(true);
   isLoadingMedia = signal(false);
@@ -103,6 +124,20 @@ export class MediaManagerComponent implements OnInit {
     return `${files.length} ${files.length === 1 ? 'file' : 'files'} ready`;
   });
 
+  constructor() {
+    // Picking a product to upload to also shows that product's media below.
+    this.uploadForm.controls.productId.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((productId) => {
+        if (productId) this.filters.controls.product.setValue(productId);
+      });
+
+    // Changing search or product filter resets the selected asset.
+    this.filters.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.selectedAssetId.set(null);
+    });
+  }
+
   ngOnInit(): void {
     const storedUser = this.authService.getStoredUser();
     if (!storedUser) {
@@ -131,17 +166,17 @@ export class MediaManagerComponent implements OnInit {
         this.products.set(products);
         this.isLoadingProducts.set(false);
         if (products.length === 0) {
-          this.uploadProductId.set('');
-          this.filterProductId.set('all');
+          this.uploadForm.controls.productId.setValue('');
+          this.filters.controls.product.setValue('all');
           this.mediaAssets.set([]);
-          this.selectedFiles.set([]);
+          this.uploadForm.controls.files.setValue([]);
           return;
         }
         const currentProductId = this.uploadProductId();
         const nextProduct =
           products.find((product) => product.id === currentProductId) ?? products[0];
-        this.uploadProductId.set(nextProduct.id);
-        this.filterProductId.set(nextProduct.id);
+        this.uploadForm.controls.productId.setValue(nextProduct.id);
+        this.filters.controls.product.setValue(nextProduct.id);
         this.loadMedia();
       },
       error: (error: HttpErrorResponse) => {
@@ -184,34 +219,8 @@ export class MediaManagerComponent implements OnInit {
     });
   }
 
-  selectUploadProduct(productId: string): void {
-    this.uploadProductId.set(productId);
-    if (productId) {
-      this.filterProductId.set(productId);
-    }
-  }
-
-  updateFilterProduct(productId: string): void {
-    this.filterProductId.set(productId || 'all');
-    this.selectedAssetId.set(null);
-  }
-
-  updateSortMode(value: string): void {
-    if (value === 'oldest' || value === 'name') {
-      this.sortMode.set(value);
-      return;
-    }
-    this.sortMode.set('newest');
-  }
-
-  updateSearchTerm(value: string): void {
-    this.searchTerm.set(value);
-    this.selectedAssetId.set(null);
-  }
-
   showAllAssets(): void {
-    this.filterProductId.set('all');
-    this.selectedAssetId.set(null);
+    this.filters.patchValue({ product: 'all', search: '' });
   }
 
   selectAsset(asset: MediaAsset): void {
@@ -234,7 +243,7 @@ export class MediaManagerComponent implements OnInit {
       return;
     }
     if (!this.uploadProductId()) {
-      this.setUploadError('Select a product before choosing media.');
+      this.uploadForm.controls.productId.markAsTouched();
       return;
     }
     const validFiles = files.filter((file) => this.isValidImage(file));
@@ -246,26 +255,23 @@ export class MediaManagerComponent implements OnInit {
     if (validFiles.length === 0) {
       return;
     }
-    this.selectedFiles.set([...this.selectedFiles(), ...validFiles]);
+    this.uploadForm.controls.files.setValue([...this.selectedFiles(), ...validFiles]);
+    this.uploadForm.controls.files.markAsTouched();
   }
 
   clearSelectedFiles(): void {
-    this.selectedFiles.set([]);
+    this.uploadForm.controls.files.setValue([]);
     this.uploadError.set(null);
   }
 
   uploadSelectedFiles(): void {
-    const productId = this.uploadProductId();
-    const files = this.selectedFiles();
-    if (!productId) {
-      this.setUploadError('Select a product before uploading media.');
+    this.uploadForm.markAllAsTouched();
+    if (this.uploadForm.invalid || this.isUploading()) {
       return;
     }
-    if (files.length === 0) {
-      this.setUploadError('Choose at least one image to upload.');
-      return;
-    }
+    const { productId, files } = this.uploadForm.getRawValue();
     this.isUploading.set(true);
+    this.uploadForm.disable({ emitEvent: false });
     this.uploadError.set(null);
     let uploaded = 0;
     files.forEach((file) => {
@@ -274,13 +280,16 @@ export class MediaManagerComponent implements OnInit {
           uploaded++;
           if (uploaded === files.length) {
             this.toastService.success('Media uploaded successfully.');
-            this.selectedFiles.set([]);
+            this.uploadForm.enable({ emitEvent: false });
+            this.uploadForm.controls.files.setValue([]);
+            this.uploadForm.controls.files.markAsUntouched();
             this.isUploading.set(false);
-            this.filterProductId.set(productId);
+            this.filters.controls.product.setValue(productId);
             this.loadMedia();
           }
         },
         error: (error: HttpErrorResponse) => {
+          this.uploadForm.enable({ emitEvent: false });
           this.setUploadError(this.api.getErrorMessage(error, 'Media upload failed.'));
           this.isUploading.set(false);
         },
@@ -371,6 +380,17 @@ export class MediaManagerComponent implements OnInit {
       return;
     }
     this.selectedAssetId.set(assets[0]?.id ?? null);
+  }
+
+  protected uploadFieldError(name: 'productId' | 'files'): string {
+    const control = this.uploadForm.controls[name];
+    if (!control.touched || control.valid) return '';
+    return name === 'productId' ? 'Select a product first.' : 'Choose at least one image to upload.';
+  }
+
+  /** Signal that always holds the current value of a form control. */
+  private controlSignal<T>(control: { value: T; valueChanges: Observable<T> }) {
+    return toSignal(control.valueChanges, { initialValue: control.value });
   }
 
   private isValidImage(file: File): boolean {

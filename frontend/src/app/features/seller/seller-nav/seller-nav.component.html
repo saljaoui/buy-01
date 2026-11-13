@@ -48,6 +48,16 @@
     Media library
   </a>
 
+  <div class="seller-nav-label">Sales</div>
+  <a class="seller-nav-link" routerLink="/seller/orders" [class.active]="activeItem === 'orders'">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linejoin="round">
+      <path d="M12 3 20 7.5v9L12 21l-8-4.5v-9L12 3Z" />
+      <path d="m4 7.5 8 4.5 8-4.5M12 12v9" />
+    </svg>
+    Orders
+  </a>
+
   <div class="seller-nav-label">Account</div>
   <a class="seller-nav-link" routerLink="/seller/profile" [class.active]="activeItem === 'profile'">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">

@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 import { ProductService } from '../../../shared/services/product-service';
 
-export type SellerNavItem = 'dashboard' | 'create-product' | 'media' | 'profile';
+export type SellerNavItem = 'dashboard' | 'create-product' | 'media' | 'orders' | 'profile';
 
 @Component({
   selector: 'app-seller-nav',

@@ -37,14 +37,14 @@
 
       <ng-container *ngIf="!isLoading()">
 
-        <div *ngIf="errorMessage()" class="panel" style="background: #fff0f0; border: 1px solid #e8b4b4; color: #c44;">
+        <div *ngIf="errorMessage()" class="panel notice notice-error" role="alert">
           <div class="panel-body">
             <app-icon name="alert" [size]="20" [decorative]="false" ariaLabel="Profile error"></app-icon>
             {{ errorMessage() }}
           </div>
         </div>
 
-        <div *ngIf="successMessage()" class="panel" style="background: #f0fff4; border: 1px solid #b4e8c4; color: #2a6;">
+        <div *ngIf="successMessage()" class="panel notice notice-success" role="status">
           <div class="panel-body">
             <app-icon name="circle-check" [size]="20"></app-icon>
             {{ successMessage() }}
@@ -54,9 +54,9 @@
         <section class="seller-banner profile-banner">
           <div class="profile-banner-head">
             <div class="profile-avatar">{{ userInitials() }}</div>
-            <div class="text-white">
+            <div>
               <div class="eyebrow"><span></span> Seller identity</div>
-              <h1>{{ displayName() }} <em>/ Seller</em></h1>
+              <h1>{{ displayName() }}</h1>
               <p>Update your personal details and profile image.</p>
             </div>
           </div>
@@ -79,17 +79,21 @@
               </div>
 
               <div class="panel-body">
-                <div class="field-grid">
-                  <div class="field">
+                <form class="field-grid" novalidate [formGroup]="form" (ngSubmit)="saveChanges()">
+                  <div class="field" [class.invalid]="showError(form, 'name')">
                     <label for="fullName">Full name</label>
                     <input
                       id="fullName"
                       type="text"
-                      [ngModel]="editableName()"
-                      (ngModelChange)="editableName.set($event)"
+                      formControlName="name"
                       placeholder="Your full name"
-                      [disabled]="isSaving()"
+                      autocomplete="name"
+                      [attr.aria-invalid]="showError(form, 'name')"
+                      aria-describedby="name-error"
                     />
+                    @if (showError(form, 'name')) {
+                      <div class="message" id="name-error" role="alert">{{ err('name') }}</div>
+                    }
                   </div>
 
                   <div class="field">
@@ -112,7 +116,7 @@
                       readonly
                     />
                   </div>
-                </div>
+                </form>
               </div>
             </section>
           </div>
@@ -143,6 +147,7 @@
           </aside>
         </div>
 
+        <app-seller-sales></app-seller-sales>
       </ng-container>
     </main>
   </div>

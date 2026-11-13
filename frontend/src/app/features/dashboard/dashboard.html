@@ -31,11 +31,8 @@
       <section class="seller-banner">
         <div class="seller-banner-copy">
           <div class="eyebrow"><span></span> Seller overview</div>
-          <h1>Manage your <em>catalog</em> with clarity.</h1>
-          <p>
-            Review active listings, image coverage, and current priorities without leaving the same
-            seller workspace.
-          </p>
+          <h1>Your store</h1>
+          <p>Listings, stock and product images at a glance.</p>
         </div>
       </section>
 
@@ -69,7 +66,7 @@
                 </g>
               </svg>
             </div>
-            <div class="metric-trend up"><app-icon name="chart" [size]="14"></app-icon> Real catalog</div>
+            <div class="metric-trend up"><app-icon name="chart" [size]="14"></app-icon> All listings</div>
           </div>
           <div class="metric-value">{{ totalProducts() }}</div>
           <div class="metric-label">Total products</div>
@@ -105,7 +102,7 @@
                 </g>
               </svg>
             </div>
-            <div class="metric-trend down"><app-icon name="alert" [size]="14"></app-icon> {{ draftTasks() }} needs work
+            <div class="metric-trend down"><app-icon name="alert" [size]="14"></app-icon> {{ draftTasks() }} to review
             </div>
           </div>
           <div class="metric-value">{{ mediaTotal() }}</div>
@@ -118,7 +115,7 @@
           <div class="panel-head">
             <div>
               <h3>Recent products</h3>
-              <p>Latest listings fetched from the product service</p>
+              <p>Your latest listings</p>
             </div>
             <a class="ghost-btn" routerLink="/products">
               View storefront
@@ -146,7 +143,7 @@
                   <th>Price</th>
                   <th>Status</th>
                   <th>Media</th>
-                  <th>actions</th>
+                  <th><span class="sr-only">Actions</span></th>
                 </tr>
               </thead>
               <tbody>
@@ -215,7 +212,7 @@
           <div class="panel-head">
             <div>
               <h3>Store health</h3>
-              <p>Calculated from existing product and media endpoints</p>
+              <p>How complete your listings are</p>
             </div>
           </div>
 
@@ -251,7 +248,7 @@
           <div class="panel-head">
             <div>
               <h3>Publishing checklist</h3>
-              <p>Simple checks based on current backend data</p>
+              <p>Quick checks on your listings</p>
             </div>
           </div>
 

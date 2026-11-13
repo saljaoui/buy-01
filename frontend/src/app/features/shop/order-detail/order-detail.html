@@ -1,0 +1,170 @@
+<div class="storefront-shell">
+  <app-navbar></app-navbar>
+
+  <main class="container shop-page">
+    <a routerLink="/orders" class="shop-back">
+      <app-icon name="arrow-left" [size]="15"></app-icon>
+      All orders
+    </a>
+
+    @if (isLoading()) {
+    <section class="shop-card empty-state">
+      <app-icon class="spin" name="spinner" [size]="22"></app-icon>
+      <strong>Loading order</strong>
+    </section>
+    } @else if (errorMessage(); as message) {
+    <section class="shop-card empty-state">
+      <app-icon name="alert" [size]="22"></app-icon>
+      <strong>Order not available</strong>
+      <span>{{ message }}</span>
+      <a routerLink="/orders" class="btn-light">Back to your orders</a>
+    </section>
+    } @else if (order(); as order) {
+
+    @if (justPlaced && order.status === 'PENDING') {
+    <section class="placed-banner" role="status">
+      <app-icon name="circle-check" [size]="26"></app-icon>
+      <div>
+        <strong>Thank you, your order is placed.</strong>
+        <span>We'll let the seller know. Have {{ order.total | currency: 'USD' }} ready when it arrives.</span>
+      </div>
+    </section>
+    }
+
+    <header class="shop-head">
+      <div>
+        <h1>Order {{ order.reference }}</h1>
+        <p>Placed {{ order.createdAt | date: 'longDate' }} at {{ order.createdAt | date: 'shortTime' }}</p>
+      </div>
+      <span class="status-badge status-lg" [class]="'status-badge status-lg status-' + order.status">
+        {{ statusLabel[order.status] }}
+      </span>
+    </header>
+
+    <div class="shop-layout">
+      <div class="checkout-main">
+        <!-- Progress -->
+        <section class="shop-card">
+          <div class="shop-card-head">
+            <h2>Progress</h2>
+          </div>
+          <div class="shop-card-body">
+            @if (order.status === 'CANCELLED') {
+            <p class="cancelled-note">
+              <app-icon name="x" [size]="16"></app-icon>
+              Cancelled on {{ cancelledAt() | date: 'medium' }}. Nothing was charged.
+            </p>
+            }
+            <ol class="timeline" [class.is-cancelled]="order.status === 'CANCELLED'">
+              @for (step of timeline(); track step.status) {
+              <li [class]="'timeline-step ' + step.state">
+                <span class="timeline-dot" aria-hidden="true">
+                  @if (step.state === 'done') {
+                  <app-icon name="check" [size]="13"></app-icon>
+                  }
+                </span>
+                <span class="timeline-label">{{ step.label }}</span>
+                <span class="timeline-time">{{ step.at ? (step.at | date: 'MMM d, h:mm a') : '' }}</span>
+              </li>
+              }
+            </ol>
+          </div>
+        </section>
+
+        <!-- Items -->
+        <section class="shop-card">
+          <div class="shop-card-head">
+            <h2>Items</h2>
+            <p>{{ itemCount(order) }} {{ itemCount(order) === 1 ? 'item' : 'items' }}</p>
+          </div>
+          <ul class="line-list">
+            @for (item of order.items; track item.productId) {
+            <li class="line-item">
+              <a class="line-thumb" [routerLink]="['/products', item.productId]" tabindex="-1" aria-hidden="true">
+                @if (item.imageUrl) {
+                <img [src]="item.imageUrl" alt="" />
+                } @else {
+                <app-icon name="image-off" [size]="20"></app-icon>
+                }
+              </a>
+              <div class="line-info">
+                <a [routerLink]="['/products', item.productId]">{{ item.name }}</a>
+                <span>{{ item.quantity }} × {{ item.price | currency: 'USD' }}</span>
+              </div>
+              <div class="line-total">{{ item.price * item.quantity | currency: 'USD' }}</div>
+            </li>
+            }
+          </ul>
+        </section>
+      </div>
+
+      <aside class="shop-aside">
+        <section class="shop-card">
+          <div class="shop-card-head">
+            <h2>Payment</h2>
+          </div>
+          <div class="shop-card-body">
+            <dl class="totals">
+              <div><dt>Subtotal</dt><dd>{{ order.subtotal | currency: 'USD' }}</dd></div>
+              <div><dt>Delivery</dt><dd>{{ order.shippingFee === 0 ? 'Free' : (order.shippingFee | currency: 'USD') }}</dd></div>
+              <div class="totals-grand">
+                <dt>{{ order.status === 'DELIVERED' ? 'Paid on delivery' : 'To pay on delivery' }}</dt>
+                <dd>{{ order.total | currency: 'USD' }}</dd>
+              </div>
+            </dl>
+          </div>
+        </section>
+
+        <section class="shop-card">
+          <div class="shop-card-head">
+            <h2>Delivery address</h2>
+          </div>
+          <address class="shop-card-body address-block">
+            <strong>{{ order.address.fullName }}</strong>
+            <span>{{ order.address.street }}</span>
+            <span>{{ order.address.postalCode }} {{ order.address.city }}</span>
+            <span>{{ order.address.phone }}</span>
+            @if (order.address.notes) {
+            <em>“{{ order.address.notes }}”</em>
+            }
+          </address>
+        </section>
+
+        <section class="shop-card">
+          <div class="shop-card-body order-actions">
+            <button type="button" class="btn-primary" (click)="reorder()" [disabled]="isReordering()">
+              <app-icon [name]="isReordering() ? 'spinner' : 'refresh'" [class.spin]="isReordering()" [size]="16"></app-icon>
+              Order again
+            </button>
+
+            @if (cancellable()) {
+            @if (!confirmingCancel()) {
+            <button type="button" class="btn-danger" (click)="confirmingCancel.set(true)">
+              Cancel order
+            </button>
+            } @else {
+            <div class="confirm-box" role="alertdialog" aria-labelledby="cancel-title">
+              <strong id="cancel-title">Cancel this order?</strong>
+              <span>The seller will be told not to ship it.</span>
+              <div class="confirm-actions">
+                <button type="button" class="btn-danger solid" (click)="cancel()" [disabled]="isCancelling()">
+                  {{ isCancelling() ? 'Cancelling...' : 'Yes, cancel' }}
+                </button>
+                <button type="button" class="btn-light" (click)="confirmingCancel.set(false)" [disabled]="isCancelling()">
+                  Keep order
+                </button>
+              </div>
+            </div>
+            }
+            } @else if (order.status === 'SHIPPED') {
+            <p class="action-note">This order is on its way, so it can no longer be cancelled.</p>
+            }
+          </div>
+        </section>
+      </aside>
+    </div>
+    }
+  </main>
+
+  <app-footer />
+</div>

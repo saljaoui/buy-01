@@ -1,8 +1,26 @@
 .brand-logo {
-  width: 54px;
+  height: 46px;
+  width: auto;
 }
 
 .logout:hover {
   color: var(--error);
-  border-color: var(--error);
+  background: var(--error-wash);
+}
+
+.nav-profile {
+  text-decoration: none;
+  transition: border-color 0.16s var(--ease);
+}
+
+.nav-profile:hover {
+  border-color: #cfc7bb;
+}
+
+.cart-btn {
+  text-decoration: none;
+}
+
+.nav-search .s-icon {
+  font-style: normal;
 }

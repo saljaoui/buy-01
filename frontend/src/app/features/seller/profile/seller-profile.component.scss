@@ -22,9 +22,9 @@
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, var(--gold), #a07840);
-  color: var(--ink);
-  font-family: 'Playfair Display', serif;
+  background: var(--ink);
+  color: var(--copper-bright);
+  font-family: var(--font-display);
   font-size: 1.8rem;
   font-weight: 700;
   flex-shrink: 0;
@@ -57,8 +57,8 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 0.95rem 1rem;
-  border-radius: 16px;
-  background: #faf8f4;
+  border-radius: var(--radius-md);
+  background: var(--sunken);
 }
 
 .toggle-item strong {
@@ -100,7 +100,7 @@
 }
 
 .toggle-switch.active {
-  background: rgba(200, 169, 110, 0.5);
+  background: rgba(168, 106, 44, 0.5);
 }
 
 .toggle-switch.active::after {
@@ -127,9 +127,9 @@
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, var(--gold), #a07840);
-  color: var(--ink);
-  font-family: 'Playfair Display', serif;
+  background: var(--ink);
+  color: var(--copper-bright);
+  font-family: var(--font-display);
   font-size: 2rem;
   font-weight: 700;
 }
@@ -151,14 +151,14 @@
 
 .mini-stat {
   padding: 0.95rem 1rem;
-  border-radius: 14px;
-  background: #faf8f4;
-  border: 1px solid #efe5d8;
+  border-radius: var(--radius-md);
+  background: var(--sunken);
+  border: 1px solid var(--line-soft);
 }
 
 .mini-stat strong {
   display: block;
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-display);
   font-size: 1.5rem;
   color: var(--ink);
 }
@@ -195,4 +195,35 @@
     align-items: flex-start;
     flex-direction: column;
   }
+}
+
+.field.invalid input {
+  border-color: var(--error);
+}
+
+/* Match the avatar used in the sidebar and navbar */
+.profile-avatar {
+  width: 72px;
+  height: 72px;
+  background: var(--ink);
+  color: var(--copper-bright);
+  font-family: var(--font-ui);
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+
+.profile-banner .eyebrow {
+  display: none;
+}
+
+.profile-banner h1 {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 2.4vw, var(--text-3xl));
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 0.25rem;
+}
+
+.profile-banner p {
+  color: var(--muted);
 }

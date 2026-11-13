@@ -1,0 +1,151 @@
+<div class="storefront-shell">
+  <app-navbar></app-navbar>
+
+  <main class="container shop-page">
+    <a routerLink="/cart" class="shop-back">
+      <app-icon name="arrow-left" [size]="15"></app-icon>
+      Back to cart
+    </a>
+    <header class="shop-head">
+      <div>
+        <h1>Checkout</h1>
+        <p>Tell us where to deliver. You pay when the order arrives.</p>
+      </div>
+    </header>
+
+    <form class="shop-layout" novalidate [formGroup]="form" (ngSubmit)="placeOrder()">
+      <div class="checkout-main">
+        <section class="shop-card">
+          <div class="shop-card-head">
+            <h2>Delivery address</h2>
+          </div>
+          <div class="shop-card-body field-grid">
+            <div class="field full" [class.invalid]="showError(form, 'fullName')">
+              <label for="fullName">Full name</label>
+              <input id="fullName" formControlName="fullName" autocomplete="name"
+                [attr.aria-invalid]="showError(form, 'fullName')" aria-describedby="fullName-error" />
+              @if (showError(form, 'fullName')) {
+              <div class="message" id="fullName-error" role="alert">{{ err('fullName') }}</div>
+              }
+            </div>
+
+            <div class="field full" [class.invalid]="showError(form, 'phone')">
+              <label for="phone">Phone number</label>
+              <input id="phone" type="tel" formControlName="phone" autocomplete="tel" placeholder="+212 6 12 34 56 78"
+                [attr.aria-invalid]="showError(form, 'phone')" aria-describedby="phone-error phone-help" />
+              @if (showError(form, 'phone')) {
+              <div class="message" id="phone-error" role="alert">{{ err('phone') }}</div>
+              } @else {
+              <div class="helper" id="phone-help">The courier calls this number before delivery.</div>
+              }
+            </div>
+
+            <div class="field full" [class.invalid]="showError(form, 'street')">
+              <label for="street">Street address</label>
+              <input id="street" formControlName="street" autocomplete="street-address"
+                [attr.aria-invalid]="showError(form, 'street')" aria-describedby="street-error" />
+              @if (showError(form, 'street')) {
+              <div class="message" id="street-error" role="alert">{{ err('street') }}</div>
+              }
+            </div>
+
+            <div class="field" [class.invalid]="showError(form, 'city')">
+              <label for="city">City</label>
+              <input id="city" formControlName="city" autocomplete="address-level2"
+                [attr.aria-invalid]="showError(form, 'city')" aria-describedby="city-error" />
+              @if (showError(form, 'city')) {
+              <div class="message" id="city-error" role="alert">{{ err('city') }}</div>
+              }
+            </div>
+
+            <div class="field" [class.invalid]="showError(form, 'postalCode')">
+              <label for="postalCode">Postal code</label>
+              <input id="postalCode" formControlName="postalCode" autocomplete="postal-code"
+                [attr.aria-invalid]="showError(form, 'postalCode')" aria-describedby="postalCode-error" />
+              @if (showError(form, 'postalCode')) {
+              <div class="message" id="postalCode-error" role="alert">{{ err('postalCode') }}</div>
+              }
+            </div>
+
+            <div class="field full" [class.invalid]="showError(form, 'notes')">
+              <label for="notes">Delivery notes <span class="optional">(optional)</span></label>
+              <textarea id="notes" formControlName="notes" rows="3" maxlength="200"
+                placeholder="Floor, door code, best time to call"></textarea>
+              @if (showError(form, 'notes')) {
+              <div class="message" role="alert">{{ err('notes') }}</div>
+              }
+            </div>
+          </div>
+        </section>
+
+        <section class="shop-card">
+          <div class="shop-card-head">
+            <h2>Payment</h2>
+          </div>
+          <div class="shop-card-body">
+            <fieldset class="pay-options">
+              <legend class="sr-only">Payment method</legend>
+              <label class="pay-option">
+                <input type="radio" formControlName="paymentMethod" value="PAY_ON_DELIVERY" />
+                <span class="pay-option-icon"><app-icon name="package" [size]="20"></app-icon></span>
+                <span class="pay-option-copy">
+                  <strong>Pay on delivery</strong>
+                  <span>Pay the courier when your order arrives. No card needed now.</span>
+                </span>
+              </label>
+            </fieldset>
+          </div>
+        </section>
+      </div>
+
+      <aside class="shop-aside">
+        <section class="shop-card">
+          <div class="shop-card-head">
+            <h2>Your order</h2>
+            <p>{{ cart.count() }} {{ cart.count() === 1 ? 'item' : 'items' }}</p>
+          </div>
+          <ul class="line-list compact-lines">
+            @for (item of cart.items(); track item.productId) {
+            <li class="line-item">
+              <span class="line-thumb">
+                @if (item.imageUrl) {
+                <img [src]="item.imageUrl" alt="" />
+                } @else {
+                <app-icon name="image-off" [size]="18"></app-icon>
+                }
+                <span class="thumb-qty" [attr.aria-label]="'Quantity ' + item.quantity">{{ item.quantity }}</span>
+              </span>
+              <div class="line-info">
+                <strong>{{ item.name }}</strong>
+              </div>
+              <div class="line-total">{{ item.price * item.quantity | currency: 'USD' }}</div>
+            </li>
+            }
+          </ul>
+          <div class="shop-card-body">
+            <dl class="totals">
+              <div><dt>Subtotal</dt><dd>{{ cart.subtotal() | currency: 'USD' }}</dd></div>
+              <div><dt>Delivery</dt><dd>{{ shippingFee === 0 ? 'Free' : (shippingFee | currency: 'USD') }}</dd></div>
+              <div class="totals-grand"><dt>To pay on delivery</dt><dd>{{ cart.subtotal() + shippingFee | currency: 'USD' }}</dd></div>
+            </dl>
+
+            @if (errorMessage(); as message) {
+            <p class="checkout-error" role="alert">
+              <app-icon name="alert" [size]="16"></app-icon>
+              {{ message }}
+            </p>
+            }
+
+            <button type="submit" class="btn-primary checkout-btn" [disabled]="isPlacing()">
+              <app-icon [name]="isPlacing() ? 'spinner' : 'check'" [class.spin]="isPlacing()" [size]="17"></app-icon>
+              {{ isPlacing() ? 'Placing order...' : 'Place order' }}
+            </button>
+            <p class="checkout-fine">Nothing is charged now. You can cancel until the order ships.</p>
+          </div>
+        </section>
+      </aside>
+    </form>
+  </main>
+
+  <app-footer />
+</div>
