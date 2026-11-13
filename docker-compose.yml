@@ -182,6 +182,31 @@ services:
       retries: 12
       start_period: 30s
 
+  order-service:
+    build:
+      context: ./services
+      dockerfile: order-service/Dockerfile
+    restart: unless-stopped
+    environment:
+      SERVER_PORT: 8084
+      EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
+      MONGODB_URI: mongodb://mongodb:27017/buy01_orders
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - buy01-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:8082/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
   frontend:
     build:
       context: ./frontend
