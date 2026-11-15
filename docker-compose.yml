@@ -202,7 +202,7 @@ services:
     networks:
       - buy01-network
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:8082/actuator/health"]
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:8084/actuator/health"]
       interval: 10s
       timeout: 5s
       retries: 12
