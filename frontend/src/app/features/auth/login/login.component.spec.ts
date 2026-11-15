@@ -5,6 +5,7 @@ import { of, throwError } from 'rxjs';
 
 import { LoginComponent } from './login.component';
 import { AuthService } from '../auth.service';
+import { environment } from '../../../../environments/environment';
 
 describe('LoginComponent (reactive form)', () => {
   let fixture: ComponentFixture<LoginComponent>;
@@ -97,7 +98,7 @@ describe('LoginComponent (reactive form)', () => {
         () =>
           new HttpErrorResponse({
             status: 401,
-            url: 'http://localhost:8080/api/auth/login',
+            url: `${environment.apiBaseUrl}/auth/login`,
             error: { status: 401, message: 'Invalid credentials' },
           }),
       ),

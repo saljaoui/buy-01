@@ -8,6 +8,7 @@ import {
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
 
+import { environment } from '../../../environments/environment';
 import { ApiClient, FORBIDDEN_MESSAGE, SESSION_EXPIRED_MESSAGE } from './api-client.service';
 
 describe('ApiClient', () => {
@@ -117,7 +118,7 @@ describe('ApiClient', () => {
     const error = new HttpErrorResponse({
       error: { message: 'Invalid credentials' },
       status: 401,
-      url: 'http://localhost:8080/api/auth/login',
+      url: `${environment.apiBaseUrl}/auth/login`,
     });
 
     expect(service.getErrorMessage(error))
@@ -128,7 +129,7 @@ describe('ApiClient', () => {
     const error = new HttpErrorResponse({
       error: { message: 'JWT expired' },
       status: 401,
-      url: 'http://localhost:8080/api/users/me',
+      url: `${environment.apiBaseUrl}/users/me`,
     });
 
     expect(service.getErrorMessage(error)).toBe(SESSION_EXPIRED_MESSAGE);
