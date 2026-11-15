@@ -19,7 +19,7 @@ describe('GlobalService', () => {
   });
 
   it('should use the correct API URL', () => {
-    expect(GlobalService.clientIP).toBe('http://localhost:8080/api');
+    expect(GlobalService.clientIP).toBe('http://51.170.128.147:8080/api');
   });
 
 });

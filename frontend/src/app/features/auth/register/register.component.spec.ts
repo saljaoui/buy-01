@@ -7,6 +7,7 @@ import { throwError } from 'rxjs';
 
 import { RegisterComponent } from './register.component';
 import { AuthService } from '../auth.service';
+import { environment } from '../../../../environments/environment';
 
 describe('RegisterComponent (reactive form)', () => {
   const setup = () => {
@@ -108,7 +109,7 @@ describe('RegisterComponent (reactive form)', () => {
         () =>
           new HttpErrorResponse({
             status: 409,
-            url: 'http://localhost:8080/api/auth/register',
+            url: `${environment.apiBaseUrl}/auth/register`,
             error: { status: 409, error: 'Conflict', message },
           }),
       ),
