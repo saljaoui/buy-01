@@ -61,6 +61,7 @@ pipeline {
         }
         
         stage('SonarQube analysis') {
+            when { branch 'main' }
             environment {
                 SCANNER_HOME = tool 'sonar-scanner'
             }
@@ -72,6 +73,7 @@ pipeline {
         }
 
         stage('Quality Gate') {
+            when { branch 'main' }
             steps {
                 timeout(time: 5, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
@@ -80,6 +82,7 @@ pipeline {
         }
 
         stage('Deploy') {
+            when { branch 'main' }
             steps {
                 sh '''
                     for img in $(docker images --format '{{.Repository}}' | grep '^buy-01-' | grep -v jenkins | sort -u); do
