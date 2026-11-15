@@ -13,7 +13,7 @@ pipeline {
     }
 
     environment {
-        NOTIFY_EMAIL    = 'saljaoui1@gmail.com'
+        NOTIFY_EMAIL    = 'abdelohabk@gmail.com, saljaoui1@gmail.com'
         BACKEND_MODULES = 'services infrastructure/discovery-service infrastructure/api-gateway'
     }
 
@@ -106,21 +106,6 @@ pipeline {
                         '''
                     }
                 }
-            }
-        }
-        stage('Mail test') {
-            steps {
-                emailext(
-                        to: 'abdelohabk@gmail.com',
-                        subject: "Build ${currentBuild.currentResult}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                        body: """Hello,
-
-                                The build ${env.JOB_NAME} #${env.BUILD_NUMBER} finished with status: ${currentBuild.currentResult}
-
-                                Details: ${env.BUILD_URL}
-                                Console log: ${env.BUILD_URL}console
-                                """,
-                )
             }
         }
     }
