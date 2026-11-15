@@ -110,7 +110,17 @@ pipeline {
         }
         stage('Mail test') {
             steps {
-                emailext(to: 'abdelohabk@gmail.com', subject: 'Jenkins test', body: 'It works')
+                emailext(
+                        to: 'abdelohabk@gmail.com',
+                        subject: "Build ${currentBuild.currentResult}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                        body: """Hello,
+
+                                The build ${env.JOB_NAME} #${env.BUILD_NUMBER} finished with status: ${currentBuild.currentResult}
+
+                                Details: ${env.BUILD_URL}
+                                Console log: ${env.BUILD_URL}console
+                                """,
+                )
             }
         }
     }
