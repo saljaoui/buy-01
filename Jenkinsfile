@@ -108,6 +108,11 @@ pipeline {
                 }
             }
         }
+        stage('Mail test') {
+            steps {
+                emailext(to: 'abdelohabk@gmail.com', subject: 'Jenkins test', body: 'It works')
+            }
+        }
     }
 
     post {
