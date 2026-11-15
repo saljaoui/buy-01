@@ -279,12 +279,13 @@ function httpError(status: number, message: string): HttpErrorResponse {
 }
 
 function cryptoId(): string {
-  return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  return crypto.randomUUID();
 }
 
 function makeReference(): string {
   const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let code = '';
-  for (let i = 0; i < 5; i++) code += alphabet[Math.floor(Math.random() * alphabet.length)];
+  const bytes = crypto.getRandomValues(new Uint8Array(5));
+  // 256 is a multiple of the 32-letter alphabet, so the modulo has no bias.
+  const code = Array.from(bytes, (b) => alphabet[b % alphabet.length]).join('');
   return `B01-${code}`;
 }
