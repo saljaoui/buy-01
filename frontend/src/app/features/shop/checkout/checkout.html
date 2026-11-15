@@ -42,7 +42,7 @@
 
             <div class="field full" [class.invalid]="showError(form, 'street')">
               <label for="street">Street address</label>
-              <input id="street" formControlName="street" autocomplete="street-address"
+              <input id="street" formControlName="street" autocomplete="address-line1"
                 [attr.aria-invalid]="showError(form, 'street')" aria-describedby="street-error" />
               @if (showError(form, 'street')) {
               <div class="message" id="street-error" role="alert">{{ err('street') }}</div>

@@ -35,7 +35,7 @@
         <span class="pr-avatar-progress" role="progressbar" [attr.aria-valuenow]="avatarProgress()" aria-valuemin="0"
           aria-valuemax="100" aria-label="Saving profile photo"><span [style.width.%]="avatarProgress()"></span></span>
       }
-      <input #avatarInput type="file" class="pr-file" accept="image/jpeg,image/png,image/webp,image/avif"
+      <input #avatarInput id="pr-avatar-input" type="file" aria-label="Upload profile photo" class="pr-file" accept="image/jpeg,image/png,image/webp,image/avif"
         (change)="onAvatarChosen($event)" tabindex="-1" aria-hidden="true" />
     </div>
 

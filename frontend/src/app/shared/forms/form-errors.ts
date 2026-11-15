@@ -52,6 +52,6 @@ export function matchFields(field: string, confirmField: string): ValidatorFn {
     delete others['mismatch'];
 
     b.setErrors(mismatch ? { ...others, mismatch: true } : Object.keys(others).length ? others : null);
-    return null;
+    return mismatch ? { mismatch: true } : null;
   };
 }
