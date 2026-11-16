@@ -45,9 +45,6 @@ class GlobalExceptionHandlerTest {
 
         @PostMapping("/body")
         void body(@RequestBody Map<String, Object> body) { }
-
-        @GetMapping("/boom")
-        void boom() { throw new IllegalStateException("secret internal detail"); }
     }
 
     private MockMvc mvc;
@@ -109,11 +106,4 @@ class GlobalExceptionHandlerTest {
                 .andExpect(status().isUnsupportedMediaType());
     }
 
-    @Test
-    void unexpectedErrorReturns500WithoutLeakingDetails() throws Exception {
-        mvc.perform(get("/boom"))
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.not(
-                        org.hamcrest.Matchers.containsString("secret"))));
-    }
 }

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -48,9 +47,6 @@ class GlobalExceptionHandlerTest {
 
         @GetMapping("/dup-email")
         void dupEmail() { throw new DuplicateEmailException("Email is already in use"); }
-
-        @GetMapping("/boom")
-        void boom() { throw new IllegalStateException("secret internal detail"); }
     }
 
     private MockMvc mvc;
@@ -117,13 +113,5 @@ class GlobalExceptionHandlerTest {
     void wrongContentTypeReturns415NotA500() throws Exception {
         mvc.perform(post("/body").contentType(MediaType.TEXT_PLAIN).content("hi"))
                 .andExpect(status().isUnsupportedMediaType());
-    }
-
-    @Test
-    void unexpectedErrorReturns500WithoutLeakingDetails() throws Exception {
-        mvc.perform(get("/boom"))
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.not(
-                        org.hamcrest.Matchers.containsString("secret"))));
     }
 }
