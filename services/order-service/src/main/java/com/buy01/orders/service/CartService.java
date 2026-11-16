@@ -1,14 +1,11 @@
 package com.buy01.orders.service;
 
-import java.util.logging.Logger;
-
 import org.springframework.stereotype.Service;
 import com.buy01.orders.repository.CartRepository;
 import lombok.AllArgsConstructor;
 import com.buy01.orders.client.ProductClient;
 import com.buy01.orders.model.dto.ProductResponse;
 import lombok.Data;
-import com.buy01.orders.model.dto.CartItemDTO;
 import com.buy01.orders.exception.ProductExistsInCartException;
 import com.buy01.orders.model.entity.Cart;
 import com.buy01.orders.common.Product;
