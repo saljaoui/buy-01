@@ -16,13 +16,13 @@ public class CartService {
     private final CartRepository cartRepository;
     private final ProductClient productClient;
 
-    public void addToCart(String userId, String productId) {
-        if (isProductInCart(productId, userId)) {
+    public void addToCart(String username, String productId) {
+        if (isProductInCart(productId, username)) {
             throw new ProductExistsInCartException("Product is already in the cart");
         }
         ProductResponse product = productClient.getProduct(productId);
-        Cart cart = cartRepository.findById(userId).orElse(new Cart());
-        cart.setUserId(userId);
+        Cart cart = cartRepository.findByUsername(username).orElse(new Cart());
+        cart.setUsername(username);
         Product cartItem = new Product();
         cartItem.setId(product.getId());
         cartItem.setName(product.getName());
@@ -32,12 +32,21 @@ public class CartService {
         cartRepository.save(cart);
     }
 
+    public Cart getSubjectCart(String username) {
+        return cartRepository.findByUsername(username).orElse(null);
+    }
 
     public Cart getCartByUserId(String userId) {
         return cartRepository.findById(userId).orElse(new Cart());
     }
-    public boolean isProductInCart(String productId, String userId) {
-        return cartRepository.existsByItemsId(productId, userId);
+    public boolean isProductInCart(String productId, String username) {
+        return cartRepository.existsByItemsId(productId, username);
+    }
+
+
+    public void removeFromCart(String userId, String productId) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'removeFromCart'");
     }
 
 }

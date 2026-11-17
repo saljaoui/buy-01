@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class CartItemDTO {
-    private String userId;
+    private String username;
     private String productId;  
 }

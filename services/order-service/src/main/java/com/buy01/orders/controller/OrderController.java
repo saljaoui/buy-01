@@ -24,17 +24,6 @@ public class OrderController {
         return ResponseEntity.ok("Order service is working");
     }
 
-    @PostMapping("/add-to-cart")
-    public ResponseEntity<ProductResponse> addToCart(@RequestBody CartItemDTO cartItemDTO, Authentication authentication) {
-        String userId = authentication.getName();
-        cartService.addToCart(userId, cartItemDTO.getProductId());
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/cart")
-    public ResponseEntity<?> getCart(Authentication authentication) {
-        String userId = authentication.getName();
-        return ResponseEntity.ok(cartService.getCartByUserId(userId));
-    }
+    
 
 }
