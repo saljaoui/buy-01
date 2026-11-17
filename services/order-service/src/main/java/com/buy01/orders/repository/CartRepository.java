@@ -9,6 +9,5 @@ import com.buy01.orders.model.entity.Cart;
 @Repository
 public interface CartRepository extends MongoRepository<Cart, String> {
     boolean existsByItemsId(String productId, String username);
-    Optional<Cart> findByUserId(String userId);
     Optional<Cart> findByUsername(String username);
 }
