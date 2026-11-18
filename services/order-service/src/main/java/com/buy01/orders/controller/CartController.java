@@ -2,9 +2,14 @@ package com.buy01.orders.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.buy01.orders.model.dto.CartUpdateRequest;
 import com.buy01.orders.model.dto.ProductResponse;
 import com.buy01.orders.service.CartService;
+
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 
@@ -20,22 +25,24 @@ public class CartController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/remove-from-cart")
-   // @PreAuthorize ("@cartService.isProductInCart(#productId, authentication.name)")
-    public ResponseEntity<ProductResponse> removeFromCart(@RequestParam String productId, String cartId, Authentication authentication) {
+    @DeleteMapping ("/remove-from-cart")
+    @PreAuthorize ("@cartService.isCartOwner(#cartId, authentication.name)")
+    public ResponseEntity<?> removeFromCart(@RequestParam String productId, String cartId, Authentication authentication) {
         cartService.removeFromCart(cartId, productId);
         return ResponseEntity.ok().build();
-    }
-
-    @GetMapping
-    public ResponseEntity<?> getCart(Authentication authentication) {
-        String userId = authentication.getName();
-        return ResponseEntity.ok(cartService.getCartByUserId(userId));
     }
 
     @GetMapping ("/subject")
     public ResponseEntity<?> getSubjectCart(Authentication authentication) {
         String username = authentication.getName();
         return ResponseEntity.ok(cartService.getSubjectCart(username));
+    }
+
+    @PutMapping
+    @PreAuthorize ("@cartService.isCartOwner(#id, authentication.name)")
+    public ResponseEntity<?> updateCart(@Valid @RequestBody CartUpdateRequest request, Authentication authentication) {
+        String username = authentication.getName();
+        cartService.updateCart(request.getCartId(), request, username);
+        return ResponseEntity.ok().build();
     }
 }

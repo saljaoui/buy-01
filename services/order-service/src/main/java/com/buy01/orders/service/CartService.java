@@ -1,14 +1,19 @@
 package com.buy01.orders.service;
 
 import java.util.ArrayList;
-
 import org.springframework.stereotype.Service;
 import com.buy01.orders.repository.CartRepository;
+
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import com.buy01.orders.client.ProductClient;
+import com.buy01.orders.model.dto.CartUpdateRequest;
 import com.buy01.orders.model.dto.ProductResponse;
 import lombok.Data;
+
+import com.buy01.orders.exception.CartNotFoundException;
 import com.buy01.orders.exception.ProductExistsInCartException;
+import com.buy01.orders.exception.ProductNotFoundException;
 import com.buy01.orders.model.entity.Cart;
 import com.buy01.orders.common.Product;
 @AllArgsConstructor
@@ -23,7 +28,8 @@ public class CartService {
         if (isProductInCart(productId, username)) {
             throw new ProductExistsInCartException("Product is already in the cart");
         }
-        ProductResponse product = productClient.getProduct(productId);
+
+        ProductResponse product = productClient.getProduct(productId).orElseThrow(() -> new ProductNotFoundException("Product not found"));
         Cart cart = cartRepository.findByUsername(username).orElseGet(Cart::new);
         cart.setUsername(username);
         Product cartItem = new Product();
@@ -46,13 +52,31 @@ public class CartService {
         return cartRepository.findById(userId).orElse(new Cart());
     }
     public boolean isProductInCart(String productId, String username) {
-        return cartRepository.existsByItemsId(productId, username);
+        return cartRepository.existsByUsernameAndProductId(username, productId);
+    }
+
+    public boolean isCartOwner(String cartId, String username) {
+        return cartRepository.existsByIdAndUsername(cartId, username);
     }
 
 
     public void removeFromCart(String userId, String productId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'removeFromCart'");
+        Cart cart = cartRepository.findById(userId).orElseThrow(() -> new CartNotFoundException("Cart not found"));
+        if (!cart.getItems().removeIf(item -> item.getId().equals(productId))) {
+            throw new ProductNotFoundException("Product not found in the cart");
+        } else {
+            cartRepository.save(cart);
+        }
+    }
+
+    public void updateCart(String id, CartUpdateRequest request, String username) {
+        Cart cart = cartRepository.findById(id).orElseThrow(() -> new CartNotFoundException("Cart not found"));
+        Product productToUpdate = cart.getItems().stream()
+                .filter(item -> item.getId().equals(request.getProductId()))
+                .findFirst()
+                .orElseThrow(() -> new ProductNotFoundException("Product not found in the cart"));
+        productToUpdate.setQuantity(request.getQuantity());
+        cartRepository.save(cart);
     }
 
 }
