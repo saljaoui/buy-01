@@ -1,5 +1,7 @@
 package com.buy01.orders.service;
 
+import java.util.ArrayList;
+
 import org.springframework.stereotype.Service;
 import com.buy01.orders.repository.CartRepository;
 import lombok.AllArgsConstructor;
@@ -17,16 +19,20 @@ public class CartService {
     private final ProductClient productClient;
 
     public void addToCart(String username, String productId) {
+        System.out.println("Adding product to cart: " + productId + " for user: " + username);
         if (isProductInCart(productId, username)) {
             throw new ProductExistsInCartException("Product is already in the cart");
         }
         ProductResponse product = productClient.getProduct(productId);
-        Cart cart = cartRepository.findByUsername(username).orElse(new Cart());
+        Cart cart = cartRepository.findByUsername(username).orElseGet(Cart::new);
         cart.setUsername(username);
         Product cartItem = new Product();
         cartItem.setId(product.getId());
         cartItem.setName(product.getName());
         cartItem.setPrice(product.getPrice());
+        if (cart.getItems() == null) {
+            cart.setItems(new ArrayList<>());
+        }
         cartItem.setQuantity(1);
         cart.getItems().add(cartItem);
         cartRepository.save(cart);
