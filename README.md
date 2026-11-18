@@ -314,5 +314,9 @@ buy-01/
 ## Collaborators
 
 - **Abdelouahab Khir**  
-  [![GitHub](  https://avatars.githubusercontent.com/u/106921935?v=4)](https://github.com/khirAbdelouahab)
-  [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/abdelouahabkhir)
+  [![GitHub]( abdelouahab khir )](https://github.com/khirAbdelouahab)
+  [![LinkedIn]( abdelouahab khir )](https://www.linkedin.com/in/abdelouahabkhir)
+
+- **Soufiane Aljaoui**  
+  [![GitHub](  Soufiane Aljaoui)](https://github.com/saljaoui)
+  [![LinkedIn]( Soufiane Aljaoui)](https://www.linkedin.com/in/saljaoui)
