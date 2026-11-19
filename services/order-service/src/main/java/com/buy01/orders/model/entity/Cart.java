@@ -1,5 +1,6 @@
 package com.buy01.orders.model.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -16,6 +17,6 @@ import lombok.NoArgsConstructor;
 public class Cart {
     @Id
     private String id;
-    private String userId;
-    private List<Product> items;
+    private String username;
+    private List<Product> items = new ArrayList<>();
 }

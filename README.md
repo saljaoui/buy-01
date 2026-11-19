@@ -35,6 +35,7 @@ flowchart LR
     GW -->|lb://user-service| US[user-service :8081]
     GW -->|lb://product-service| PS[product-service :8082]
     GW -->|lb://media-service| MS[media-service :8083]
+    GW -->|lb://order-service| MS[order-service :8084]
     MS -->|Feign: ownership check| PS
     PS -->|product-deleted| K[(Kafka)]
     K --> MS
@@ -172,12 +173,22 @@ All paths go through the gateway (`http://localhost:8080`).
 | GET | `/api/media/product/{productId}` | public | List the media of a product |
 | DELETE | `/api/media/{id}` | `SELLER`, owner of the product | Delete an image (file and record) |
 
+
+### order-service
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| GET | `/api/cart/subject` | token* | return shoping cart for user connected |
+| POST | `/api/cart/add-to-cart` | token* | add product to shoping-cart RequestParam: `productId` |
+| DELETE | `/api/cart/remove-from-cart` | token* | remove product from cart RequestParam: `productId`, `cartId` |
+| PUT | `/api/cart` | token* | update cart product quantity body: `productId`, `cartId`, `quantity` --> between `1` and `5`  |
+
 ## 6. Running tests locally
 
 Backend (JUnit 5 + Mockito unit tests, no MongoDB/Kafka/Eureka needed):
 
 ```bash
-cd services && ./mvnw -B test                        # user-, product-, media-service, shared-events
+cd services && ./mvnw -B test                        # user-, product-, media-, order-service, shared-events
 cd infrastructure/discovery-service && ./mvnw -B test
 cd infrastructure/api-gateway && ./mvnw -B test
 ```
@@ -292,10 +303,20 @@ buy-01/
 │   ├── shared-events/           # Kafka event classes (ProductDeletedEvent)
 │   ├── user-service/
 │   ├── product-service/
-│   └── media-service/
+│   ├── media-service/
+|   └── order-service/
 └── frontend/                    # Angular app
     ├── src/
     ├── public/
     ├── Dockerfile
     └── nginx.conf
 ```
+## Collaborators
+
+- **Abdelouahab Khir**  
+  [![GitHub]( abdelouahab khir )](https://github.com/khirAbdelouahab)
+  [![LinkedIn]( abdelouahab khir )](https://www.linkedin.com/in/abdelouahabkhir)
+
+- **Soufiane Aljaoui**  
+  [![GitHub](  Soufiane Aljaoui)](https://github.com/saljaoui)
+  [![LinkedIn]( Soufiane Aljaoui)](https://www.linkedin.com/in/saljaoui)

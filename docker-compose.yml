@@ -192,6 +192,7 @@ services:
       EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
       MONGODB_URI: mongodb://mongodb:27017/buy01_orders
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_DATA_MONGODB_CORE_MONGOTEMPLATE: DEBUG
     depends_on:
       discovery-service:
         condition: service_healthy
