@@ -1,29 +1,26 @@
 package com.buy01.orders.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import com.buy01.orders.model.dto.CartItemDTO;
-import com.buy01.orders.model.dto.ProductResponse;
-import com.buy01.orders.service.CartService;
-import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
-
-
-
+import org.springframework.web.bind.annotation.*;
+import com.buy01.orders.service.OrderService;
+import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/order")
 public class OrderController {
-    private final CartService cartService;
-
+    
+    private final OrderService orderService;
     @GetMapping("/test")
     public ResponseEntity<String> test() {
-        // For demonstration purposes, we return a simple string. In a real application,
-        // you would fetch the order from the database.
         return ResponseEntity.ok("Order service is working");
     }
 
-    
+    @PostMapping
+    public ResponseEntity<String> createOrder(Authentication authentication) {
+        String message = orderService.createOrder(authentication.getName());
+        return ResponseEntity.ok(message);
+    }
 
 }

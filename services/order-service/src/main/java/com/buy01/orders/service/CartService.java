@@ -1,6 +1,9 @@
 package com.buy01.orders.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+
+import org.bson.types.Decimal128;
 import org.springframework.stereotype.Service;
 import com.buy01.orders.repository.CartRepository;
 
@@ -15,6 +18,7 @@ import com.buy01.orders.exception.CartNotFoundException;
 import com.buy01.orders.exception.ProductExistsInCartException;
 import com.buy01.orders.exception.ProductNotFoundException;
 import com.buy01.orders.model.entity.Cart;
+import com.buy01.orders.common.CartStatus;
 import com.buy01.orders.common.Product;
 @AllArgsConstructor
 @Data
@@ -32,10 +36,11 @@ public class CartService {
         ProductResponse product = productClient.getProduct(productId).orElseThrow(() -> new ProductNotFoundException("Product not found"));
         Cart cart = cartRepository.findByUsername(username).orElseGet(Cart::new);
         cart.setUsername(username);
+        
         Product cartItem = new Product();
         cartItem.setId(product.getId());
         cartItem.setName(product.getName());
-        cartItem.setPrice(product.getPrice());
+        cartItem.setPrice(new Decimal128(BigDecimal.valueOf(product.getPrice())));
         if (cart.getItems() == null) {
             cart.setItems(new ArrayList<>());
         }
@@ -59,7 +64,6 @@ public class CartService {
         return cartRepository.existsByIdAndUsername(cartId, username);
     }
 
-
     public void removeFromCart(String userId, String productId) {
         Cart cart = cartRepository.findById(userId).orElseThrow(() -> new CartNotFoundException("Cart not found"));
         if (!cart.getItems().removeIf(item -> item.getId().equals(productId))) {
@@ -79,4 +83,15 @@ public class CartService {
         cartRepository.save(cart);
     }
 
+    public void clearCart(String username) {
+        Cart cart = cartRepository.findByUsername(username).orElseThrow(() -> new CartNotFoundException("Cart not found"));
+        cart.getItems().clear();
+        cartRepository.save(cart);
+    }
+
+    public void releaseCart(String username) {
+        Cart cart = cartRepository.findByUsername(username).orElseThrow(() -> new CartNotFoundException("Cart not found"));
+        cart.setStatus(CartStatus.AVAILABLE);
+        cartRepository.save(cart);
+    }
 }
