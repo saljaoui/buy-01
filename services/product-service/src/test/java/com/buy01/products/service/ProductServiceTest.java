@@ -15,6 +15,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -86,5 +88,41 @@ class ProductServiceTest {
         assertThrows(ResponseStatusException.class, () -> productService.delete("p1", "someoneElse"));
         verify(productRepository, never()).delete(any(Product.class));
         verify(eventPublisher, never()).publishProductDeleted(any());
+    }
+
+    @Test
+    void update_changesFieldsAndSaves_whenUserIsOwner() {
+        when(productRepository.findById("p1")).thenReturn(Optional.of(sampleProduct()));
+        when(productRepository.save(any(Product.class))).thenAnswer(inv -> inv.getArgument(0));
+        ProductRequest request = new ProductRequest();
+        request.setName("Gaming Laptop");
+        request.setPrice(1200.0);
+        request.setQuantity(2);
+
+        ProductResponse response = productService.update("p1", request, "seller1");
+
+        assertThat(response.getName()).isEqualTo("Gaming Laptop");
+        assertThat(response.getPrice()).isEqualTo(1200.0);
+        assertThat(response.getQuantity()).isEqualTo(2);
+    }
+
+    @Test
+    void update_throws_whenUserIsNotOwner() {
+        when(productRepository.findById("p1")).thenReturn(Optional.of(sampleProduct()));
+
+        assertThatThrownBy(() -> productService.update("p1", new ProductRequest(), "someoneElse"))
+                .isInstanceOf(ResponseStatusException.class);
+        verify(productRepository, never()).save(any(Product.class));
+    }
+
+    @Test
+    void delete_removesProductAndPublishesEvent_whenUserIsOwner() {
+        Product product = sampleProduct();
+        when(productRepository.findById("p1")).thenReturn(Optional.of(product));
+
+        productService.delete("p1", "seller1");
+
+        verify(productRepository).delete(product);
+        verify(eventPublisher).publishProductDeleted("p1");
     }
 }

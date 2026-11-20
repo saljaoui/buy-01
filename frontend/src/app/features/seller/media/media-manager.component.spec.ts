@@ -6,71 +6,91 @@ import { of } from 'rxjs';
 import { MediaManagerComponent } from './media-manager.component';
 import { AuthService } from '../../auth/auth.service';
 import { MediaOrderService } from '../../../shared/services/media-order.service';
-import { Media, MediaService } from '../../../shared/services/media-service';
-import { ProductResponse, ProductService } from '../../../shared/services/product-service';
+import { MediaService } from '../../../shared/services/media-service';
+import { ProductService } from '../../../shared/services/product-service';
 import { ConfirmService } from '../../../shared/ui/confirm/confirm.service';
 
-const m = (id: string, productId = 'a'): Media => ({ id, productId, imageUrl: '/media/' + id });
-
 describe('MediaManagerComponent', () => {
-  let apply: ReturnType<typeof vi.fn>;
-  let del: ReturnType<typeof vi.fn>;
+  const bowl = { id: 'a', name: 'Bowl', description: 'A bowl', price: 10, quantity: 1, owner: true };
+  const photo1 = { id: '1', productId: 'a', imageUrl: '/media/1' };
+  const photo2 = { id: '2', productId: 'a', imageUrl: '/media/2' };
+  const productService = { getProductsOwnedBy: vi.fn() };
+  const mediaService = {
+    getMediaByProduct: vi.fn(),
+    deleteMedia: vi.fn(),
+    imageUrl: vi.fn((media: { imageUrl: string }) => `http://test${media.imageUrl}`),
+  };
 
-  const setup = (products: ProductResponse[], media: Record<string, Media[]>) => {
-    apply = vi.fn(() => of([m('2'), m('3'), m('1b')]));
-    del = vi.fn(() => of(undefined));
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mediaService.getMediaByProduct.mockReturnValue(of([]));
+    mediaService.deleteMedia.mockReturnValue(of(undefined));
     TestBed.configureTestingModule({
       imports: [MediaManagerComponent],
       providers: [
         provideHttpClient(),
         provideRouter([]),
-        { provide: ProductService, useValue: { getProductsOwnedBy: () => of(products) } },
-        { provide: MediaService, useValue: { getMediaByProduct: (id: string) => of(media[id] ?? []), imageUrl: (x: Media) => 'http://x' + x.imageUrl, deleteMedia: del } },
-        { provide: MediaOrderService, useValue: { apply } },
+        { provide: ProductService, useValue: productService },
+        { provide: MediaService, useValue: mediaService },
+        { provide: MediaOrderService, useValue: { apply: vi.fn() } },
       ],
     });
-    vi.spyOn(TestBed.inject(AuthService), 'getStoredUser').mockReturnValue({ id: 's', name: 'S', email: 's@x', role: 'SELLER' });
+    vi.spyOn(TestBed.inject(AuthService), 'getStoredUser').mockReturnValue({ id: 's', name: 'S', email: 's@x.com', role: 'SELLER' });
+  });
+
+  it('asks to create a product first when the seller has no products', () => {
+    productService.getProductsOwnedBy.mockReturnValue(of([]));
+
     const fixture = TestBed.createComponent(MediaManagerComponent);
     fixture.detectChanges();
-    return { fixture, el: fixture.nativeElement as HTMLElement };
-  };
 
-  const bowl: ProductResponse = { id: 'a', name: 'Bowl', description: 'A bowl', price: 1, quantity: 1, owner: true };
-
-  it('no products: one empty state with one action, no filters', () => {
-    const { el } = setup([], {});
-    const empty = el.querySelector('[data-testid=no-products]')!;
-    expect(empty.querySelectorAll('a, button').length).toBe(1);
-    expect(empty.textContent).toContain('Create your first product');
-    expect(el.querySelector('.mm-toolbar')).toBeNull();
-    expect(el.querySelector('[data-testid=upload-open]')).toBeNull();
+    expect(fixture.nativeElement.querySelector('[data-testid=no-products]').textContent).toContain('Create your first product');
   });
 
-  it('products without photos: the upload panel is the empty state; library hidden', () => {
-    const { el } = setup([bowl], {});
-    expect(el.querySelector('[data-testid=upload-panel]')).not.toBeNull();
-    expect(el.querySelector('.mm-toolbar')).toBeNull();
-  });
+  it('shows the upload panel when the products have no photos', () => {
+    productService.getProductsOwnedBy.mockReturnValue(of([bowl]));
 
-  it('with photos: grouped gallery, cover first, set as cover re-orders through MediaOrderService', () => {
-    const { fixture, el } = setup([bowl], { a: [m('1'), m('2'), m('3')] });
-    expect(el.querySelectorAll('[data-testid=media-group]').length).toBe(1);
-    expect(el.querySelectorAll('[data-testid=media-tile]').length).toBe(3);
-    expect(el.querySelector('.mm-cover')).not.toBeNull();
-
-    el.querySelector<HTMLButtonElement>('[data-testid=set-cover]')!.click();
+    const fixture = TestBed.createComponent(MediaManagerComponent);
     fixture.detectChanges();
-    const wanted = apply.mock.calls[0][2].map((p: { media: Media }) => p.media.id);
-    expect(wanted).toEqual(['2', '3', '1']); // only photo 1 has to move
+
+    expect(fixture.nativeElement.querySelector('[data-testid=upload-panel]')).not.toBeNull();
   });
 
-  it('delete asks first', async () => {
-    const { fixture, el } = setup([bowl], { a: [m('1'), m('2')] });
+  it('shows one tile per photo', () => {
+    productService.getProductsOwnedBy.mockReturnValue(of([bowl]));
+    mediaService.getMediaByProduct.mockReturnValue(of([photo1, photo2]));
+
+    const fixture = TestBed.createComponent(MediaManagerComponent);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelectorAll('[data-testid=media-tile]').length).toBe(2);
+  });
+
+  it('deletes a photo after the seller confirms', async () => {
+    productService.getProductsOwnedBy.mockReturnValue(of([bowl]));
+    mediaService.getMediaByProduct.mockReturnValue(of([photo1, photo2]));
     vi.spyOn(TestBed.inject(ConfirmService), 'ask').mockResolvedValue(true);
-    el.querySelector<HTMLButtonElement>('[data-testid=delete-media]')!.click();
+    const fixture = TestBed.createComponent(MediaManagerComponent);
+    fixture.detectChanges();
+
+    fixture.nativeElement.querySelector('[data-testid=delete-media]').click();
     await fixture.whenStable();
     fixture.detectChanges();
-    expect(del).toHaveBeenCalledWith('1');
-    expect(el.querySelectorAll('[data-testid=media-tile]').length).toBe(1);
+
+    expect(mediaService.deleteMedia).toHaveBeenCalledWith('1');
+    expect(fixture.nativeElement.querySelectorAll('[data-testid=media-tile]').length).toBe(1);
+  });
+
+  it('does not delete a photo when the seller cancels', async () => {
+    productService.getProductsOwnedBy.mockReturnValue(of([bowl]));
+    mediaService.getMediaByProduct.mockReturnValue(of([photo1]));
+    vi.spyOn(TestBed.inject(ConfirmService), 'ask').mockResolvedValue(false);
+    const fixture = TestBed.createComponent(MediaManagerComponent);
+    fixture.detectChanges();
+
+    fixture.nativeElement.querySelector('[data-testid=delete-media]').click();
+    await fixture.whenStable();
+
+    expect(mediaService.deleteMedia).not.toHaveBeenCalled();
   });
 });

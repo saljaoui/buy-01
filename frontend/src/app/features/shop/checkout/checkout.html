@@ -13,8 +13,28 @@
       </div>
     </header>
 
-    <form class="shop-layout" novalidate [formGroup]="form" (ngSubmit)="placeOrder()">
+    <!-- Stepper -->
+    <nav aria-label="Checkout progress">
+      <ol class="checkout-steps">
+        @for (s of steps; track s.n) {
+        <li class="checkout-step" [class.active]="step() === s.n" [class.done]="step() > s.n">
+          <button type="button" (click)="goTo(s.n)" [disabled]="s.n >= step()"
+            [attr.aria-current]="step() === s.n ? 'step' : null">
+            <span class="checkout-step-num">
+              @if (step() > s.n) { <app-icon name="check" [size]="14"></app-icon> } @else { {{ s.n }} }
+            </span>
+            <span class="checkout-step-label">{{ s.label }}</span>
+          </button>
+        </li>
+        }
+      </ol>
+    </nav>
+
+    <form class="shop-layout" novalidate [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="checkout-main">
+
+        <!-- STEP 1: Address -->
+        @if (step() === 1) {
         <section class="shop-card">
           <div class="shop-card-head">
             <h2>Delivery address</h2>
@@ -77,7 +97,54 @@
             </div>
           </div>
         </section>
+        }
 
+        <!-- STEP 2: Review -->
+        @if (step() === 2) {
+        @let p = preview;
+        <section class="shop-card">
+          <div class="shop-card-head">
+            <h2>Deliver to</h2>
+            <button type="button" class="link-btn" (click)="goTo(1)">Edit</button>
+          </div>
+          <div class="shop-card-body">
+            <p class="review-block">
+              <strong>{{ p.fullName }}</strong><br />
+              {{ p.street }}<br />
+              {{ p.city }} {{ p.postalCode }}<br />
+              {{ p.phone }}
+            </p>
+            @if (p.notes) {
+            <p class="review-notes"><strong>Notes:</strong> {{ p.notes }}</p>
+            }
+          </div>
+        </section>
+
+        <section class="shop-card">
+          <div class="shop-card-head">
+            <h2>Items</h2>
+            <a routerLink="/cart" class="link-btn">Edit cart</a>
+          </div>
+          <ul class="line-list">
+            @for (item of cart.items(); track item.productId) {
+            <li class="line-item">
+              <span class="line-thumb">
+                @if (item.imageUrl) { <img [src]="item.imageUrl" alt="" /> }
+                @else { <app-icon name="image-off" [size]="18"></app-icon> }
+              </span>
+              <div class="line-info">
+                <strong>{{ item.name }}</strong>
+                <span>{{ item.quantity }} × {{ item.price | currency: 'USD' }}</span>
+              </div>
+              <div class="line-total">{{ item.price * item.quantity | currency: 'USD' }}</div>
+            </li>
+            }
+          </ul>
+        </section>
+        }
+
+        <!-- STEP 3: Confirm / payment -->
+        @if (step() === 3) {
         <section class="shop-card">
           <div class="shop-card-head">
             <h2>Payment</h2>
@@ -94,10 +161,22 @@
                 </span>
               </label>
             </fieldset>
+            <p class="review-notes">
+              Delivering to <strong>{{ preview.fullName }}</strong>, {{ preview.street }}, {{ preview.city }}.
+            </p>
           </div>
         </section>
+        }
+
+        @if (step() > 1) {
+        <button type="button" class="btn-secondary checkout-back" (click)="back()" [disabled]="isPlacing()">
+          <app-icon name="arrow-left" [size]="15"></app-icon>
+          Back
+        </button>
+        }
       </div>
 
+      <!-- Order summary (all steps) -->
       <aside class="shop-aside">
         <section class="shop-card">
           <div class="shop-card-head">
@@ -126,7 +205,7 @@
             <dl class="totals">
               <div><dt>Subtotal</dt><dd>{{ cart.subtotal() | currency: 'USD' }}</dd></div>
               <div><dt>Delivery</dt><dd>{{ shippingFee === 0 ? 'Free' : (shippingFee | currency: 'USD') }}</dd></div>
-              <div class="totals-grand"><dt>To pay on delivery</dt><dd>{{ cart.subtotal() + shippingFee | currency: 'USD' }}</dd></div>
+              <div class="totals-grand"><dt>To pay on delivery</dt><dd>{{ total() | currency: 'USD' }}</dd></div>
             </dl>
 
             @if (errorMessage(); as message) {
@@ -137,8 +216,10 @@
             }
 
             <button type="submit" class="btn-primary checkout-btn" [disabled]="isPlacing()">
+              @if (step() === 3) {
               <app-icon [name]="isPlacing() ? 'spinner' : 'check'" [class.spin]="isPlacing()" [size]="17"></app-icon>
-              {{ isPlacing() ? 'Placing order...' : 'Place order' }}
+              }
+              {{ submitLabel() }}
             </button>
             <p class="checkout-fine">Nothing is charged now. You can cancel until the order ships.</p>
           </div>

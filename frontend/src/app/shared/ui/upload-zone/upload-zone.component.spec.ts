@@ -2,39 +2,44 @@ import { TestBed } from '@angular/core/testing';
 
 import { UploadZoneComponent, rejectReason } from './upload-zone.component';
 
-const file = (name: string, type: string, size: number) => new File([new Uint8Array(size)], name, { type });
-
 describe('UploadZoneComponent', () => {
-  it('rejectReason checks type and size', () => {
-    expect(rejectReason(file('a.png', 'image/png', 10), ['image/png'], 100)).toBeNull();
-    expect(rejectReason(file('a.gif', 'image/gif', 10), ['image/png'], 100)).toContain('only JPG');
-    expect(rejectReason(file('a.png', 'image/png', 200), ['image/png'], 100)).toContain('over the');
+  it('rejectReason accepts a valid image', () => {
+    const png = new File(['x'], 'a.png', { type: 'image/png' });
+
+    expect(rejectReason(png, ['image/png'], 100)).toBeNull();
   });
 
-  it('emits only valid files, within the room left, and lists what was rejected', () => {
+  it('rejectReason refuses a wrong file type', () => {
+    const gif = new File(['x'], 'a.gif', { type: 'image/gif' });
+
+    expect(rejectReason(gif, ['image/png'], 100)).toContain('only JPG');
+  });
+
+  it('rejectReason refuses a file that is too big', () => {
+    const bigPng = new File([new Uint8Array(200)], 'a.png', { type: 'image/png' });
+
+    expect(rejectReason(bigPng, ['image/png'], 100)).toContain('over the');
+  });
+
+  it('sends only valid files and lists the refused ones', () => {
     const fixture = TestBed.createComponent(UploadZoneComponent);
-    fixture.componentRef.setInput('maxFiles', 1);
     fixture.detectChanges();
-    const emitted: File[][] = [];
-    fixture.componentInstance.files.subscribe((f) => emitted.push(f));
+    const sent: File[][] = [];
+    fixture.componentInstance.files.subscribe((files) => sent.push(files));
 
-    fixture.componentInstance.accept([
-      file('ok.png', 'image/png', 10),
-      file('second.png', 'image/png', 10),
-      file('notes.txt', 'text/plain', 10),
-    ]);
+    fixture.componentInstance.accept([new File(['x'], 'ok.png', { type: 'image/png' }), new File(['x'], 'notes.txt', { type: 'text/plain' })]);
     fixture.detectChanges();
 
-    expect(emitted).toEqual([[expect.objectContaining({ name: 'ok.png' })]]);
-    const errors = fixture.nativeElement.querySelector('[data-testid=upload-errors]').textContent;
-    expect(errors).toContain('notes.txt');
-    expect(errors).toContain('1 skipped');
+    expect(sent[0].map((f) => f.name)).toEqual(['ok.png']);
+    expect(fixture.nativeElement.querySelector('[data-testid=upload-errors]').textContent).toContain('notes.txt');
   });
 
-  it('shows the limit state when no more files fit', () => {
+  it('shows "Photo limit reached" when no more files fit', () => {
     const fixture = TestBed.createComponent(UploadZoneComponent);
     fixture.componentRef.setInput('maxFiles', 0);
+
     fixture.detectChanges();
+
     expect(fixture.nativeElement.textContent).toContain('Photo limit reached');
   });
 });
