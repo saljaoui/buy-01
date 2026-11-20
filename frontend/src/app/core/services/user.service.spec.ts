@@ -31,6 +31,7 @@ describe('UserService', () => {
 
   it('updateCurrentUser sends a PUT with the new name and avatar', () => {
     let result: User | undefined;
+    const body = { name: 'New Name', avatar: '/media/avatar.png' };
 
     service.updateCurrentUser(body).subscribe((u) => (result = u));
     const req = httpMock.expectOne((r) => r.url.endsWith('/users/me'));

@@ -45,6 +45,8 @@ describe('authInterceptor', () => {
   });
 
   it('does not send the token to other websites', () => {
+    http.get('https://example.com/data').subscribe();
+    const req = httpMock.expectOne('https://example.com/data');
     req.flush({});
 
     expect(req.request.headers.has('Authorization')).toBe(false);
