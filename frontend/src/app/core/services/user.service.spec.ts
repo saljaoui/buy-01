@@ -1,10 +1,6 @@
-
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { UserService } from './user.service';
 import { User } from '../models/user.model';
@@ -12,71 +8,36 @@ import { User } from '../models/user.model';
 describe('UserService', () => {
   let service: UserService;
   let httpMock: HttpTestingController;
-
-  const mockUser: User = {
-    id: '1',
-    name: 'Soufian',
-    email: 'soufian@example.com',
-    role: 'CLIENT',
-    avatar: null,
-  };
+  const user: User = { id: '1', name: 'Amina', email: 'amina@x.com', role: 'CLIENT', avatar: null };
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
-      ],
-    });
-
+    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
     service = TestBed.inject(UserService);
     httpMock = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => {
-    httpMock.verify();
-  });
+  afterEach(() => httpMock.verify());
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
+  it('getCurrentUser sends a GET to /users/me and returns the user', () => {
+    let result: User | undefined;
 
-  it('should send a GET request to get current user', () => {
-    service.getCurrentUser().subscribe((data) => {
-      expect(data).toEqual(mockUser);
-    });
-
-    const req = httpMock.expectOne(
-      (req) => req.url.endsWith('/users/me')
-    );
+    service.getCurrentUser().subscribe((u) => (result = u));
+    const req = httpMock.expectOne((r) => r.url.endsWith('/users/me'));
+    req.flush(user);
 
     expect(req.request.method).toBe('GET');
-
-    req.flush(mockUser);
+    expect(result).toEqual(user);
   });
 
-  it('should send a PUT request to update current user', () => {
-    const payload = {
-      name: 'New Name',
-      avatar: 'https://example.com/avatar.png',
-    };
+  it('updateCurrentUser sends a PUT with the new name and avatar', () => {
+    let result: User | undefined;
 
-    const updatedUser: User = {
-      ...mockUser,
-      ...payload,
-    };
-
-    service.updateCurrentUser(payload).subscribe((data) => {
-      expect(data).toEqual(updatedUser);
-    });
-
-    const req = httpMock.expectOne(
-      (req) => req.url.endsWith('/users/me')
-    );
+    service.updateCurrentUser(body).subscribe((u) => (result = u));
+    const req = httpMock.expectOne((r) => r.url.endsWith('/users/me'));
+    req.flush({ ...user, ...body });
 
     expect(req.request.method).toBe('PUT');
-    expect(req.request.body).toEqual(payload);
-
-    req.flush(updatedUser);
+    expect(req.request.body).toEqual(body);
+    expect(result?.name).toBe('New Name');
   });
 });

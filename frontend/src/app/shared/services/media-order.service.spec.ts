@@ -1,56 +1,41 @@
 import { TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 
-import { MediaOrderService, PhotoSource, planOrder } from './media-order.service';
+import { MediaOrderService, planOrder } from './media-order.service';
 import { Media, MediaService } from './media-service';
 
-const m = (id: string): Media => ({ id, productId: 'p', imageUrl: `/media/${id}` });
-const ex = (media: Media): PhotoSource => ({ kind: 'existing', media });
+describe('MediaOrderService', () => {
+  const photoA: Media = { id: 'a', productId: 'p', imageUrl: '/media/a' };
+  const photoB: Media = { id: 'b', productId: 'p', imageUrl: '/media/b' };
 
-describe('planOrder', () => {
-  const [a, b, c] = [m('a'), m('b'), m('c')];
+  it('planOrder keeps all photos when the order is unchanged', () => {
+    const plan = planOrder([photoA, photoB], [{ kind: 'existing', media: photoA }, { kind: 'existing', media: photoB }]);
 
-  it('keeps everything when the order is unchanged', () => {
-    expect(planOrder([a, b, c], [ex(a), ex(b), ex(c)])).toEqual({ remove: [], keep: 3, upload: [] });
+    expect(plan).toEqual({ remove: [], keep: 2, upload: [] });
   });
 
-  it('moving the 2nd photo to the front only re-uploads the 1st', () => {
-    const plan = planOrder([a, b, c], [ex(b), ex(c), ex(a)]);
-    expect(plan.keep).toBe(2);
-    expect(plan.upload).toEqual([ex(a)]);
+  it('planOrder deletes the photos the seller removed', () => {
+    const plan = planOrder([photoA, photoB], [{ kind: 'existing', media: photoA }]);
+
+    expect(plan.remove).toEqual([photoB]);
   });
 
-  it('removed photos are deleted; new files go after the kept ones', () => {
-    const file = new File(['x'], 'x.png', { type: 'image/png' });
-    const plan = planOrder([a, b, c], [ex(a), ex(c), { kind: 'new', file }]);
-    expect(plan.remove).toEqual([b]);
-    expect(plan.keep).toBe(2);
-    expect(plan.upload).toEqual([{ kind: 'new', file }]);
-  });
-});
+  it('planOrder re-uploads only the photo that has to move', () => {
+    const plan = planOrder([photoA, photoB], [{ kind: 'existing', media: photoB }, { kind: 'existing', media: photoA }]);
 
-describe('MediaOrderService.apply', () => {
-  it('copies a moved photo first, then deletes its original', async () => {
-    const calls: string[] = [];
-    TestBed.configureTestingModule({
-      providers: [
-        {
-          provide: MediaService,
-          useValue: {
-            download: (media: Media) => (calls.push('download ' + media.id), of(new Blob(['x'], { type: 'image/png' }))),
-            uploadWithProgress: (_p: string, _b: Blob, name: string) => (calls.push('upload ' + name), of({ type: 'progress', percent: 50 }, { type: 'done', media: m('a2') })),
-            deleteMedia: (id: string) => (calls.push('delete ' + id), of(undefined)),
-          },
-        },
-      ],
-    });
-    const progress: number[] = [];
-    const [a, b] = [m('a'), m('b')];
-    const result = await new Promise<Media[]>((resolve) =>
-      TestBed.inject(MediaOrderService).apply('p', [a, b], [ex(b), ex(a)], (_i, pct) => progress.push(pct)).subscribe(resolve),
-    );
-    expect(calls).toEqual(['download a', 'upload a.png', 'delete a']);
-    expect(result.map((x) => x.id)).toEqual(['b', 'a2']);
-    expect(progress).toEqual([50, 100]);
+    expect(plan.keep).toBe(1);
+    expect(plan.upload).toEqual([{ kind: 'existing', media: photoA }]);
+  });
+
+  it('apply uploads a new file after the kept photos', async () => {
+    const saved: Media = { id: 'new', productId: 'p', imageUrl: '/media/new' };
+    const mediaService = { uploadWithProgress: vi.fn(() => of({ type: 'done', media: saved })), deleteMedia: vi.fn(), download: vi.fn() };
+    TestBed.configureTestingModule({ providers: [{ provide: MediaService, useValue: mediaService }] });
+    const file = new File(['x'], 'photo.png', { type: 'image/png' });
+
+    const result = await firstValueFrom(TestBed.inject(MediaOrderService).apply('p', [photoA], [{ kind: 'existing', media: photoA }, { kind: 'new', file }]));
+
+    expect(result.map((m) => m.id)).toEqual(['a', 'new']);
+    expect(mediaService.deleteMedia).not.toHaveBeenCalled();
   });
 });

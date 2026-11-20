@@ -71,7 +71,8 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
-            "runnerConfig": true
+            "runnerConfig": true,
+            "coverageReporters": ["text", "lcov"]
           }
         }
       }
