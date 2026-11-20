@@ -21,14 +21,12 @@ import { round } from './cart.service';
 const ORDERS_KEY = 'buy01.orders';
 const LATENCY_MS = 250;
 
-/** What a seller sees: the order, but only the lines that are theirs. */
 export interface SellerOrderView {
   order: Order;
   items: OrderItem[];
   sellerTotal: number;
 }
 
-/** Item details the checkout knows (name, price, image) for each cart line. */
 export type CheckoutLine = OrderItem;
 
 /**
@@ -56,8 +54,6 @@ export type CheckoutLine = OrderItem;
 @Injectable({ providedIn: 'root' })
 export class OrderService {
   private readonly auth = inject(AuthService);
-
-  // ---------- Buyer ----------
 
   placeOrder(request: PlaceOrderRequest, lines: CheckoutLine[]): Observable<Order> {
     return this.run(() => {
@@ -170,7 +166,6 @@ export class OrderService {
     });
   }
 
-  /** Moves an order one step forward (Placed → Confirmed → On the way → Delivered). */
   advanceStatus(orderId: string, sellerProductIds: string[]): Observable<Order> {
     return this.run(() => {
       this.requireUser('SELLER');
@@ -199,8 +194,6 @@ export class OrderService {
       };
     });
   }
-
-  // ---------- Internals ----------
 
   private filter(orders: Order[], query: OrderQuery): Order[] {
     const q = query.q?.trim().toLowerCase() ?? '';
@@ -245,7 +238,6 @@ export class OrderService {
     localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
   }
 
-  /** Runs the work asynchronously, like a network call, and turns thrown errors into Observable errors. */
   private run<T>(work: () => T): Observable<T> {
     return defer(() => {
       try {
@@ -285,7 +277,6 @@ function cryptoId(): string {
 function makeReference(): string {
   const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const bytes = crypto.getRandomValues(new Uint8Array(5));
-  // 256 is a multiple of the 32-letter alphabet, so the modulo has no bias.
   const code = Array.from(bytes, (b) => alphabet[b % alphabet.length]).join('');
   return `B01-${code}`;
 }
