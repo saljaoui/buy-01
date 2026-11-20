@@ -85,6 +85,9 @@ describe('CheckoutComponent', () => {
     orderService.placeOrder.mockReturnValue(of({ id: 'o1', reference: 'B01-ABCDE' }));
     fixture.componentInstance.form.patchValue(validAddress);
 
+    clickMainButton();
+    clickMainButton();
+    clickMainButton();
 
     expect(orderService.placeOrder).toHaveBeenCalledWith(
       { items: [{ productId: 'p1', quantity: 2 }], address: { ...validAddress, notes: undefined }, paymentMethod: 'PAY_ON_DELIVERY' },

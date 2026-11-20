@@ -15,7 +15,11 @@ describe('MediaManagerComponent', () => {
   const photo1 = { id: '1', productId: 'a', imageUrl: '/media/1' };
   const photo2 = { id: '2', productId: 'a', imageUrl: '/media/2' };
   const productService = { getProductsOwnedBy: vi.fn() };
-  const mediaService = { getMediaByProduct: vi.fn(), deleteMedia: vi.fn() };
+  const mediaService = {
+    getMediaByProduct: vi.fn(),
+    deleteMedia: vi.fn(),
+    imageUrl: vi.fn((media: { imageUrl: string }) => `http://test${media.imageUrl}`),
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
