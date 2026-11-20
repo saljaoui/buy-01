@@ -14,7 +14,7 @@ spring:
               uri: lb://user-service
               predicates:
                 - Path=/api/auth/**,/api/users/**
-            
+
             - id: product-service
               uri: lb://product-service
               predicates:
@@ -24,10 +24,11 @@ spring:
               uri: lb://media-service
               predicates:
                 - Path=/api/media/**
+
             - id: order-service
               uri: lb://order-service
               predicates:
-                - Path=/api/order/**,/api/cart/**
+                - Path=/api/order/**,/api/orders/**,/api/cart/**
 
 jwt:
   secret: ${JWT_SECRET}
