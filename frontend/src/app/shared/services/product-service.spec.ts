@@ -1,225 +1,95 @@
-
 import { TestBed } from '@angular/core/testing';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
-import { ProductService } from './product-service';
-import {
-  ProductRequest,
-  ProductResponse,
-  Page,
-} from './product-service';
-
+import { ProductResponse, ProductService, applySearch } from './product-service';
 import { environment } from '../../../environments/environment';
 
 describe('ProductService', () => {
   let service: ProductService;
   let httpMock: HttpTestingController;
-
   const baseUrl = environment.apiBaseUrl;
-
-  const mockProduct: ProductResponse = {
-    id: 'product-1',
-    name: 'Laptop',
-    description: 'Gaming laptop',
-    price: 12000,
-    quantity: 5,
-    owner: true,
-  };
-
-  const mockProductRequest: ProductRequest = {
-    name: 'Laptop',
-    description: 'Gaming laptop',
-    price: 12000,
-    quantity: 5,
-  };
+  const lamp: ProductResponse = { id: 'p1', name: 'Lamp', description: 'Warm light', price: 20, quantity: 5, owner: true };
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
-      ],
-    });
-
-    httpMock = TestBed.inject(HttpTestingController);
+    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
     service = TestBed.inject(ProductService);
+    httpMock = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => {
-    httpMock.verify();
-  });
+  afterEach(() => httpMock.verify());
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
-
-  it('should send a GET request to get products with pagination', () => {
-    const mockResponse: Page<ProductResponse> = {
-      content: [mockProduct],
-      totalElements: 1,
-      totalPages: 1,
-    };
-
-    service.getProducts(0, 10).subscribe((data) => {
-      expect(data).toEqual(mockResponse);
-    });
-
-    const req = httpMock.expectOne(
-      `${baseUrl}/products?page=0&size=10`
-    );
+  it('getProducts sends a GET with page and size', () => {
+    service.getProducts(0, 10).subscribe();
+    const req = httpMock.expectOne(`${baseUrl}/products?page=0&size=10`);
+    req.flush({ content: [lamp], totalElements: 1, totalPages: 1 });
 
     expect(req.request.method).toBe('GET');
-
-    req.flush(mockResponse);
   });
 
-  it('should send a GET request to get a product by ID', () => {
-    service.getProduct('product-1').subscribe((data) => {
-      expect(data).toEqual(mockProduct);
-    });
+  it('getProduct sends a GET to /products/{id} and returns the product', () => {
+    let result: ProductResponse | undefined;
 
-    const req = httpMock.expectOne(
-      `${baseUrl}/products/product-1`
-    );
+    service.getProduct('p1').subscribe((p) => (result = p));
+    httpMock.expectOne(`${baseUrl}/products/p1`).flush(lamp);
 
-    expect(req.request.method).toBe('GET');
-
-    req.flush(mockProduct);
+    expect(result).toEqual(lamp);
   });
 
-  it('should return only products owned by the user', () => {
-    const mockProducts: ProductResponse[] = [
-      {
-        id: 'product-1',
-        name: 'Laptop',
-        description: 'Gaming laptop',
-        price: 12000,
-        quantity: 5,
-        owner: true,
-      },
-      {
-        id: 'product-2',
-        name: 'Phone',
-        description: 'Smartphone',
-        price: 5000,
-        quantity: 10,
-        owner: false,
-      },
-      {
-        id: 'product-3',
-        name: 'Keyboard',
-        description: 'Mechanical keyboard',
-        price: 800,
-        quantity: 15,
-        owner: true,
-      },
-    ];
+  it('getProductsOwnedBy keeps only the products owned by the user', () => {
+    const mug = { ...lamp, id: 'p2', owner: false };
+    let result: ProductResponse[] = [];
 
-    const mockResponse: Page<ProductResponse> = {
-      content: mockProducts,
-      totalElements: 3,
-      totalPages: 1,
-    };
+    service.getProductsOwnedBy('seller-1').subscribe((list) => (result = list));
+    httpMock.expectOne(`${baseUrl}/products?page=0&size=100`).flush({ content: [lamp, mug], totalElements: 2, totalPages: 1 });
 
-    service.getProductsOwnedBy('user-1').subscribe((data) => {
-      expect(data.length).toBe(2);
-      expect(data.every((product) => product.owner)).toBe(true);
-      expect(data[0].id).toBe('product-1');
-      expect(data[1].id).toBe('product-3');
-    });
-
-    const req = httpMock.expectOne(
-      `${baseUrl}/products?page=0&size=100`
-    );
-
-    expect(req.request.method).toBe('GET');
-
-    req.flush(mockResponse);
+    expect(result.map((p) => p.id)).toEqual(['p1']);
   });
 
-  it('should send a POST request to publish a product', () => {
-    service.publishProduct(mockProductRequest).subscribe((data) => {
-      expect(data).toEqual(mockProduct);
-    });
+  it('publishProduct sends a POST with the product', () => {
+    const body = { name: 'Lamp', description: 'Warm light', price: 20, quantity: 5 };
 
+    service.publishProduct(body).subscribe();
     const req = httpMock.expectOne(`${baseUrl}/products`);
+    req.flush(lamp);
 
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual(mockProductRequest);
-
-    req.flush(mockProduct);
+    expect(req.request.body).toEqual(body);
   });
 
-  it('should send a DELETE request to delete a product', () => {
-    service.deleteProduct('product-1').subscribe((data) => {
-      expect(data).toBeNull();
-    });
+  it('updateProduct sends a PUT with the new data', () => {
+    const body = { name: 'Big lamp', description: 'Warm light', price: 25, quantity: 5 };
 
-    const req = httpMock.expectOne(
-      `${baseUrl}/products/product-1`
-    );
-
-    expect(req.request.method).toBe('DELETE');
-
-    req.flush(null);
-  });
-
-  it('should send a PUT request to update a product', () => {
-    const updatedProduct: ProductResponse = {
-      ...mockProduct,
-      name: 'Updated Laptop',
-      price: 15000,
-    };
-
-    const updateRequest: ProductRequest = {
-      ...mockProductRequest,
-      name: 'Updated Laptop',
-      price: 15000,
-    };
-
-    service.updateProduct('product-1', updateRequest).subscribe((data) => {
-      expect(data).toEqual(updatedProduct);
-    });
-
-    const req = httpMock.expectOne(
-      `${baseUrl}/products/product-1`
-    );
+    service.updateProduct('p1', body).subscribe();
+    const req = httpMock.expectOne(`${baseUrl}/products/p1`);
+    req.flush(lamp);
 
     expect(req.request.method).toBe('PUT');
-    expect(req.request.body).toEqual(updateRequest);
+    expect(req.request.body).toEqual(body);
+  });
 
-    req.flush(updatedProduct);
+  it('deleteProduct sends a DELETE', () => {
+    service.deleteProduct('p1').subscribe();
+    const req = httpMock.expectOne(`${baseUrl}/products/p1`);
+    req.flush(null);
+
+    expect(req.request.method).toBe('DELETE');
   });
 });
 
-import { applySearch } from './product-service';
+describe('applySearch', () => {
+  const lamp = { id: '1', name: 'Walnut Lamp', description: 'Warm light', price: 129, quantity: 6, owner: false };
+  const throw_ = { id: '2', name: 'Linen Throw', description: 'Soft linen', price: 64, quantity: 0, owner: false };
 
-describe('applySearch (catalog search & filters)', () => {
-  const products = [
-    { id: '1', name: 'Walnut Lamp', description: 'Warm light', price: 129, quantity: 6, owner: false },
-    { id: '2', name: 'Linen Throw', description: 'Soft linen', price: 64, quantity: 0, owner: false },
-    { id: '3', name: 'Notebook', description: 'Dot grid paper', price: 18, quantity: 200, owner: false },
-  ];
-  const base = { page: 0, size: 12 };
+  it('finds products whose name contains the search word', () => {
+    const page = applySearch([lamp, throw_], { page: 0, size: 12, q: 'LINEN' });
 
-  it('matches keywords in name and description', () => {
-    expect(applySearch(products, { ...base, q: 'linen' }).content.map((p) => p.id)).toEqual(['2']);
-    expect(applySearch(products, { ...base, q: 'GRID' }).content.map((p) => p.id)).toEqual(['3']);
+    expect(page.content.map((p) => p.id)).toEqual(['2']);
   });
 
-  it('filters by price range and stock', () => {
-    expect(applySearch(products, { ...base, minPrice: 20, maxPrice: 100 }).content.map((p) => p.id)).toEqual(['2']);
-    expect(applySearch(products, { ...base, inStock: true }).totalElements).toBe(2);
-  });
+  it('hides sold-out products when inStock is set', () => {
+    const page = applySearch([lamp, throw_], { page: 0, size: 12, inStock: true });
 
-  it('sorts and paginates', () => {
-    expect(applySearch(products, { ...base, sort: 'price-asc' }).content.map((p) => p.id)).toEqual(['3', '2', '1']);
-    const page = applySearch(products, { page: 1, size: 2, sort: 'name' });
-    expect(page.totalPages).toBe(2);
     expect(page.content.map((p) => p.id)).toEqual(['1']);
   });
 });

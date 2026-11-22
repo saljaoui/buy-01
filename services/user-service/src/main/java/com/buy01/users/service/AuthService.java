@@ -38,7 +38,7 @@ public class AuthService {
                 .build();
 
         User saved = userRepository.save(user);
-        String token = jwtUtil.generateToken(user.getId(), user.getRole());
+        String token = jwtUtil.generateToken(saved.getId(), user.getRole());
 
         return AuthResponse.builder()
                 .token(token)
@@ -65,7 +65,6 @@ public class AuthService {
                 .build();
     }
 
-    /** Emails are compared and stored trimmed and lower-cased: "Bob@X.com " == "bob@x.com". */
     private static String normalizeEmail(String email) {
         return email == null ? null : email.trim().toLowerCase(Locale.ROOT);
     }

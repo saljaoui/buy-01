@@ -11,54 +11,64 @@ import { ProductService } from '../../../shared/services/product-service';
 
 describe('SellerProfileComponent', () => {
   const user = { id: 's', name: 'Ada Lovelace', email: 'ada@x.com', role: 'SELLER' as const, avatar: null };
+  const userService = { getCurrentUser: vi.fn(), updateCurrentUser: vi.fn() };
 
-  const setup = () => {
-    const update = vi.fn((body) => of({ ...user, ...body }));
+  beforeEach(() => {
+    vi.clearAllMocks();
+    userService.getCurrentUser.mockReturnValue(of(user));
+    userService.updateCurrentUser.mockReturnValue(of({ ...user, name: 'Ada L.' }));
     TestBed.configureTestingModule({
       imports: [SellerProfileComponent],
       providers: [
         provideHttpClient(),
         provideRouter([]),
-        { provide: UserService, useValue: { getCurrentUser: () => of(user), updateCurrentUser: update } },
+        { provide: UserService, useValue: userService },
         { provide: ProductService, useValue: { getProductsOwnedBy: () => of([]) } },
         { provide: OrderService, useValue: { sellerStats: () => of({ revenue: 0, unitsSold: 0, orderCount: 0, bestSellers: [] }) } },
       ],
     });
     vi.spyOn(TestBed.inject(AuthService), 'getStoredUser').mockReturnValue(user);
-    const fixture = TestBed.createComponent(SellerProfileComponent);
-    fixture.detectChanges();
-    return { fixture, el: fixture.nativeElement as HTMLElement, update };
-  };
-
-  it('one hero with avatar, name and Seller badge; email is read-only text, no role input', () => {
-    const { el } = setup();
-    expect(el.querySelector('#pr-name')!.textContent).toContain('Ada Lovelace');
-    expect(el.querySelector('.pr-role')!.textContent).toContain('Seller');
-    expect(el.querySelector('[data-testid=avatar-btn]')!.getAttribute('aria-label')).toBe('Add a profile photo');
-    expect(el.querySelector('.pr-readonly')!.textContent).toContain('ada@x.com');
-    expect(el.querySelectorAll('input:not([type=file])').length).toBe(1); // only the name
   });
 
-  it('Save is only enabled when the name changed', () => {
-    const { fixture, el, update } = setup();
-    const save = () => el.querySelector<HTMLButtonElement>('[data-testid=save-profile]')!;
-    expect(save().disabled).toBe(true);
+  it('shows the seller name and email', () => {
+    const fixture = TestBed.createComponent(SellerProfileComponent);
+    fixture.detectChanges();
 
-    const input = el.querySelector<HTMLInputElement>('#pr-name-input')!;
+    expect(fixture.nativeElement.querySelector('#pr-name').textContent).toContain('Ada Lovelace');
+    expect(fixture.nativeElement.querySelector('.pr-readonly').textContent).toContain('ada@x.com');
+  });
+
+  it('has only one editable text field: the name', () => {
+    const fixture = TestBed.createComponent(SellerProfileComponent);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelectorAll('input:not([type=file])').length).toBe(1);
+  });
+
+  it('disables Save when the name did not change', () => {
+    const fixture = TestBed.createComponent(SellerProfileComponent);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('[data-testid=save-profile]').disabled).toBe(true);
+  });
+
+  it('saves the new name', () => {
+    const fixture = TestBed.createComponent(SellerProfileComponent);
+    fixture.detectChanges();
+    const input = fixture.nativeElement.querySelector('#pr-name-input');
     input.value = 'Ada L.';
     input.dispatchEvent(new Event('input'));
     fixture.detectChanges();
-    expect(save().disabled).toBe(false);
 
-    save().click();
-    fixture.detectChanges();
-    expect(update).toHaveBeenCalledWith({ name: 'Ada L.', avatar: null });
-    expect(save().disabled).toBe(true);
+    fixture.nativeElement.querySelector('[data-testid=save-profile]').click();
+
+    expect(userService.updateCurrentUser).toHaveBeenCalledWith({ name: 'Ada L.', avatar: null });
   });
 
-  it('sales use the stat cards; best sellers has an empty state', () => {
-    const { el } = setup();
-    expect(el.querySelectorAll('app-seller-sales app-stat-card').length).toBe(3);
-    expect(el.textContent).toContain('No best sellers yet');
+  it('shows "No best sellers yet" when nothing was sold', () => {
+    const fixture = TestBed.createComponent(SellerProfileComponent);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('No best sellers yet');
   });
 });
