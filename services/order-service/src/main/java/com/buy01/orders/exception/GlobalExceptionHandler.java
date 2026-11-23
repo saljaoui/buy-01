@@ -1,5 +1,6 @@
 package com.buy01.orders.exception;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -8,6 +9,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.buy01.orders.model.dto.ErrorResponse;
+import com.buy01.orders.model.dto.PriceChange;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 @ControllerAdvice
@@ -33,6 +36,11 @@ public class GlobalExceptionHandler {
             .map(e -> e.getField() + ": " + e.getDefaultMessage())
             .collect(Collectors.joining(", "));
         return buildResponse(HttpStatus.BAD_REQUEST, "Validation_Error", message, request);
+    }
+
+    @ExceptionHandler(PriceChangedException.class)
+    public ResponseEntity<List<PriceChange>> handlePriceChanged(PriceChangedException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getChanges());
     }
 
     private ResponseEntity<ErrorResponse> buildResponse(HttpStatus status, String errorCode, String message, HttpServletRequest request) {

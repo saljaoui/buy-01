@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import com.buy01.orders.model.dto.ProductResponse;
+import com.buy01.events.product.ReserveItem;
 
 @FeignClient(name = "product-service" , dismiss404 = true)
 public interface ProductClient {
@@ -17,4 +18,7 @@ public interface ProductClient {
 
     @PostMapping ("/api/products/collections")
     List<ProductResponse> getAllProducts(@RequestBody List<String> productIds);
+
+    @PostMapping("/api/products/reserve")
+    void reserve(@RequestBody List<ReserveItem> items);
 }

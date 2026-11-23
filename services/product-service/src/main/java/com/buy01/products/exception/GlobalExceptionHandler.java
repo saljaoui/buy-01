@@ -13,6 +13,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import com.buy01.events.exception.OutOfStockException;
+import com.buy01.events.product.ReserveItemResponse;
+import java.util.List;
 
 import com.buy01.products.dto.ErrorResponse;
 
@@ -37,6 +40,11 @@ public class GlobalExceptionHandler {
 
         return buildResponse(HttpStatus.BAD_REQUEST, "VALIDATION_FAILED",
                 "Invalid request data", request);
+    }
+
+    @ExceptionHandler(OutOfStockException.class)
+    public ResponseEntity<List<ReserveItemResponse>> handleOutOfStock(OutOfStockException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getItems());
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

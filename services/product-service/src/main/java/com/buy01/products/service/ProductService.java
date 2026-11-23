@@ -1,27 +1,34 @@
 package com.buy01.products.service;
-
+import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
 import com.buy01.products.dto.ProductRequest;
 import com.buy01.products.dto.ProductResponse;
 import com.buy01.products.event.ProductEventPublisher;
 import com.buy01.products.exception.ProductNotFoundException;
 import com.buy01.products.model.Product;
 import com.buy01.products.repository.ProductRepository;
-
+import com.mongodb.client.result.UpdateResult;
+import com.buy01.events.product.ReserveItem;
+import com.buy01.events.product.ReserveItemResponse;
 import lombok.RequiredArgsConstructor;
+import com.buy01.events.exception.OutOfStockException;
 
 @Service
 @RequiredArgsConstructor
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final MongoTemplate mongoTemplate;
     private final ProductEventPublisher eventPublisher;
 
     public Page<ProductResponse> findAll(String userId, Pageable pageable) {
@@ -117,5 +124,24 @@ public class ProductService {
                         .owner(false) // Assuming we don't have user context here
                         .build())
                 .toList();
+    }
+
+    @Transactional
+    public void reserve(List<ReserveItem> items) throws OutOfStockException {
+        List<ReserveItemResponse> responses = new ArrayList<>();
+        boolean success = true;
+        for (ReserveItem item : items) {
+            Query q = new Query(Criteria.where("id").is(item.productId())
+                    .and("quantity").gte(item.quantity()));
+            Update u = new Update().inc("quantity", -item.quantity());
+            UpdateResult result = mongoTemplate.updateFirst(q, u, Product.class);
+            if (result.getModifiedCount() != 1) {
+                responses.add(new ReserveItemResponse(item.productId(), item.quantity(), false, "Out of stock"));
+                success = false;  
+            }
+        }
+        if(!success) {
+            throw new OutOfStockException(responses); // rolls back everything
+        }
     }
 }

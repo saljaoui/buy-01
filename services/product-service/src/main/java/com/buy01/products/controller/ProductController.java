@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import com.buy01.events.product.ReserveItem;
 
 @RestController
 @RequestMapping("/api/products")
@@ -78,5 +79,11 @@ public class ProductController {
     public ResponseEntity<?> getProductsByIds(@RequestBody List<String> productIds) {
         List<ProductResponse> products = productService.findAllByIds(productIds);
         return ResponseEntity.ok(products);
+    }
+
+    @PostMapping("/reserve")
+    public ResponseEntity<?> reserveProducts(@RequestBody List<ReserveItem> items) {
+        this.productService.reserve(items);
+        return ResponseEntity.ok("products reserved");
     }
 }

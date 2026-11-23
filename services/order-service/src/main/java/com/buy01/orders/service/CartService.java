@@ -4,6 +4,11 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import org.bson.types.Decimal128;
+import org.springframework.data.mongodb.core.FindAndModifyOptions;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import com.buy01.orders.repository.CartRepository;
 
@@ -12,6 +17,8 @@ import lombok.AllArgsConstructor;
 import com.buy01.orders.client.ProductClient;
 import com.buy01.orders.model.dto.CartUpdateRequest;
 import com.buy01.orders.model.dto.ProductResponse;
+import com.buy01.orders.model.dto.UpdateCartResponse;
+
 import lombok.Data;
 
 import com.buy01.orders.exception.CartNotFoundException;
@@ -26,6 +33,7 @@ import com.buy01.orders.common.Product;
 public class CartService {
     private final CartRepository cartRepository;
     private final ProductClient productClient;
+    private final MongoTemplate mongoTemplate;
 
     public void addToCart(String username, String productId) {
         System.out.println("Adding product to cart: " + productId + " for user: " + username);
@@ -93,5 +101,23 @@ public class CartService {
         Cart cart = cartRepository.findByUsername(username).orElseThrow(() -> new CartNotFoundException("Cart not found"));
         cart.setStatus(CartStatus.AVAILABLE);
         cartRepository.save(cart);
+    }
+
+    public UpdateCartResponse makeCartCheckingOut(String username) {
+        Query q = new Query(Criteria.where("username").is(username)
+                .and("status").is(CartStatus.AVAILABLE));
+        Update u = new Update()
+                .set("status", CartStatus.CHECKING_OUT);
+        Cart cart = mongoTemplate.findAndModify(q, u,
+                FindAndModifyOptions.options().returnNew(true), Cart.class);
+        if (cart != null) {
+            if (cart.getItems().isEmpty()) {
+                return new UpdateCartResponse(false,  "Cart is empty.", null);
+            }
+            return new UpdateCartResponse(true,"Cart status updated to CHECKING_OUT", cart);
+        } else {
+            return new UpdateCartResponse(false, "No available cart found for user: " + username, null);
+            
+        }
     }
 }

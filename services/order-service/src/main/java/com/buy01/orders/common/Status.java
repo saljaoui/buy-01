@@ -1,9 +1,10 @@
 package com.buy01.orders.common;
 
 public enum Status {
-    PENDING,
+    PENDDING,
     CONFIRMED,
     SHIPPED,
     DELIVERED,
+    EXPIRED,
     CANCELLED
 }

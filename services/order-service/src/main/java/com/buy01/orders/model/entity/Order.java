@@ -1,5 +1,6 @@
 package com.buy01.orders.model.entity;
 
+import java.util.Date;
 import java.util.List;
 import org.bson.types.Decimal128;
 import org.springframework.data.annotation.Id;
@@ -8,9 +9,11 @@ import com.buy01.orders.common.Product;
 import com.buy01.orders.common.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @Data
+@NoArgsConstructor
 @Document(collection = "orders")
 public class Order {
     @Id
@@ -19,4 +22,6 @@ public class Order {
     private List<Product> items;
     private Decimal128 totalAmount;
     private Status status;
+    private Date createdAt;
+    private String cancelationReason;
 }
